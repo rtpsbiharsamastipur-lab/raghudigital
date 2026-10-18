@@ -80,4 +80,167 @@
 
     /* Admin Box */
     #adminBox { background: #fff7ed; border: 1.5px solid #fed7aa; border-top: 4px solid #ea580c; border-radius: 8px; padding: 18px; margin-bottom: 25px; }
-    .admin-form { display: flex; gap: 8px; flex
+    .admin-form { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+    .admin-form input { padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px; }
+    .btn-green { background: #16a34a; color: white; border: none; padding: 8px 14px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+
+    /* Modules */
+    .module-box { display: none; background: white; border: 1px solid #cbd5e1; border-top: 4px solid #2563eb; border-radius: 8px; padding: 22px; margin-bottom: 20px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .field { margin-bottom: 12px; }
+    .field label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #334155; }
+    .field input, .field textarea { width: 100%; padding: 10px; border: 1.5px solid #cbd5e1; border-radius: 5px; font-size: 13px; outline: none; }
+    .btn-act { background: #2563eb; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
+
+    .note-box { background: #fef2f2; border: 1.5px dashed #ef4444; color: #b91c1c; padding: 12px; border-radius: 6px; font-size: 13px; margin: 15px 0; font-weight: bold; line-height: 1.4; }
+    .qr-box { display: flex; flex-direction: column; align-items: center; padding: 15px; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px; margin: 12px 0; }
+    
+    /* Receipt Box */
+    #receiptBox { display: none; background: white; border: 2px dashed #0f172a; padding: 20px; max-width: 500px; margin: 20px auto; border-radius: 6px; }
+    .rcpt-line { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; }
+  </style>
+</head>
+<body>
+
+  <!-- Top User Navigation Bar -->
+  <div class="user-bar" id="navBar">
+    <div class="wallet-badge" id="wBadge" onclick="openModule('recharge')">Wallet: ₹0.00 ➕ रिचार्ज</div>
+    <div>उपयोगकर्ता: <strong id="uBadge" style="color: #fbbf24;"></strong></div>
+    <button class="btn-exit" onclick="doLogout()">लॉगआउट</button>
+  </div>
+
+  <!-- 1. LOGIN SCREEN -->
+  <div id="authSection">
+    <div class="login-card">
+      <h2>RAGHU BABA ONLINE SERVICE</h2>
+      <p class="sub">B2B Digital Services Portal • Samastipur</p>
+
+      <div class="input-box">
+        <label>User ID / Mobile Number</label>
+        <input type="text" id="uid" placeholder="User ID darj karein (jaise admin)" autocomplete="off">
+      </div>
+
+      <div class="input-box">
+        <label>Password</label>
+        <input type="password" id="upw" placeholder="Password darj karein (jaise admin123)" autocomplete="off">
+      </div>
+
+      <button type="button" class="btn-submit-login" id="subBtn" onclick="loginDirect()">पोर्टल में प्रवेश करें</button>
+
+      <div style="margin-top: 20px; font-size: 12px; color: #94a3b8;">
+        WhatsApp हेल्पडेस्क: <strong style="color: #38bdf8;">8207827581</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. DASHBOARD VIEW -->
+  <div id="dashView">
+    <div class="dash-wrap">
+
+      <!-- Admin Panel -->
+      <div id="adminBox" style="display: none;">
+        <h3 style="color: #c2410c; font-size: 15px;">🛠️ मुख्य एडमिन कंसोल - नया दुकानदार (Retailer) बनाएं</h3>
+        <div class="admin-form">
+          <input type="text" id="aName" placeholder="दुकानदार का नाम">
+          <input type="text" id="aId" placeholder="User ID / Mobile">
+          <input type="text" id="aPw" placeholder="Password">
+          <input type="number" id="aBal" placeholder="Wallet ₹" style="width: 100px;">
+          <button class="btn-green" type="button" onclick="createRetailer()">दुकानदार जोड़ें</button>
+        </div>
+        <div id="adminRetailerList" style="background: white; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 12px;">दुकानदार सूची लोड हो रही है...</div>
+      </div>
+
+      <!-- Services Grid -->
+      <div class="dash-title">मुख्य डिजिटल सेवाएँ</div>
+      <div class="grid">
+        <div class="card c-qr" onclick="openModule('recharge')">
+          <h3 style="color: #16a34a;">💳 Wallet Recharge (QR Code)</h3>
+          <p>QR कोड स्कैन करें, न्यूनतम ₹1 पेमेंट करें और वॉलेट एक्टिव करें।</p>
+          <div class="link-text" style="color: #16a34a;">रिचार्ज करें ➔</div>
+        </div>
+
+        <div class="card c-pa" onclick="openModule('pa')">
+          <h3 style="color: #1e3a8a;">🆕 New PAN Card Apply</h3>
+          <p>नया पैन कार्ड आवेदन (फ़ोटो, सिग्नेचर व डॉक्यूमेंट अपलोड)।</p>
+          <div class="link-text" style="color: #1e3a8a;">आवेदन खोलें ➔</div>
+        </div>
+
+        <div class="card c-fast" onclick="openModule('voter_mobile')">
+          <h3 style="color: #d97706;">📲 Voter Mobile Link (Instant)</h3>
+          <p>वोटर कार्ड में नया मोबाइल नंबर तुरंत लिंक करवाएँ।</p>
+          <div class="link-text" style="color: #d97706;">लिंक करें ➔</div>
+        </div>
+
+        <div class="card c-fast" onclick="openModule('ration_aadhaar')">
+          <h3 style="color: #d97706;">🌾 Ration No se Aadhaar (Instant)</h3>
+          <p>राशन कार्ड नंबर से सदस्यों का आधार नंबर प्राप्त करें।</p>
+          <div class="link-text" style="color: #d97706;">खोजें ➔</div>
+        </div>
+
+        <div class="card c-fast" onclick="openModule('rc_pdf')">
+          <h3 style="color: #d97706;">🚗 RC No se RC PDF (Instant)</h3>
+          <p>गाड़ी संख्या से ओरिजिनल डिजिटल RC PDF मँगाएँ।</p>
+          <div class="link-text" style="color: #d97706;">डाउनलोड ➔</div>
+        </div>
+
+        <div class="card c-fast" onclick="openModule('dl_pdf')">
+          <h3 style="color: #d97706;">🪪 DL No se DL PDF (Instant)</h3>
+          <p>ड्राइविंग लाइसेंस नंबर व DOB से डिजिटल DL निकालें।</p>
+          <div class="link-text" style="color: #d97706;">डाउनलोड ➔</div>
+        </div>
+
+        <div class="card c-fast" onclick="openModule('aadhaar_pvc')">
+          <h3 style="color: #d97706;">🖨️ Photocopy se Original Aadhaar</h3>
+          <p>आधार फोटोकॉपी से ओरिजिनल PVC प्रिंट फाइल प्राप्त करें।</p>
+          <div class="link-text" style="color: #d97706;">ऑर्डर करें ➔</div>
+        </div>
+
+        <div class="card c-pf" onclick="openModule('pf')">
+          <h3 style="color: #0284c7;">🔍 PAN Find Service</h3>
+          <p>आधार नंबर से खोया हुआ पैन नंबर प्राप्त करें। (शुल्क: ₹30)</p>
+          <div class="link-text" style="color: #0284c7;">रिक्वेस्ट भेजें ➔</div>
+        </div>
+
+        <div class="card c-pd" onclick="openModule('pd')">
+          <h3 style="color: #059669;">📄 PAN Details Service</h3>
+          <p>पैन नंबर से पूरा विवरण निकालें। (शुल्क: ₹10)</p>
+          <div class="link-text" style="color: #059669;">विवरण खोजें ➔</div>
+        </div>
+      </div>
+
+      <!-- MODULE: WALLET RECHARGE -->
+      <div class="module-box" id="modRecharge">
+        <h3 style="color: #16a34a; margin-bottom: 12px;">💳 QR कोड से वॉलेट रिचार्ज करें</h3>
+        <p style="font-size: 13px; color: #475569; margin-bottom: 12px;">न्यूनतम रिचार्ज राशि ₹1 है। राशि डालते ही QR कोड दिखेगा।</p>
+        <div style="max-width: 400px;">
+          <div class="field">
+            <label>रिचार्ज राशि (₹) [न्यूनतम ₹1]</label>
+            <input type="number" id="rechAmount" placeholder="राशि दर्ज करें (जैसे 1, 50, 100)" oninput="genQR()">
+          </div>
+          <div class="qr-box" id="qrContainer" style="display: none;">
+            <p style="font-size: 13px; font-weight: bold; color: #1e3a8a;">PhonePe / GPay / Paytm से स्कैन करें</p>
+            <img id="qrImg" src="" style="width: 180px; height: 180px; margin: 10px 0; border: 2px solid #000; padding: 4px;">
+            <p id="qrText" style="font-size: 14px; font-weight: bold; color: #16a34a;"></p>
+            <p style="font-size: 11px; color: #64748b;">UPI ID: 8207827581-3@ybl</p>
+          </div>
+          <div class="field">
+            <label>12 अंकों का UTR / Ref No</label>
+            <input type="text" id="rechUtr" placeholder="पेमेंट के बाद प्राप्त 12 अंकों का UTR">
+          </div>
+          <button class="btn-act" style="background: #16a34a; width: 100%;" onclick="submitRecharge()">सबमिट करें</button>
+        </div>
+      </div>
+
+      <!-- MODULE: NEW PAN APPLY -->
+      <div class="module-box" id="modPa">
+        <h3 style="color: #1e3a8a; margin-bottom: 12px;">🆕 New PAN Card Application Form</h3>
+        <div class="form-grid">
+          <div class="field"><label>Applicant Full Name (आवेदक का नाम)</label><input type="text" id="pName" placeholder="आधार कार्ड के अनुसार नाम"></div>
+          <div class="field"><label>Father's Name (पिता का नाम)</label><input type="text" id="pFather" placeholder="पिता का पूरा नाम"></div>
+          <div class="field"><label>Aadhaar Registered Mobile No</label><input type="number" id="pMob" placeholder="आधार लिंक मोबाइल नंबर"></div>
+          <div class="field"><label>Aadhaar Number</label><input type="number" id="pAadhaar" placeholder="12 अंकों का आधार नंबर"></div>
+        </div>
+        <div class="field"><label>Full Address (पूरा पता - गाँव, पोस्ट, थाना, जिला, पिनकोड)</label><textarea id="pAddr" rows="2" placeholder="पूरा पता दर्ज करें"></textarea></div>
+        
+        <div class="form-grid">
+          <div class="field"><label>Aadhaar PDF Upload</label><input type="file" id="pAad
