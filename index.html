@@ -199,7 +199,7 @@
     <!-- 3. DASHBOARD VIEW -->
     <div id="dashboardView">
 
-      <!-- ADMIN EXCLUSIVE: RETAILER MANAGEMENT & BALANCE TRANSFER MODULE -->
+      <!-- ADMIN EXCLUSIVE: RETAILER MANAGEMENT -->
       <div class="module-card" id="adminRetailerBox" style="border-top-color: #d97706; display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
           <div>
@@ -310,7 +310,6 @@
     var activeUser = null;
     var currentService = null;
 
-    // 11 SERVICES LIST
     var SERVICES_CONFIG = [
       {
         id: "voter_link",
@@ -333,38 +332,4 @@
           { name: "mobile_no", label: "Mobile No", type: "number", required: true },
           { name: "aadhaar_no", label: "Aadhaar No", type: "text", required: true },
           { name: "address", label: "Full Address", type: "textarea", required: true },
-          { name: "aadhaar_doc", label: "Aadhaar Upload (PDF/Image)", type: "file", required: true },
-          { name: "photo_doc", label: "Photo Upload", type: "file", required: true },
-          { name: "sig_doc", label: "Signature Upload", type: "file", required: true },
-          { name: "other_doc", label: "Other Document Upload", type: "file", required: false }
-        ]
-      },
-      {
-        id: "pan_find",
-        name: "Pan find",
-        charge: 30,
-        fields: [
-          { name: "aadhaar_no", label: "Customer Aadhaar No", type: "text", required: true }
-        ]
-      },
-      {
-        id: "vehicle_rc",
-        name: "Vehicle RC PDF",
-        charge: 50,
-        fields: [
-          { name: "vehicle_no", label: "Vehicle Number (RC)", type: "text", required: true }
-        ]
-      },
-      {
-        id: "dl_pdf",
-        name: "DL pdf",
-        charge: 20,
-        fields: [
-          { name: "dl_no", label: "Driving Licence Number", type: "text", required: true },
-          { name: "dob", label: "Date of Birth (DOB)", type: "date", required: true }
-        ]
-      },
-      {
-        id: "ll_new",
-        name: "LL New Apply",
-        charge: 2000
+          { name: "aadhaar_doc", label: "Aadhaar Upload (PDF/Image)", type: "file",
