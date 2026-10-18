@@ -734,6 +734,10 @@
     }
 
     function closeAllModules() {
+      var ordersTable = document.querySelector('#adminOrdersBox .admin-table-wrap');
+      if (ordersTable) ordersTable.style.display = 'block';
+      var actionBox = document.getElementById('orderClearanceActionBox');
+      if (actionBox) actionBox.style.display = 'none';
       document.body.classList.remove('orders-only');
       var ids = ['adminOrdersBox', 'adminRechargeBox', 'adminLedgerBox', 'retailerOrdersBox', 'adminRetailerBox', 'formOrderBox', 'formRechargeBox'];
       ids.forEach(function(id) {
@@ -1023,6 +1027,8 @@
         .then(function(orderObj) {
           if (!orderObj) return;
           activeOrderContext = orderObj;
+          var ordersTable = document.querySelector('#adminOrdersBox .admin-table-wrap');
+          if (ordersTable) ordersTable.style.display = 'none';
           var box = document.getElementById('orderClearanceActionBox');
           document.getElementById('clearanceOrderIdText').innerText = orderId + " (" + orderObj.serviceName + ")";
           document.getElementById('clearanceOrderChargeInfo').innerText = "Retailer: " + orderObj.retailerName + " (" + orderObj.retailerPhone + ") | Charge: ₹" + orderObj.charge;
