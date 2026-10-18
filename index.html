@@ -1050,7 +1050,7 @@
         alert('Naam, mobile, email aur password sabhi bharna zaroori hai!');
         return;
       }
-      if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         alert('Sahi email address dalein!');
         return;
       }
@@ -1370,7 +1370,7 @@
       var current = prompt('Retailer ' + mob + ' ka email address dalein:');
       if (current === null) return;
       var email = current.trim().toLowerCase();
-      if (email && !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {
+      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         alert('Sahi email address dalein.'); return;
       }
       fetch(FIREBASE_URL + '/retailers/' + encodeURIComponent(mob) + '.json')
