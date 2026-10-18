@@ -736,6 +736,8 @@
         var el = document.getElementById(id);
         if (el) el.style.display = 'none';
       });
+      var servicesSection = document.getElementById('retailerServicesSection');
+      if (servicesSection) servicesSection.style.display = 'block';
     }
 
     function renderServicesGrid() {
@@ -1463,6 +1465,8 @@
 
     function openRetailerOrdersPanel() {
       closeAllModules();
+      var servicesSection = document.getElementById('retailerServicesSection');
+      if (servicesSection) servicesSection.style.display = 'none';
       var b = document.getElementById('retailerOrdersBox');
       b.style.display = 'block';
       b.scrollIntoView({ behavior: 'smooth' });
