@@ -11,7 +11,7 @@
     /* Top Clean Header */
     .top-navbar {
       background: #ffffff;
-      padding: 10px 24px;
+      padding: 12px 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -23,7 +23,7 @@
       background: linear-gradient(135deg, #0284c7, #1e3a8a);
       color: white;
       font-weight: 800;
-      padding: 8px 12px;
+      padding: 8px 14px;
       border-radius: 8px;
       font-size: 16px;
       letter-spacing: 0.5px;
@@ -70,7 +70,7 @@
       justify-content: space-between;
       gap: 30px;
     }
-    .hero-text-block { flex: 1.2; min-width: 320px; padding-right: 20px; }
+    .hero-text-block { flex: 1.2; min-width: 300px; padding-right: 20px; }
     .hero-badge {
       display: inline-block;
       background: rgba(37, 99, 235, 0.35);
@@ -82,4 +82,455 @@
       font-weight: 600;
       margin-bottom: 16px;
     }
-    .hero-text-block h1 { font-size: 32px; font
+    .hero-text-block h1 { font-size: 30px; font-weight: 700; line-height: 1.3; margin-bottom: 12px; }
+    .hero-text-block p { font-size: 14px; color: #cbd5e1; line-height: 1.6; margin-bottom: 20px; }
+    .hero-feature-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .hero-feature-tags span { background: rgba(255,255,255,0.08); padding: 5px 12px; border-radius: 6px; font-size: 12px; color: #e2e8f0; }
+
+    /* Card Box (Login & Reg) */
+    .card-box {
+      flex: 0.9;
+      min-width: 320px;
+      max-width: 420px;
+      background: #ffffff;
+      padding: 30px 24px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      border-top: 5px solid #2563eb;
+      text-align: center;
+      color: #1e293b;
+    }
+    .card-box h2 { font-size: 22px; color: #0f172a; margin-bottom: 6px; }
+    .card-box p.subtitle { font-size: 13px; color: #64748b; margin-bottom: 20px; }
+
+    .input-group { text-align: left; margin-bottom: 16px; }
+    .input-group label { display: block; font-size: 12px; font-weight: 600; color: #334155; margin-bottom: 6px; }
+    .input-group input, .input-group select, .input-group textarea {
+      width: 100%; padding: 11px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 14px; outline: none; background: #f8fafc;
+    }
+    .input-group input:focus, .input-group select:focus, .input-group textarea:focus { border-color: #2563eb; background: #ffffff; }
+
+    .btn-submit {
+      display: block;
+      width: 100%;
+      background: #2563eb;
+      color: #ffffff;
+      border: none;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .btn-submit:hover { opacity: 0.95; }
+    .btn-reg { background: #059669 !important; }
+
+    .switch-tab { margin-top: 18px; font-size: 13px; color: #475569; }
+    .switch-tab a { color: #2563eb; font-weight: 700; text-decoration: none; cursor: pointer; }
+
+    /* Dashboard Layout */
+    .main-wrap { max-width: 1200px; margin: 25px auto; padding: 0 15px; }
+    #dashboardView { display: none; }
+    .panel-header { font-size: 19px; font-weight: 600; color: #ffffff; margin-bottom: 18px; border-left: 4px solid #ef4444; padding-left: 12px; }
+
+    /* Services Grid */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-bottom: 30px;
+    }
+    .service-card {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 16px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+      border-top: 4px solid #2563eb;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .service-card h3 { font-size: 16px; font-weight: 600; color: #0f172a; margin-bottom: 6px; }
+    .tag-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 10px; }
+    .b-blue { background: #e0f2fe; color: #0369a1; }
+    .b-red { background: #ffe4e6; color: #be123c; }
+
+    .card-btns { display: flex; gap: 8px; margin-top: 14px; }
+    .c-btn { flex: 1; padding: 9px; border-radius: 6px; font-size: 12px; font-weight: 600; border: none; cursor: pointer; text-align: center; }
+    .btn-open { background: #2563eb; color: white; }
+
+    /* Dynamic Module Box */
+    .module-card {
+      display: none; background: #ffffff; border-radius: 10px; padding: 22px;
+      border-top: 5px solid #059669; margin-bottom: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; }
+    .qr-container { text-align: center; background: #f8fafc; padding: 15px; border: 1.5px dashed #cbd5e1; border-radius: 8px; margin: 15px 0; }
+
+    /* Tables */
+    .admin-table-wrap { overflow-x: auto; margin-top: 15px; border-radius: 8px; border: 1px solid #e2e8f0; }
+    .admin-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
+    .admin-table th { background: #0f172a; color: #ffffff; padding: 12px 14px; font-weight: 600; }
+    .admin-table td { padding: 12px 14px; border-bottom: 1px solid #e2e8f0; color: #334155; vertical-align: top; }
+    .admin-table tr:hover { background: #f8fafc; }
+    
+    .btn-action-small { background: #059669; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 12px; }
+    .btn-delete-small { background: #ef4444; color: white; border: none; padding: 6px 10px; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 12px; margin-left: 5px; }
+
+    /* Badges */
+    .st-pending { background: #fef3c7; color: #b45309; padding: 4px 8px; border-radius: 12px; font-weight: 600; font-size: 11px; }
+    .st-processing { background: #e0f2fe; color: #0284c7; padding: 4px 8px; border-radius: 12px; font-weight: 600; font-size: 11px; }
+    .st-completed { background: #dcfce7; color: #15803d; padding: 4px 8px; border-radius: 12px; font-weight: 600; font-size: 11px; }
+    .st-refunded { background: #ffe4e6; color: #b91c1c; padding: 4px 8px; border-radius: 12px; font-weight: 700; font-size: 11px; }
+
+    /* Display Box For Admin View */
+    .order-data-box {
+      font-size: 13px;
+      line-height: 1.6;
+      background: #f1f5f9;
+      padding: 10px 12px;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      color: #0f172a;
+      max-width: 380px;
+    }
+    .order-data-box strong {
+      color: #1e3a8a;
+      display: inline-block;
+      min-width: 90px;
+    }
+
+    /* Live Notification Banner */
+    #adminNoticeAlert {
+      display: none;
+      background: #dc2626;
+      color: white;
+      padding: 14px 20px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 16px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      cursor: pointer;
+      animation: pulseAlert 1.5s infinite;
+    }
+    @keyframes pulseAlert {
+      0% { opacity: 1; }
+      50% { opacity: 0.8; }
+      100% { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Audio Element for Order Alert -->
+  <audio id="orderSoundAlert" preload="auto">
+    <source src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- Live Notification Alert -->
+  <div id="adminNoticeAlert" onclick="openAdminOrdersPanel()">
+    🔔 NAYA ORDER AAYA HAI! Yahan click karke Orders Desk kholein.
+  </div>
+
+  <!-- Top Navbar -->
+  <header class="top-navbar">
+    <div class="brand-logo-area">
+      <div class="brand-logo-badge">RB</div>
+      <div class="brand-title-wrap">
+        <h2>RAGHU BABA ONLINE SERVICE</h2>
+        <p>B2B Digital &amp; Fast Document Services</p>
+      </div>
+    </div>
+    <div class="top-nav-tag">⚡ Fast Delivery Portal</div>
+  </header>
+
+  <!-- Top Bar (Visible after login) -->
+  <div id="userBar">
+    <div>Dukandar: <strong id="barUserName" style="color: #facc15; font-size: 14px;"></strong> (<span id="barUserPhone"></span>)</div>
+    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+      <button class="btn-bar-action btn-admin-orders" id="btnAdminOrders" onclick="openAdminOrdersPanel()">📦 Orders Desk (<span id="countAdminPending">0</span>)</button>
+      <button class="btn-bar-action btn-admin-recharge" id="btnAdminRecharge" onclick="openAdminRechargePanel()">💳 Recharges (<span id="countAdminRech">0</span>)</button>
+      <button class="btn-bar-action btn-admin-ledger" id="btnAdminLedger" onclick="openAdminLedgerPanel()">📊 Din Bhar Ka Khata</button>
+      <button class="btn-bar-action btn-admin-manage" id="btnAdminPanel" onclick="openAdminPanel()">👑 Retailers</button>
+      <button class="btn-bar-action btn-my-orders" id="btnMyOrders" onclick="openRetailerOrdersPanel()">📑 Mere Orders</button>
+      <div class="wallet-pill" id="barWalletPill" onclick="openRechargeModule()">💰 Wallet: ₹<span id="barWalletAmt">0.00</span> ➕</div>
+      <button class="btn-bar-action btn-exit" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+
+  <!-- HERO & AUTH SECTION -->
+  <section id="authLandingSection">
+    <div class="hero-container">
+      
+      <div class="hero-text-block">
+        <span class="hero-badge">⚡ Retailer &amp; Cyber Cafe Partner Network</span>
+        <h1>Apni Dukan Ki Sabhi Digital Services Ek Hi Jagah</h1>
+        <p>Driving Licence Passing, Voter ID Card Link, Pan Card, Vehicle RC aur sabhi fast PDF services ek secure portal se deliver karein.</p>
+        <div class="hero-feature-tags">
+          <span>✔️ Instant Wallet System</span>
+          <span>✔️ Instant Slip Delivery</span>
+          <span>✔️ 100% Safe Processing</span>
+        </div>
+      </div>
+
+      <!-- Login Card -->
+      <div class="card-box" id="loginBox">
+        <h2>🔐 Retailer Login</h2>
+        <p class="subtitle">Apna ID aur Password darj karein</p>
+
+        <div class="input-group">
+          <label>User ID / Mobile Number</label>
+          <input type="text" id="loginId" placeholder="User ID ya Mobile number">
+        </div>
+
+        <div class="input-group">
+          <label>Password</label>
+          <input type="password" id="loginPass" placeholder="Password">
+        </div>
+
+        <button type="button" class="btn-submit" id="btnSignIn" onclick="handleLoginAction()">लॉगिन करें</button>
+
+        <div class="switch-tab">
+          Naye dukandar hain? <a onclick="showRegister(true)">Naya Registration Karein ➔</a>
+        </div>
+      </div>
+
+      <!-- Registration Card -->
+      <div class="card-box" id="regBox" style="display: none; border-top-color: #059669;">
+        <h2>📝 Naya Dukandar Registration</h2>
+        <p class="subtitle">Apna account turant banayein</p>
+
+        <div class="input-group">
+          <label>Dukan / Operator ka Naam</label>
+          <input type="text" id="newUserName" placeholder="Poora naam">
+        </div>
+
+        <div class="input-group">
+          <label>Mobile Number (Login ID banegi)</label>
+          <input type="number" id="newUserMobile" placeholder="10 anko ka mobile number">
+        </div>
+
+        <div class="input-group">
+          <label>Password Banayein</label>
+          <input type="password" id="newUserPass" placeholder="Apna password banayein">
+        </div>
+
+        <button type="button" class="btn-submit btn-reg" id="btnSignUp" onclick="handleRegistrationAction()">Account Banayein</button>
+
+        <div class="switch-tab">
+          Pehle se account hai? <a onclick="showRegister(false)">Login Karein ➔</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- DASHBOARD WRAPPER -->
+  <div class="main-wrap">
+    <div id="dashboardView">
+
+      <!-- ADMIN: ORDERS CLEARANCE -->
+      <div class="module-card" id="adminOrdersBox" style="border-top-color: #2563eb; display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+          <div>
+            <h3 style="color: #1e3a8a; font-size: 19px;">📦 Admin Orders &amp; Slip Delivery Desk</h3>
+            <p style="font-size: 13px; color: #64748b;">Orders clear karein, final receipt/slip upload karein ya refund bhejein.</p>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="c-btn btn-open" style="max-width: 110px;" onclick="fetchAdminOrdersList()">🔄 Refresh</button>
+            <button type="button" class="btn-exit" style="background: #475569;" onclick="closeAllModules()">Close</button>
+          </div>
+        </div>
+
+        <!-- Clearance Box -->
+        <div id="orderClearanceActionBox" style="display: none; background: #eff6ff; padding: 18px; border-radius: 8px; border: 1.5px solid #bfdbfe; margin-bottom: 20px;">
+          <h4 style="font-size: 15px; margin-bottom: 6px; color: #1e3a8a;">⚙️ Process Order: <span id="clearanceOrderIdText" style="color: #ef4444; font-weight: bold;"></span></h4>
+          <p id="clearanceOrderChargeInfo" style="font-size: 13px; color: #334155; margin-bottom: 12px;"></p>
+          
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-bottom: 12px;">
+            <div>
+              <label style="font-size: 12px; font-weight: 700; display: block; margin-bottom: 4px;">Update Status</label>
+              <select id="updateOrderStatusSelect" style="width: 100%; padding: 9px; border: 1px solid #cbd5e1; border-radius: 5px;">
+                <option value="Completed">Completed (✅ Slip Deliver Karein)</option>
+                <option value="Processing">Processing (⚙️ In Progress)</option>
+                <option value="Rejected_Refund">Rejected &amp; Auto Refund (❌ Katoti Wapas)</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 12px; font-weight: 700; display: block; margin-bottom: 4px;">Final Slip Upload (PDF / Image)</label>
+              <input type="file" id="slipUploadFile" style="width: 100%; padding: 6px; background: white; border: 1px solid #cbd5e1; border-radius: 5px;">
+            </div>
+            <div>
+              <label style="font-size: 12px; font-weight: 700; display: block; margin-bottom: 4px;">Ya Web Link / Karan</label>
+              <input type="text" id="orderDeliverFileLink" placeholder="Link ya Refund ka karan" style="width: 100%; padding: 9px; border: 1px solid #cbd5e1; border-radius: 5px;">
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button type="button" class="btn-submit btn-reg" style="width: auto; padding: 10px 22px;" id="btnSaveOrderAction" onclick="saveOrderDeliveryOrRefund()">Update &amp; Finish</button>
+            <button type="button" class="btn-submit" style="width: auto; padding: 10px 20px; background: #64748b;" onclick="document.getElementById('orderClearanceActionBox').style.display='none'">Cancel</button>
+          </div>
+        </div>
+
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Order ID &amp; Time</th>
+                <th>Retailer Details</th>
+                <th>Service Name</th>
+                <th>Charge</th>
+                <th style="min-width: 250px;">Retailer Data</th>
+                <th>Status</th>
+                <th>Slip / Note</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="adminOrdersTableBody">
+              <tr><td colspan="8" style="text-align: center; color: #64748b;">Orders load ho rahe hain...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ADMIN: RECHARGE APPROVAL -->
+      <div class="module-card" id="adminRechargeBox" style="border-top-color: #7c3aed; display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+          <div>
+            <h3 style="color: #6d28d9; font-size: 18px;">💳 Retailer Recharge Desk</h3>
+            <p style="font-size: 13px; color: #64748b;">Retailers dwara bheje gaye UTR verify karein.</p>
+          </div>
+          <button type="button" class="btn-exit" style="background: #475569;" onclick="closeAllModules()">Close</button>
+        </div>
+
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Req ID / Date</th>
+                <th>Retailer Mobile / Name</th>
+                <th>Amount (₹)</th>
+                <th>UTR / Ref Number</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="adminRechargeTableBody">
+              <tr><td colspan="6" style="text-align: center; color: #64748b;">Recharge requests load ho rahi hain...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ADMIN: DAILY LEDGER -->
+      <div class="module-card" id="adminLedgerBox" style="border-top-color: #0891b2; display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+          <div>
+            <h3 style="color: #0e7490; font-size: 18px;">📊 Din Bhar Ka Khata</h3>
+            <p style="font-size: 13px; color: #64748b;">Balance transfer aur service order ka hisab kitab.</p>
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <input type="date" id="ledgerFilterDate" style="padding: 7px; border: 1px solid #cbd5e1; border-radius: 5px; font-size: 13px;">
+            <button class="c-btn btn-open" style="max-width: 110px;" onclick="renderDailyLedger()">Filter</button>
+            <button type="button" class="btn-exit" style="background: #475569;" onclick="closeAllModules()">Close</button>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+          <div style="background: #ecfeff; border-left: 4px solid #0891b2; padding: 15px; border-radius: 6px;">
+            <p style="font-size: 12px; font-weight: 600; color: #155e75;">AAJ KA TOTAL TRANSFERS</p>
+            <h3 style="font-size: 24px; color: #0e7490; margin-top: 5px;">₹<span id="ledgerTotalTransfer">0.00</span></h3>
+          </div>
+          <div style="background: #eff6ff; border-left: 4px solid #2563eb; padding: 15px; border-radius: 6px;">
+            <p style="font-size: 12px; font-weight: 600; color: #1e40af;">AAJ KE SERVICE ORDERS</p>
+            <h3 style="font-size: 24px; color: #1d4ed8; margin-top: 5px;">₹<span id="ledgerTotalOrders">0.00</span></h3>
+          </div>
+        </div>
+
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Date &amp; Time</th>
+                <th>Retailer Name</th>
+                <th>Mobile</th>
+                <th>Amount (₹)</th>
+                <th>Post Transfer Wallet</th>
+              </tr>
+            </thead>
+            <tbody id="ledgerTransfersTableBody">
+              <tr><td colspan="5" style="text-align: center; color: #64748b;">Records load ho rahe hain...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ADMIN: RETAILER MANAGEMENT -->
+      <div class="module-card" id="adminRetailerBox" style="border-top-color: #d97706; display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+          <div>
+            <h3 style="color: #b45309; font-size: 18px;">👑 Retailer Management</h3>
+            <p style="font-size: 13px; color: #64748b;">Retailer list, live balance transfer aur controls.</p>
+          </div>
+          <button type="button" class="btn-exit" style="background: #475569;" onclick="closeAllModules()">Close</button>
+        </div>
+
+        <div style="background: #f8fafc; padding: 16px; border-radius: 8px; border: 1.5px solid #cbd5e1; margin-bottom: 20px;">
+          <h4 style="font-size: 14px; margin-bottom: 10px; color: #0f172a;">💸 Wallet Balance Transfer:</h4>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end;">
+            <div style="flex: 1; min-width: 200px;">
+              <label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px;">Retailer Mobile No</label>
+              <input type="text" id="adminTransferMobile" placeholder="Retailer Mobile No" style="width: 100%; padding: 9px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 13px;">
+            </div>
+            <div style="flex: 1; min-width: 150px;">
+              <label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px;">Amount (₹)</label>
+              <input type="number" id="adminTransferAmt" placeholder="Amount (e.g. 100, 500)" style="width: 100%; padding: 9px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 13px;">
+            </div>
+            <div>
+              <button type="button" class="btn-submit btn-reg" style="padding: 10px 20px; width: auto;" onclick="executeAdminTransfer()">Transfer Balance ➔</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Dukan / Naam</th>
+                <th>Mobile (User ID)</th>
+                <th>Reg. Date</th>
+                <th>Current Balance</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="retailersTableBody">
+              <tr><td colspan="5" style="text-align: center; color: #64748b;">Retailers load ho rahe hain...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- RETAILER: MY ORDERS -->
+      <div class="module-card" id="retailerOrdersBox" style="border-top-color: #0284c7; display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+          <div>
+            <h3 style="color: #0369a1; font-size: 18px;">📑 Mere Orders &amp; Slip Download</h3>
+            <p style="font-size: 13px; color: #64748b;">Aapke lagaye gaye orders ka live status aur download slip.</p>
+          </div>
+          <button type="button" class="btn-exit" style="background: #475569;" onclick="closeAllModules()">Close</button>
+        </div>
+
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Service</th>
+                <th>Date &amp; Time</th>
+                <th>Charge</th>
+                <th>Status</th>
+                <th>Final Delivery Slip / Note</th>
+              </tr>
+            </thead>
+            <tbody id="retailerOrdersTableBody">
+              <tr><td colspan="6" style="text-align: center; color: #64748b;">Aapke orders fetch ho rahe hain
