@@ -26,6 +26,71 @@
       background-attachment: fixed !important;
     }
 
+    /* Modern login card inspired by the reference design */
+    body:has(#loginBox:not([style*="display: none"])),
+    body:has(#regBox:not([style*="display: none"])) {
+      background: linear-gradient(135deg, #dce8ff 0%, #eef2ff 48%, #e9ddff 100%) !important;
+      background-attachment: fixed !important;
+    }
+    #loginBox, #regBox {
+      max-width: 500px !important;
+      margin: 42px auto !important;
+      padding: 38px 38px 32px !important;
+      background: rgba(255,255,255,.97) !important;
+      border: 1px solid rgba(255,255,255,.85) !important;
+      border-top: 6px solid #6d5bd0 !important;
+      border-radius: 20px !important;
+      box-shadow: 0 20px 55px rgba(42, 49, 105, .22) !important;
+      text-align: left !important;
+    }
+    #loginBox h2, #regBox h2 {
+      text-align: center !important;
+      font-size: 30px !important;
+      font-weight: 900 !important;
+      color: #26345f !important;
+      margin-bottom: 10px !important;
+    }
+    #loginBox p.subtitle, #regBox p.subtitle {
+      text-align: center !important;
+      color: #68738a !important;
+      font-size: 15px !important;
+      margin-bottom: 28px !important;
+    }
+    #loginBox .input-group label, #regBox .input-group label {
+      font-size: 14px !important;
+      font-weight: 800 !important;
+      color: #334155 !important;
+    }
+    #loginBox .input-group input, #regBox .input-group input {
+      min-height: 48px !important;
+      padding: 14px 16px !important;
+      border: 1px solid #d4dbea !important;
+      border-radius: 10px !important;
+      background: #fff !important;
+      box-shadow: 0 2px 5px rgba(15,23,42,.05) !important;
+    }
+    #loginBox .btn-submit, #regBox .btn-submit {
+      min-height: 48px !important;
+      border-radius: 10px !important;
+      background: linear-gradient(100deg, #4778ef, #7650b8) !important;
+      font-size: 17px !important;
+      font-weight: 900 !important;
+      box-shadow: 0 7px 15px rgba(77,91,205,.22) !important;
+    }
+    #regBox .btn-reg { background: linear-gradient(100deg, #059669, #0f766e) !important; }
+    #loginBox .switch-tab, #regBox .switch-tab {
+      text-align: center !important;
+      font-size: 15px !important;
+      margin-top: 22px !important;
+    }
+    #loginBox .switch-tab a, #regBox .switch-tab a { font-weight: 900 !important; }
+    .forgot-password-link {
+      display: block; margin: 15px 0 0 auto; padding: 0;
+      border: 0; background: transparent; color: #5968c8;
+      font-size: 14px; font-weight: 800; cursor: pointer;
+    }
+    .forgot-password-link:hover { text-decoration: underline; }
+    
     /* Extra-bold headings */
     .site-header h1 { font-weight: 900 !important; font-size: 27px; letter-spacing: 1px; text-shadow: 0 1px 1px rgba(0,0,0,.12); }
     .panel-header { font-weight: 900 !important; font-size: 21px; }
@@ -268,6 +333,7 @@
       </div>
 
       <button type="button" class="btn-submit" id="btnSignIn" onclick="handleLoginAction()">लॉगिन करें</button>
+      <button type="button" class="forgot-password-link" onclick="showForgotPasswordHelp()">Forgot Password?</button>
 
       <div class="switch-tab">
         <a onclick="showRegister(true)">New Registration</a>
@@ -766,6 +832,10 @@
 
       setInterval(syncPortalState, 8000);
     });
+
+    function showForgotPasswordHelp() {
+      alert('Password reset ke liye Admin se sampark karein. Security ke liye bina verified identity ke password change nahi kiya ja sakta.');
+    }
 
     function showRegister(flag) {
       document.getElementById('loginBox').style.display = flag ? 'none' : 'block';
