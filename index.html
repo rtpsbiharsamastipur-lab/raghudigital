@@ -139,7 +139,7 @@
     .st-completed { background: #dcfce7; color: #15803d; padding: 4px 8px; border-radius: 12px; font-weight: 600; font-size: 11px; }
     .st-refunded { background: #ffe4e6; color: #b91c1c; padding: 4px 8px; border-radius: 12px; font-weight: 700; font-size: 11px; }
 
-    /* Large Font Customer Data Box */
+    /* Display Box For Admin View */
     .order-data-box {
       font-size: 14px;
       line-height: 1.6;
@@ -161,34 +161,40 @@
       display: none;
       background: #dc2626;
       color: white;
-      padding: 12px 20px;
+      padding: 14px 20px;
       text-align: center;
       font-weight: bold;
-      font-size: 15px;
+      font-size: 16px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.3);
       cursor: pointer;
+      animation: pulseAlert 1.5s infinite;
+    }
+    @keyframes pulseAlert {
+      0% { opacity: 1; }
+      50% { opacity: 0.8; }
+      100% { opacity: 1; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Audio Alert for Master Admin -->
+  <!-- Audio Element for Order Alert -->
   <audio id="orderSoundAlert" preload="auto">
     <source src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" type="audio/mpeg">
   </audio>
 
-  <!-- Live Notice Bar -->
+  <!-- Flashing Notification Bar for Master Admin -->
   <div id="adminNoticeAlert" onclick="openAdminOrdersPanel()">
     🔔 NAYA ORDER AAYA HAI! Yahan click karke Orders Desk kholein.
   </div>
 
-  <!-- Site Header -->
+  <!-- Header -->
   <div class="site-header">
     <h1>RAGHU BABA ONLINE SERVICE</h1>
     <p>⚡ All B2B Digital &amp; Printing Services • Dedicated Retailer Portal ⚡</p>
   </div>
 
-  <!-- Top User Bar -->
+  <!-- Top Bar (Dashboard) -->
   <div id="userBar">
     <div>Dukandar: <strong id="barUserName" style="color: #facc15; font-size: 14px;"></strong> (<span id="barUserPhone"></span>)</div>
     <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
@@ -211,12 +217,12 @@
 
       <div class="input-group">
         <label>User ID / Mobile Number</label>
-        <input type="text" id="loginId" placeholder="User ID ya Mobile number" autocomplete="username">
+        <input type="text" id="loginId" placeholder="User ID ya Mobile number">
       </div>
 
       <div class="input-group">
         <label>Password</label>
-        <input type="password" id="loginPass" placeholder="Password" autocomplete="current-password">
+        <input type="password" id="loginPass" placeholder="Password">
       </div>
 
       <button type="button" class="btn-submit" id="btnSignIn" onclick="handleLoginAction()">लॉगिन करें</button>
@@ -256,12 +262,12 @@
     <!-- 3. MAIN DASHBOARD VIEW -->
     <div id="dashboardView">
 
-      <!-- ADMIN EXCLUSIVE: ORDER CLEARANCE & SLIP DELIVERY DESK -->
+      <!-- ADMIN EXCLUSIVE: ORDER CLEARANCE & REFUND DESK -->
       <div class="module-card" id="adminOrdersBox" style="border-top-color: #2563eb; display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
           <div>
             <h3 style="color: #1e3a8a; font-size: 19px;">📦 Admin Orders &amp; Slip Delivery Desk</h3>
-            <p style="font-size: 13px; color: #64748b;">Orders clear karein, receipt/slip upload karein ya refund bhejein.</p>
+            <p style="font-size: 13px; color: #64748b;">Orders clear karein, final receipt/slip upload karein ya refund bhejein.</p>
           </div>
           <div style="display: flex; gap: 8px;">
             <button class="c-btn btn-open" style="max-width: 110px;" onclick="fetchAdminOrdersList()">🔄 Refresh</button>
@@ -278,17 +284,17 @@
             <div>
               <label style="font-size: 12px; font-weight: 700; display: block; margin-bottom: 4px;">Update Status</label>
               <select id="updateOrderStatusSelect" style="width: 100%; padding: 9px; border: 1px solid #cbd5e1; border-radius: 5px;">
-                <option value="Completed">Completed (✅ Deliver Slip / PDF)</option>
+                <option value="Completed">Completed (✅ Slip / PDF Deliver Karein)</option>
                 <option value="Processing">Processing (⚙️ In Progress)</option>
                 <option value="Rejected_Refund">Rejected &amp; Auto Refund (❌ Katoti Wapas Karein)</option>
               </select>
             </div>
             <div>
-              <label style="font-size: 12px; font-weight: 700; display: block; margin-bottom: 4px;">Final Slip Upload (PDF / Image)</label>
+              <label style="font-size: 12px; font-weight: 700; display: block; margin-bottom: 4px;">Final Slip Upload Karein (PDF / Image)</label>
               <input type="file" id="slipUploadFile" style="width: 100%; padding: 6px; background: white; border: 1px solid #cbd5e1; border-radius: 5px;">
             </div>
             <div>
-              <label style="font-size: 12px; font-weight: 700; display: block; margin-bottom: 4px;">Ya Web Link / Refund Reason</label>
+              <label style="font-size: 12px; font-weight: 700; display: block; margin-bottom: 4px;">Ya Web Link / Refund Karan Likhein</label>
               <input type="text" id="orderDeliverFileLink" placeholder="Link ya Refund ka karan dalein" style="width: 100%; padding: 9px; border: 1px solid #cbd5e1; border-radius: 5px;">
             </div>
           </div>
@@ -306,7 +312,7 @@
                 <th>Retailer Details</th>
                 <th>Service Name</th>
                 <th>Charge</th>
-                <th style="min-width: 280px;">Retailer Bhara Hua Data (Bada Font)</th>
+                <th style="min-width: 280px;">Retailer Bhara Hua Data</th>
                 <th>Status</th>
                 <th>Slip / Note</th>
                 <th>Action</th>
@@ -324,7 +330,7 @@
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
           <div>
             <h3 style="color: #6d28d9; font-size: 18px;">💳 Retailer Recharge Verification Desk</h3>
-            <p style="font-size: 13px; color: #64748b;">Retailers dwara bheje gaye UTR verify karke approve karein.</p>
+            <p style="font-size: 13px; color: #64748b;">Retailers dwara bheje gaye UTR check karein aur verify karke approve karein.</p>
           </div>
           <button type="button" class="btn-exit" style="background: #475569;" onclick="closeAllModules()">Close</button>
         </div>
@@ -353,7 +359,7 @@
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
           <div>
             <h3 style="color: #0e7490; font-size: 18px;">📊 Din Bhar Ka Khata (Daily Ledger Report)</h3>
-            <p style="font-size: 13px; color: #64748b;">Aaj kis dukandar ko kitna balance transfer kiya gaya aur orders count.</p>
+            <p style="font-size: 13px; color: #64748b;">Aaj kis dukandar ko kitna balance transfer kiya gaya aur kitna order laga.</p>
           </div>
           <div style="display: flex; gap: 8px; align-items: center;">
             <input type="date" id="ledgerFilterDate" style="padding: 7px; border: 1px solid #cbd5e1; border-radius: 5px; font-size: 13px;">
@@ -475,7 +481,7 @@
         </div>
       </div>
 
-      <!-- RETAILER SERVICES (HIDDEN FOR MASTER ADMIN) -->
+      <!-- RETAILER EXCLUSIVE SERVICES AREA -->
       <div id="retailerServicesSection">
         <div class="panel-header">📌 Digital Services Panel</div>
         <div class="services-grid" id="servicesGrid"></div>
@@ -538,6 +544,30 @@
     var lastKnownOrdersCount = -1;
 
     var SERVICES_CONFIG = [
+      {
+        id: "dl_passing",
+        name: "DL PASSING",
+        charge: 50,
+        fields: [
+          { name: "name", label: "Full Name", type: "text", required: true },
+          { name: "father_name", label: "Father Name", type: "text", required: true },
+          { name: "app_no", label: "Application Number", type: "text", required: true },
+          { name: "dob", label: "Date of Birth (DOB)", type: "date", required: true },
+          { name: "doc_pdf", label: "PDF / Document Upload (Under 500KB)", type: "file", required: true }
+        ]
+      },
+      {
+        id: "ll_passing",
+        name: "LL PASSING",
+        charge: 50,
+        fields: [
+          { name: "name", label: "Full Name", type: "text", required: true },
+          { name: "father_name", label: "Father Name", type: "text", required: true },
+          { name: "app_no", label: "Application Number", type: "text", required: true },
+          { name: "dob", label: "Date of Birth (DOB)", type: "date", required: true },
+          { name: "doc_pdf", label: "PDF / Document Upload (Under 500KB)", type: "file", required: true }
+        ]
+      },
       {
         id: "voter_link",
         name: "Voter link mobile no",
@@ -679,7 +709,6 @@
       });
     }
 
-    // Initialize application
     window.addEventListener('DOMContentLoaded', function() {
       try {
         var saved = getSafeLocalData("raghu_active_user");
@@ -693,7 +722,6 @@
         showRegister(false);
       }
 
-      // Live Poller (Runs every 8 seconds)
       setInterval(syncPortalState, 8000);
     });
 
@@ -729,12 +757,9 @@
       });
     }
 
-    // ----------------- FAST & FIXED LOGIN ENGINE -----------------
     function handleLoginAction() {
-      var rawU = (document.getElementById('loginId').value || '');
-      var rawP = (document.getElementById('loginPass').value || '');
-      var u = rawU.trim();
-      var p = rawP.trim();
+      var u = (document.getElementById('loginId').value || '').trim();
+      var p = (document.getElementById('loginPass').value || '').trim();
 
       if (!u || !p) {
         alert('Kripya User ID aur Password dono darj karein!');
@@ -742,8 +767,18 @@
       }
 
       // Master Admin Direct Login
-      if (u.toLowerCase() === 'admin' && p === 'admin123') {
+      if (u === 'admin' && p === 'admin123') {
         activeUser = { role: 'admin', id: 'admin', name: 'Master Admin (Raghu Baba)', mobile: '8207827581', wallet: 99999 };
+        setSafeLocalData("raghu_active_user", activeUser);
+        openDashboardPanel();
+        return;
+      }
+
+      var allRetailers = getSafeLocalData("all_portal_retailers") || {};
+      var userObj = allRetailers[u] || getSafeLocalData("user_" + u);
+
+      if (userObj && userObj.pass === p) {
+        activeUser = { role: 'retailer', id: u, name: userObj.name, mobile: u, wallet: Number(userObj.wallet || 0) };
         setSafeLocalData("raghu_active_user", activeUser);
         openDashboardPanel();
         return;
@@ -753,87 +788,34 @@
       btn.innerText = "Checking...";
       btn.disabled = true;
 
-      // 1. Check local storage cache for instant login without network lag
-      var allRetailers = getSafeLocalData("all_portal_retailers") || {};
-      var localRetailer = allRetailers[u] || getSafeLocalData("user_" + u);
+      fetch(FIREBASE_URL + "/retailers/" + encodeURIComponent(u) + ".json")
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          btn.innerText = "लॉगिन करें";
+          btn.disabled = false;
 
-      var attemptFirebaseLogin = function() {
-        // Fetch with timeout fallback
-        var controller = new AbortController();
-        var timer = setTimeout(function() { controller.abort(); }, 4000);
+          if (!data) {
+            alert('User ID nahi mili! Naya registration karein.');
+            return;
+          }
 
-        fetch(FIREBASE_URL + "/retailers/" + encodeURIComponent(u) + ".json", { signal: controller.signal })
-          .then(function(res) { clearTimeout(timer); return res.json(); })
-          .then(function(data) {
-            btn.innerText = "लॉगिन करें";
-            btn.disabled = false;
+          if (data.pass === p) {
+            allRetailers[u] = data;
+            setSafeLocalData("all_portal_retailers", allRetailers);
+            setSafeLocalData("user_" + u, data);
 
-            if (!data) {
-              if (localRetailer && String(localRetailer.pass).trim() === p) {
-                proceedRetailerLogin(u, localRetailer);
-              } else {
-                alert('User ID nahi mili! Kripya Naya Registration karein.');
-              }
-              return;
-            }
-
-            if (String(data.pass).trim() === p) {
-              allRetailers[u] = data;
-              setSafeLocalData("all_portal_retailers", allRetailers);
-              setSafeLocalData("user_" + u, data);
-              proceedRetailerLogin(u, data);
-            } else {
-              alert('Galat Password! Sahi password dalein.');
-            }
-          })
-          .catch(function() {
-            clearTimeout(timer);
-            btn.innerText = "लॉगिन करें";
-            btn.disabled = false;
-
-            // Offline / Network Failure Fallback
-            if (localRetailer && String(localRetailer.pass).trim() === p) {
-              proceedRetailerLogin(u, localRetailer);
-            } else {
-              alert('Server se connect nahi ho saka. Mobile number check karein ya naya registration karein.');
-            }
-          });
-      };
-
-      if (localRetailer && String(localRetailer.pass).trim() === p) {
-        btn.innerText = "लॉगिन करें";
-        btn.disabled = false;
-        proceedRetailerLogin(u, localRetailer);
-        // Background sync to fetch fresh balance
-        fetch(FIREBASE_URL + "/retailers/" + encodeURIComponent(u) + ".json")
-          .then(function(res){ return res.json(); })
-          .then(function(fresh){
-            if (fresh) {
-              allRetailers[u] = fresh;
-              setSafeLocalData("all_portal_retailers", allRetailers);
-              if (activeUser && activeUser.id === u) {
-                activeUser.wallet = Number(fresh.wallet || 0);
-                setSafeLocalData("raghu_active_user", activeUser);
-                var el = document.getElementById('barWalletAmt');
-                if (el) el.innerText = Number(fresh.wallet || 0).toFixed(2);
-              }
-            }
-          }).catch(function(){});
-      } else {
-        attemptFirebaseLogin();
-      }
-    }
-
-    function proceedRetailerLogin(userId, data) {
-      activeUser = {
-        role: 'retailer',
-        id: userId,
-        name: data.name || 'Dukandar',
-        mobile: data.mobile || userId,
-        wallet: Number(data.wallet || 0)
-      };
-      setSafeLocalData("raghu_active_user", activeUser);
-      openDashboardPanel();
+            activeUser = { role: 'retailer', id: u, name: data.name, mobile: u, wallet: Number(data.wallet || 0) };
+            setSafeLocalData("raghu_active_user", activeUser);
+            openDashboardPanel();
+          } else {
+            alert('Galat Password! Sahi password dalein.');
+          }
+        })
+        .catch(function() {
+          btn.innerText = "लॉगिन करें";
+          btn.disabled = false;
+          alert('Network issue! Kripya dobara koshish karein.');
+        });
     }
 
     function handleRegistrationAction() {
@@ -861,12 +843,12 @@
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newUserData)
-      }).catch(function(){});
-
-      alert('Registration Safal! Login karein.');
-      showRegister(false);
-      document.getElementById('loginId').value = mob;
-      document.getElementById('loginPass').value = pass;
+      }).then(function() {
+        alert('Registration Safal! Login karein.');
+        showRegister(false);
+        document.getElementById('loginId').value = mob;
+        document.getElementById('loginPass').value = pass;
+      });
     }
 
     function openDashboardPanel() {
@@ -885,7 +867,7 @@
         document.getElementById('btnAdminLedger').style.display = 'inline-block';
         document.getElementById('btnMyOrders').style.display = 'none';
         document.getElementById('barWalletPill').style.display = 'none';
-        document.getElementById('retailerServicesSection').style.display = 'none'; // Admin has services hidden
+        document.getElementById('retailerServicesSection').style.display = 'none';
         openAdminOrdersPanel();
       } else {
         document.getElementById('btnAdminPanel').style.display = 'none';
@@ -894,7 +876,7 @@
         document.getElementById('btnAdminLedger').style.display = 'none';
         document.getElementById('btnMyOrders').style.display = 'inline-block';
         document.getElementById('barWalletPill').style.display = 'inline-block';
-        document.getElementById('retailerServicesSection').style.display = 'block'; // Retailer sees services
+        document.getElementById('retailerServicesSection').style.display = 'block';
         renderServicesGrid();
       }
 
@@ -911,7 +893,6 @@
       showRegister(false);
     }
 
-    // Live Sync (Balance, Orders, Sound Notice)
     function syncPortalState() {
       if (!activeUser) return;
 
@@ -922,8 +903,7 @@
             if (bal !== null && bal !== undefined) {
               activeUser.wallet = Number(bal);
               setSafeLocalData("raghu_active_user", activeUser);
-              var el = document.getElementById('barWalletAmt');
-              if (el) el.innerText = Number(bal).toFixed(2);
+              document.getElementById('barWalletAmt').innerText = Number(bal).toFixed(2);
             }
           }).catch(function(){});
       }
@@ -939,14 +919,12 @@
               if (orders[k].status === 'Pending') pendingCount++;
             });
 
-            var cntEl = document.getElementById('countAdminPending');
-            if (cntEl) cntEl.innerText = pendingCount;
+            document.getElementById('countAdminPending').innerText = pendingCount;
 
             if (lastKnownOrdersCount !== -1 && list.length > lastKnownOrdersCount) {
               var audio = document.getElementById('orderSoundAlert');
               if (audio) { audio.play().catch(function(){}); }
-              var notice = document.getElementById('adminNoticeAlert');
-              if (notice) notice.style.display = 'block';
+              document.getElementById('adminNoticeAlert').style.display = 'block';
             }
             lastKnownOrdersCount = list.length;
           }).catch(function(){});
@@ -958,17 +936,14 @@
             for (var r in rech || {}) {
               if (rech[r].status === 'Pending') count++;
             }
-            var b = document.getElementById('countAdminRech');
-            if (b) b.innerText = count;
+            document.getElementById('countAdminRech').innerText = count;
           }).catch(function(){});
       }
     }
 
-    // ----------------- ADMIN ORDERS & SLIP UPLOAD -----------------
     function openAdminOrdersPanel() {
       closeAllModules();
-      var notice = document.getElementById('adminNoticeAlert');
-      if (notice) notice.style.display = 'none';
+      document.getElementById('adminNoticeAlert').style.display = 'none';
       var b = document.getElementById('adminOrdersBox');
       b.style.display = 'block';
       b.scrollIntoView({ behavior: 'smooth' });
@@ -1005,7 +980,6 @@
               stLabel = "Refunded (₹" + o.charge + " Wapas)";
             }
 
-            // Customer details shown in large font
             var detailsFormatted = [];
             if (o.formData) {
               for (var f in o.formData) {
@@ -1111,7 +1085,7 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ status: selectedAction, deliveryResult: finalResultData })
         });
-        alert('Order status aur delivery slip update ho gayi!');
+        alert('Order status aur delivery slip safaltapoorvak update ho gayi!');
       }
 
       btn.innerText = "Update & Finish Action";
@@ -1120,7 +1094,6 @@
       fetchAdminOrdersList();
     }
 
-    // ----------------- ADMIN RETAILERS (TRANSFER + DELETE) -----------------
     function openAdminPanel() {
       closeAllModules();
       var aBox = document.getElementById('adminRetailerBox');
@@ -1163,16 +1136,16 @@
     }
 
     function deleteRetailerAccount(mob, name) {
-      if (!confirm('⚠️ Kya aap dukandar "' + name + '" (' + mob + ') ko DELETE karna chahte hain?')) return;
+      var ok = confirm('⚠️ Kya aap waqai dukandar "' + name + '" (' + mob + ') ko hamesha ke liye DELETE karna chahte hain?');
+      if (!ok) return;
 
       fetch(FIREBASE_URL + "/retailers/" + encodeURIComponent(mob) + ".json", {
         method: "DELETE"
       }).then(function() {
-        var all = getSafeLocalData("all_portal_retailers") || {};
-        delete all[mob];
-        setSafeLocalData("all_portal_retailers", all);
         alert('Retailer (' + name + ') safaltapoorvak delete ho gaya.');
         fetchRetailersList();
+      }).catch(function() {
+        alert('Delete karne me samasya aayi.');
       });
     }
 
@@ -1226,7 +1199,6 @@
         });
     }
 
-    // ----------------- DIN BHAR KA KHATA (LEDGER) -----------------
     function openAdminLedgerPanel() {
       closeAllModules();
       var lBox = document.getElementById('adminLedgerBox');
@@ -1287,7 +1259,6 @@
         });
     }
 
-    // ----------------- ADMIN RECHARGE DESK -----------------
     function openAdminRechargePanel() {
       closeAllModules();
       var b = document.getElementById('adminRechargeBox');
@@ -1350,7 +1321,6 @@
         });
     }
 
-    // ----------------- RETAILER ORDER SUBMISSION -----------------
     function openOrderForm(serviceId) {
       closeAllModules();
       currentService = SERVICES_CONFIG.find(function(s) { return s.id === serviceId; });
@@ -1491,7 +1461,6 @@
       closeAllModules();
     }
 
-    // ----------------- RETAILER ORDERS VIEW -----------------
     function openRetailerOrdersPanel() {
       closeAllModules();
       var b = document.getElementById('retailerOrdersBox');
@@ -1555,7 +1524,6 @@
         });
     }
 
-    // ----------------- RETAILER RECHARGE REQUEST -----------------
     function openRechargeModule() {
       closeAllModules();
       var rBox = document.getElementById('formRechargeBox');
