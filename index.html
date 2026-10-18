@@ -6,7 +6,7 @@
   <title>RAGHU BABA ONLINE SERVICE - B2B Digital Portal</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-    body { background: #0b1329; color: #1e293b; min-height: 100vh; padding-bottom: 50px; }
+    body { background: #0b1329; color: #1e293b; min-height: 100vh; padding-bottom: 60px; }
 
     /* Top Colorful Header */
     .site-header {
@@ -19,7 +19,7 @@
     .site-header h1 { font-size: 24px; font-weight: 700; letter-spacing: 0.5px; }
     .site-header p { font-size: 13px; margin-top: 4px; font-weight: 500; }
 
-    /* Top User Bar (Dashboard) */
+    /* Top User Bar */
     #userBar {
       display: none;
       background: #1e293b;
@@ -44,7 +44,7 @@
 
     /* Card Box (Login & Reg) */
     .card-box {
-      max-width: 400px;
+      max-width: 420px;
       margin: 40px auto;
       background: #ffffff;
       padding: 30px 24px;
@@ -52,27 +52,38 @@
       box-shadow: 0 10px 30px rgba(0,0,0,0.4);
       border-top: 5px solid #2563eb;
       text-align: center;
+      display: block;
     }
     .card-box h2 { font-size: 22px; color: #0f172a; margin-bottom: 6px; }
-    .card-box p.subtitle { font-size: 13px; color: #64748b; margin-bottom: 22px; }
+    .card-box p.subtitle { font-size: 13px; color: #64748b; margin-bottom: 20px; }
 
-    .input-group { text-align: left; margin-bottom: 15px; }
-    .input-group label { display: block; font-size: 12px; font-weight: 600; color: #334155; margin-bottom: 5px; }
+    .input-group { text-align: left; margin-bottom: 16px; }
+    .input-group label { display: block; font-size: 12px; font-weight: 600; color: #334155; margin-bottom: 6px; }
     .input-group input, .input-group select, .input-group textarea {
-      width: 100%; padding: 11px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none; background: #f8fafc;
+      width: 100%; padding: 12px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 14px; outline: none; background: #f8fafc;
     }
     .input-group input:focus, .input-group select:focus, .input-group textarea:focus { border-color: #2563eb; background: #ffffff; }
 
     .btn-submit {
-      width: 100%; background: #2563eb; color: white; border: none;
-      padding: 12px; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer;
+      display: block;
+      width: 100%;
+      background: #2563eb;
+      color: #ffffff;
+      border: none;
+      padding: 13px;
+      border-radius: 6px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 10px;
     }
+    .btn-submit:hover { opacity: 0.95; }
     .btn-reg { background: #059669 !important; }
 
-    .switch-tab { margin-top: 15px; font-size: 13px; }
-    .switch-tab a { color: #2563eb; font-weight: 600; text-decoration: none; cursor: pointer; }
+    .switch-tab { margin-top: 18px; font-size: 13px; color: #475569; }
+    .switch-tab a { color: #2563eb; font-weight: 700; text-decoration: none; cursor: pointer; }
 
-    /* Dashboard View */
+    /* Dashboard Layout */
     #dashboardView { display: none; }
     .panel-header { font-size: 19px; font-weight: 600; color: #ffffff; margin-bottom: 18px; border-left: 4px solid #ef4444; padding-left: 12px; }
 
@@ -118,7 +129,7 @@
     .admin-table tr:hover { background: #f8fafc; }
     .btn-action-small { background: #059669; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 12px; }
 
-    /* Status Badges */
+    /* Badges */
     .st-pending { background: #fef3c7; color: #b45309; padding: 4px 8px; border-radius: 12px; font-weight: 600; font-size: 11px; }
     .st-processing { background: #e0f2fe; color: #0284c7; padding: 4px 8px; border-radius: 12px; font-weight: 600; font-size: 11px; }
     .st-completed { background: #dcfce7; color: #15803d; padding: 4px 8px; border-radius: 12px; font-weight: 600; font-size: 11px; }
@@ -127,13 +138,13 @@
 </head>
 <body>
 
-  <!-- Top Header -->
+  <!-- Header -->
   <div class="site-header">
     <h1>RAGHU BABA ONLINE SERVICE</h1>
     <p>⚡ All B2B Digital &amp; Printing Services • Dedicated Retailer Portal ⚡</p>
   </div>
 
-  <!-- Top Bar -->
+  <!-- Top Bar (Dashboard) -->
   <div id="userBar">
     <div>Dukandar: <strong id="barUserName" style="color: #facc15; font-size: 14px;"></strong> (<span id="barUserPhone"></span>)</div>
     <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
@@ -161,3 +172,1122 @@
         <label>Password</label>
         <input type="password" id="loginPass" placeholder="Password">
       </div>
+
+      <!-- Login Button Explicitly Visible -->
+      <button type="button" class="btn-submit" id="btnSignIn" onclick="handleLoginAction()">लॉगिन करें</button>
+
+      <!-- New Registration Switch Link -->
+      <div class="switch-tab">
+        Naye dukandar hain? <a onclick="showRegister(true)">Naya Registration Karein ➔</a>
+      </div>
+    </div>
+
+    <!-- 2. REGISTRATION SCREEN -->
+    <div class="card-box" id="regBox" style="display: none; border-top-color: #059669;">
+      <h2>📝 Naya Dukandar Registration</h2>
+      <p class="subtitle">Apna account turant banayein</p>
+
+      <div class="input-group">
+        <label>Dukan / Operator ka Naam</label>
+        <input type="text" id="newUserName" placeholder="Poora naam">
+      </div>
+
+      <div class="input-group">
+        <label>Mobile Number (Yehi Login ID banegi)</label>
+        <input type="number" id="newUserMobile" placeholder="10 anko ka mobile number">
+      </div>
+
+      <div class="input-group">
+        <label>Password Banayein</label>
+        <input type="password" id="newUserPass" placeholder="Apna password banayein">
+      </div>
+
+      <button type="button" class="btn-submit btn-reg" id="btnSignUp" onclick="handleRegistrationAction()">Account Banayein</button>
+
+      <div class="switch-tab">
+        Pehle se account hai? <a onclick="showRegister(false)">Login Karein ➔</a>
+      </div>
+    </div>
+
+    <!-- 3. MAIN DASHBOARD VIEW -->
+    <div id="dashboardView">
+
+      <!-- ADMIN EXCLUSIVE: ORDER CLEARANCE & REFUND DESK -->
+      <div class="module-card" id="adminOrdersBox" style="border-top-color: #2563eb; display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+          <div>
+            <h3 style="color: #1e3a8a; font-size: 18px;">📦 Admin Orders &amp; Refund Desk</h3>
+            <p style="font-size: 12px; color: #64748b;">Orders clear karein ya kaam na hone par retailer ko turant refund bhejein.</p>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="c-btn btn-open" style="max-width: 110px;" onclick="fetchAdminOrdersList()">🔄 Refresh</button>
+            <button type="button" class="btn-exit" style="background: #475569;" onclick="closeAllModules()">Close</button>
+          </div>
+        </div>
+
+        <div id="orderClearanceActionBox" style="display: none; background: #eff6ff; padding: 15px; border-radius: 8px; border: 1.5px solid #bfdbfe; margin-bottom: 20px;">
+          <h4 style="font-size: 14px; margin-bottom: 8px; color: #1e3a8a;">⚙️ Process Order: <span id="clearanceOrderIdText" style="color: #ef4444;"></span></h4>
+          <p id="clearanceOrderChargeInfo" style="font-size: 12px; color: #334155; margin-bottom: 10px;"></p>
+          
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-bottom: 10px;">
+            <div>
+              <label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px;">Update Status / Action</label>
+              <select id="updateOrderStatusSelect" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 5px;">
+                <option value="Completed">Completed (✅ Deliver File)</option>
+                <option value="Processing">Processing (⚙️ In Progress)</option>
+                <option value="Rejected_Refund">Rejected &amp; Auto Refund (❌ Katoti Wapas Karein)</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px;">Download PDF Link / Refund Karan</label>
+              <input type="text" id="orderDeliverFileLink" placeholder="Completed par Link / Refund par Karan dalein" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 5px;">
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button type="button" class="btn-submit btn-reg" style="width: auto; padding: 8px 18px;" onclick="saveOrderDeliveryOrRefund()">Update &amp; Process Action</button>
+            <button type="button" class="btn-submit" style="width: auto; padding: 8px 18px; background: #64748b;" onclick="document.getElementById('orderClearanceActionBox').style.display='none'">Cancel</button>
+          </div>
+        </div>
+
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Retailer Details</th>
+                <th>Service Name</th>
+                <th>Charge</th>
+                <th>Input Details</th>
+                <th>Status</th>
+                <th>Delivery File / Note</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="adminOrdersTableBody">
+              <tr><td colspan="8" style="text-align: center; color: #64748b;">Orders load ho rahe hain...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- RETAILER EXCLUSIVE: MY ORDERS & REFUND STATUS -->
+      <div class="module-card" id="retailerOrdersBox" style="border-top-color: #0284c7; display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+          <div>
+            <h3 style="color: #0369a1; font-size: 18px;">📑 Mere Orders &amp; Refund Status</h3>
+            <p style="font-size: 12px; color: #64748b;">Aapke lagaye gaye orders ka status, PDF file ya refund ki jankari.</p>
+          </div>
+          <button type="button" class="btn-exit" style="background: #475569;" onclick="closeAllModules()">Close</button>
+        </div>
+
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Service</th>
+                <th>Date &amp; Time</th>
+                <th>Charge</th>
+                <th>Status</th>
+                <th>Result / Refund Details</th>
+              </tr>
+            </thead>
+            <tbody id="retailerOrdersTableBody">
+              <tr><td colspan="6" style="text-align: center; color: #64748b;">Aapke orders fetch ho rahe hain...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ADMIN EXCLUSIVE: RETAILER MANAGEMENT -->
+      <div class="module-card" id="adminRetailerBox" style="border-top-color: #d97706; display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+          <div>
+            <h3 style="color: #b45309; font-size: 18px;">👑 Admin Retailer Management &amp; Wallet Transfer</h3>
+            <p style="font-size: 12px; color: #64748b;">Aapke portal me jude sabhi dukandar aur unka live balance.</p>
+          </div>
+          <button type="button" class="btn-exit" style="background: #475569;" onclick="closeAllModules()">Close</button>
+        </div>
+
+        <div style="background: #f8fafc; padding: 16px; border-radius: 8px; border: 1.5px solid #cbd5e1; margin-bottom: 20px;">
+          <h4 style="font-size: 14px; margin-bottom: 10px; color: #0f172a;">💸 Retailer Wallet Me Balance Transfer Karein:</h4>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end;">
+            <div style="flex: 1; min-width: 200px;">
+              <label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px;">Retailer Mobile / User ID</label>
+              <input type="text" id="adminTransferMobile" placeholder="Retailer Mobile No" style="width: 100%; padding: 9px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 13px;">
+            </div>
+            <div style="flex: 1; min-width: 150px;">
+              <label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px;">Transfer Amount (₹)</label>
+              <input type="number" id="adminTransferAmt" placeholder="Amount (Jaise 100, 500)" style="width: 100%; padding: 9px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 13px;">
+            </div>
+            <div>
+              <button type="button" class="btn-submit btn-reg" style="padding: 10px 20px; width: auto;" onclick="executeAdminTransfer()">Transfer Balance ➔</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+          <h4 style="font-size: 15px; color: #0f172a;">Registered Retailers (<span id="totalRetailersCount">0</span>)</h4>
+          <button class="c-btn btn-open" style="max-width: 120px;" onclick="fetchRetailersList()">🔄 Refresh List</button>
+        </div>
+
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Dukan / Naam</th>
+                <th>Mobile (User ID)</th>
+                <th>Reg. Date</th>
+                <th>Current Balance</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="retailersTableBody">
+              <tr><td colspan="5" style="text-align: center; color: #64748b;">Retailers load ho rahe hain...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel-header">📌 Digital Services Panel</div>
+
+      <!-- Services Grid -->
+      <div class="services-grid" id="servicesGrid"></div>
+
+      <!-- DYNAMIC ORDER FORM -->
+      <div class="module-card" id="formOrderBox">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+          <h3 id="formTitleText" style="color: #1e3a8a; font-size: 18px;"></h3>
+          <span id="formChargeText" class="tag-badge b-red" style="font-size: 14px;"></span>
+        </div>
+
+        <div id="formNoteText" style="display: none; font-size: 13px; color: #b45309; background: #fef3c7; padding: 10px; border-radius: 6px; margin-bottom: 15px;"></div>
+
+        <form id="dynamicServiceForm" onsubmit="event.preventDefault(); submitOrderAction();">
+          <div class="form-grid" id="formInputsContainer"></div>
+          <div style="margin-top: 20px; display: flex; gap: 10px;">
+            <button type="submit" class="btn-submit" style="max-width: 280px;" id="btnSubmitOrder">Order Lagayein &amp; Send WhatsApp</button>
+            <button type="button" class="btn-submit" style="max-width: 120px; background: #64748b;" onclick="closeAllModules()">Cancel</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- WALLET RECHARGE MODULE -->
+      <div class="module-card" id="formRechargeBox" style="border-top-color: #6d28d9;">
+        <h3 style="color: #6d28d9; margin-bottom: 12px; font-size: 18px;">💳 QR Code Se Wallet Recharge (Auto Add)</h3>
+        <p style="font-size: 13px; color: #64748b; margin-bottom: 15px;">Scan karke pay karein aur UTR number enter karein, balance turant auto add ho jayega.</p>
+        
+        <div style="max-width: 440px;">
+          <div class="input-group">
+            <label>Recharge Amount (₹)</label>
+            <input type="number" id="inputRechAmt" placeholder="Amount dalein (Jaise 50, 100, 500)" oninput="buildQrCode()">
+          </div>
+
+          <div class="qr-container" id="qrImageBox" style="display: none;">
+            <p style="font-size: 13px; font-weight: 600; color: #1e3a8a;">Scan &amp; Pay via UPI PhonePe/GPay/Paytm</p>
+            <img id="qrRenderImg" src="" style="width: 175px; height: 175px; margin: 10px auto; border: 2px solid #000; padding: 4px; background: white; display: block;" alt="QR Code">
+            <p id="qrAmountLabel" style="font-size: 14px; font-weight: bold; color: #059669;"></p>
+            <p style="font-size: 12px; color: #64748b; margin-top: 3px;">UPI ID: 8207827581-3@ybl</p>
+          </div>
+
+          <div class="input-group">
+            <label>12 Ankon ka UTR / Ref Number</label>
+            <input type="text" id="inputRechUtr" placeholder="Payment UTR Number (12 Digit)">
+          </div>
+
+          <button type="button" class="btn-submit btn-reg" id="btnRecharge" onclick="submitRechargeDetails()">Payment Verify &amp; Auto Add Karein</button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    var FIREBASE_URL = "https://raghudigital-b685f-default-rtdb.firebaseio.com";
+    var ADMIN_WHATSAPP = "918207827581";
+    var activeUser = null;
+    var currentService = null;
+    var activeOrderContext = null;
+
+    var SERVICES_CONFIG = [
+      {
+        id: "voter_link",
+        name: "Voter link mobile no",
+        charge: 50,
+        fields: [
+          { name: "voter_no", label: "Customer Voter No", type: "text", required: true },
+          { name: "mobile_no", label: "Mobile No", type: "number", required: true }
+        ]
+      },
+      {
+        id: "pan_new",
+        name: "Pan Card New apply",
+        charge: 150,
+        note: "Note: Pan Card apply karne me kam se kam 2 documents lagana zaroori hai.",
+        fields: [
+          { name: "name", label: "Full Name", type: "text", required: true },
+          { name: "father_name", label: "Father Name", type: "text", required: true },
+          { name: "mother_name", label: "Mother Name", type: "text", required: true },
+          { name: "mobile_no", label: "Mobile No", type: "number", required: true },
+          { name: "identity_no", label: "Customer Identity No", type: "text", required: true },
+          { name: "address", label: "Full Address", type: "textarea", required: true },
+          { name: "doc_upload", label: "Identity Document Upload (PDF/Image)", type: "file", required: true },
+          { name: "photo_doc", label: "Photo Upload", type: "file", required: true },
+          { name: "sig_doc", label: "Signature Upload", type: "file", required: true },
+          { name: "other_doc", label: "Other Document Upload", type: "file", required: false }
+        ]
+      },
+      {
+        id: "pan_find",
+        name: "Pan find",
+        charge: 30,
+        fields: [
+          { name: "identity_no", label: "Customer Identity No", type: "text", required: true }
+        ]
+      },
+      {
+        id: "vehicle_rc",
+        name: "Vehicle RC PDF",
+        charge: 50,
+        fields: [
+          { name: "vehicle_no", label: "Vehicle Number (RC)", type: "text", required: true }
+        ]
+      },
+      {
+        id: "dl_pdf",
+        name: "DL pdf",
+        charge: 20,
+        fields: [
+          { name: "dl_no", label: "Driving Licence Number", type: "text", required: true },
+          { name: "dob", label: "Date of Birth (DOB)", type: "date", required: true }
+        ]
+      },
+      {
+        id: "ll_new",
+        name: "LL New Apply",
+        charge: 2000,
+        fields: [
+          { name: "name", label: "Name", type: "text", required: true },
+          { name: "father_name", label: "Father Name", type: "text", required: true },
+          { name: "mother_name", label: "Mother Name", type: "text", required: true },
+          { name: "dob", label: "Date of Birth", type: "date", required: true },
+          { name: "identity_mark", label: "Pahchan Chinh (Identity Mark)", type: "text", required: true },
+          { name: "address", label: "Full Address", type: "textarea", required: true },
+          { name: "mobile_no", label: "Mobile No", type: "number", required: true },
+          { name: "email_id", label: "Email ID", type: "text", required: false },
+          { name: "blood_group", label: "Blood Group", type: "text", required: true },
+          { name: "gender", label: "Gender", type: "select", options: ["Male", "Female", "Other"], required: true },
+          { name: "doc_pdf", label: "Identity Document Upload PDF (Under 500KB)", type: "file", required: true },
+          { name: "photo_doc", label: "Photo Upload", type: "file", required: true },
+          { name: "sig_doc", label: "Signature Upload", type: "file", required: true },
+          { name: "marksheet_pan", label: "10th Marksheet ya Pan Card Upload", type: "file", required: true }
+        ]
+      },
+      {
+        id: "scan_to_pdf",
+        name: "Identity Document Scan to Original PDF",
+        charge: 50,
+        fields: [
+          { name: "doc_copy", label: "Photo Copy Upload (Image/PDF)", type: "file", required: true },
+          { name: "customer_mobile", label: "Customer Mobile No (Optional)", type: "number", required: false }
+        ]
+      },
+      {
+        id: "farmer_id",
+        name: "Farmer ID PDF",
+        charge: 25,
+        fields: [
+          { name: "identity_no", label: "Customer Identity No", type: "text", required: true }
+        ]
+      },
+      {
+        id: "rashan_to_id",
+        name: "Rashan no se identity no",
+        charge: 250,
+        fields: [
+          { name: "rashan_no", label: "Ration Card Number", type: "text", required: true }
+        ]
+      },
+      {
+        id: "ll_print",
+        name: "LL Print PDF",
+        charge: 25,
+        fields: [
+          { name: "ll_no", label: "Learning Licence Number", type: "text", required: true },
+          { name: "dob", label: "Date of Birth (DOB)", type: "date", required: true },
+          { name: "card_type", label: "Card Type", type: "select", options: ["Non PVC", "Normal PVC"], required: true },
+          { name: "bg_color", label: "Card Background", type: "select", options: ["Light Blue", "White"], required: true }
+        ]
+      },
+      {
+        id: "dl_apply",
+        name: "DL Apply",
+        charge: 3500,
+        fields: [
+          { name: "app_no", label: "Application Number", type: "text", required: true },
+          { name: "dob", label: "Date of Birth (DOB)", type: "date", required: true },
+          { name: "ll_pdf", label: "LL PDF Upload", type: "file", required: true }
+        ]
+      }
+    ];
+
+    function getSafeLocalData(key) {
+      try {
+        var str = localStorage.getItem(key);
+        return str ? JSON.parse(str) : null;
+      } catch(e) {
+        return null;
+      }
+    }
+
+    function setSafeLocalData(key, val) {
+      try {
+        localStorage.setItem(key, JSON.stringify(val));
+      } catch(e) {}
+    }
+
+    // Safety Initializer
+    window.addEventListener('DOMContentLoaded', function() {
+      try {
+        var saved = getSafeLocalData("raghu_active_user");
+        if (saved && saved.id) {
+          activeUser = saved;
+          var all = getSafeLocalData("all_portal_retailers") || {};
+          if (all[activeUser.id]) {
+            activeUser.wallet = Number(all[activeUser.id].wallet || 0);
+          }
+          openDashboardPanel();
+        } else {
+          showRegister(false);
+        }
+      } catch(e) {
+        showRegister(false);
+      }
+    });
+
+    function showRegister(flag) {
+      document.getElementById('loginBox').style.display = flag ? 'none' : 'block';
+      document.getElementById('regBox').style.display = flag ? 'block' : 'none';
+    }
+
+    function closeAllModules() {
+      var ids = ['adminOrdersBox', 'retailerOrdersBox', 'adminRetailerBox', 'formOrderBox', 'formRechargeBox'];
+      ids.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      });
+    }
+
+    function renderServicesGrid() {
+      var grid = document.getElementById('servicesGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+      SERVICES_CONFIG.forEach(function(s) {
+        var card = document.createElement('div');
+        card.className = 'service-card';
+        card.innerHTML = 
+          '<div>' +
+            '<h3>' + s.name + '</h3>' +
+            '<span class="tag-badge b-blue">Charge: ₹' + s.charge + '</span>' +
+          '</div>' +
+          '<div class="card-btns">' +
+            '<button class="c-btn btn-open" onclick="openOrderForm(\'' + s.id + '\')">Apply / Open Form ➔</button>' +
+          '</div>';
+        grid.appendChild(card);
+      });
+    }
+
+    function handleLoginAction() {
+      var u = (document.getElementById('loginId').value || '').trim();
+      var p = (document.getElementById('loginPass').value || '').trim();
+
+      if (!u || !p) {
+        alert('Kripya User ID aur Password dono darj karein!');
+        return;
+      }
+
+      // Master Admin Direct Login
+      if (u === 'admin' && p === 'admin123') {
+        activeUser = { role: 'admin', id: 'admin', name: 'Master Admin (Raghu Baba)', mobile: '8207827581', wallet: 99999 };
+        setSafeLocalData("raghu_active_user", activeUser);
+        openDashboardPanel();
+        return;
+      }
+
+      var allRetailers = getSafeLocalData("all_portal_retailers") || {};
+      var userObj = allRetailers[u] || getSafeLocalData("user_" + u);
+
+      if (userObj) {
+        if (userObj.pass === p) {
+          activeUser = { role: 'retailer', id: u, name: userObj.name, mobile: u, wallet: Number(userObj.wallet || 0) };
+          setSafeLocalData("raghu_active_user", activeUser);
+          openDashboardPanel();
+          return;
+        } else {
+          alert('Galat Password! Sahi password dalein.');
+          return;
+        }
+      }
+
+      var btn = document.getElementById('btnSignIn');
+      btn.innerText = "Checking...";
+      btn.disabled = true;
+
+      fetch(FIREBASE_URL + "/retailers/" + encodeURIComponent(u) + ".json")
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          btn.innerText = "लॉगिन करें";
+          btn.disabled = false;
+
+          if (!data) {
+            alert('User ID nahi mili! Pehle Naya Registration karein.');
+            return;
+          }
+
+          if (data.pass === p) {
+            allRetailers[u] = data;
+            setSafeLocalData("all_portal_retailers", allRetailers);
+            setSafeLocalData("user_" + u, data);
+
+            activeUser = { role: 'retailer', id: u, name: data.name, mobile: u, wallet: Number(data.wallet || 0) };
+            setSafeLocalData("raghu_active_user", activeUser);
+            openDashboardPanel();
+          } else {
+            alert('Galat Password! Sahi password dalein.');
+          }
+        })
+        .catch(function() {
+          btn.innerText = "लॉगिन करें";
+          btn.disabled = false;
+          alert('User ID nahi mili ya server issue hai. Naya Registration karein.');
+        });
+    }
+
+    function handleRegistrationAction() {
+      var name = (document.getElementById('newUserName').value || '').trim();
+      var mob = (document.getElementById('newUserMobile').value || '').trim();
+      var pass = (document.getElementById('newUserPass').value || '').trim();
+
+      if (!name || !mob || !pass) {
+        alert('Sabhi details bharna zaroori hai!');
+        return;
+      }
+      if (mob.length !== 10) {
+        alert('Mobile number 10 anko ka hona chahiye!');
+        return;
+      }
+
+      var newUserData = { name: name, pass: pass, wallet: 0, mobile: mob, date: new Date().toLocaleDateString() };
+
+      var allRetailers = getSafeLocalData("all_portal_retailers") || {};
+      allRetailers[mob] = newUserData;
+      setSafeLocalData("all_portal_retailers", allRetailers);
+      setSafeLocalData("user_" + mob, newUserData);
+
+      try {
+        fetch(FIREBASE_URL + "/retailers/" + encodeURIComponent(mob) + ".json", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(newUserData)
+        });
+      } catch(e) {}
+
+      alert('Registration Safal raha! ID: ' + mob + '\nAb login karein.');
+      showRegister(false);
+      document.getElementById('loginId').value = mob;
+      document.getElementById('loginPass').value = pass;
+    }
+
+    function openDashboardPanel() {
+      document.getElementById('loginBox').style.display = 'none';
+      document.getElementById('regBox').style.display = 'none';
+      document.getElementById('userBar').style.display = 'flex';
+      document.getElementById('dashboardView').style.display = 'block';
+
+      document.getElementById('barUserName').innerText = activeUser.name;
+      document.getElementById('barUserPhone').innerText = activeUser.mobile || activeUser.id;
+      document.getElementById('barWalletAmt').innerText = Number(activeUser.wallet || 0).toFixed(2);
+
+      if (activeUser.role === 'admin') {
+        document.getElementById('btnAdminPanel').style.display = 'inline-block';
+        document.getElementById('btnAdminOrders').style.display = 'inline-block';
+        document.getElementById('btnMyOrders').style.display = 'none';
+      } else {
+        document.getElementById('btnAdminPanel').style.display = 'none';
+        document.getElementById('btnAdminOrders').style.display = 'none';
+        document.getElementById('btnMyOrders').style.display = 'inline-block';
+      }
+
+      renderServicesGrid();
+    }
+
+    function doLogout() {
+      activeUser = null;
+      try { localStorage.removeItem("raghu_active_user"); } catch(e){}
+      document.getElementById('userBar').style.display = 'none';
+      document.getElementById('dashboardView').style.display = 'none';
+      closeAllModules();
+      showRegister(false);
+    }
+
+    // ----------------- ADMIN ORDERS & AUTO-REFUND -----------------
+    function openAdminOrdersPanel() {
+      closeAllModules();
+      var b = document.getElementById('adminOrdersBox');
+      b.style.display = 'block';
+      b.scrollIntoView({ behavior: 'smooth' });
+      fetchAdminOrdersList();
+    }
+
+    function fetchAdminOrdersList() {
+      var tbody = document.getElementById('adminOrdersTableBody');
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #64748b;">Orders fetch ho rahe hain...</td></tr>';
+
+      var renderRows = function(ordersDict) {
+        tbody.innerHTML = '';
+        var keys = Object.keys(ordersDict || {});
+        if (keys.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #ef4444;">Abhi tak koi order prapt nahi hua hai.</td></tr>';
+          return;
+        }
+
+        keys.reverse().forEach(function(key) {
+          var o = ordersDict[key];
+          var stClass = "st-pending";
+          var stLabel = o.status || 'Pending';
+
+          if (o.status === 'Completed') {
+            stClass = "st-completed";
+            stLabel = "Completed (✅)";
+          } else if (o.status === 'Processing') {
+            stClass = "st-processing";
+            stLabel = "Processing (⚙️)";
+          } else if (o.status === 'Refunded' || o.status === 'Rejected_Refund') {
+            stClass = "st-refunded";
+            stLabel = "Refunded (₹" + o.charge + " Wapas)";
+          }
+
+          var detailsFormatted = [];
+          if (o.formData) {
+            for (var f in o.formData) {
+              detailsFormatted.push('<strong>' + f + ':</strong> ' + o.formData[f]);
+            }
+          }
+
+          var resultDeliveryHtml = o.deliveryResult ? 
+            (o.deliveryResult.startsWith('http') ? '<a href="' + o.deliveryResult + '" target="_blank" style="color:#2563eb; font-weight:bold;">🔗 Open PDF</a>' : o.deliveryResult) 
+            : '<span style="color:#94a3b8;">Pending Action</span>';
+
+          var tr = document.createElement('tr');
+          tr.innerHTML = 
+            '<td><strong>' + (o.orderId || key) + '</strong><br><small style="color:#64748b;">' + (o.date || '') + '</small></td>' +
+            '<td><strong>' + (o.retailerName || 'N/A') + '</strong><br><small>' + (o.retailerPhone || '') + '</small></td>' +
+            '<td><span style="color:#1e40af; font-weight:600;">' + (o.serviceName || '') + '</span></td>' +
+            '<td><strong>₹' + (o.charge || '0') + '</strong></td>' +
+            '<td style="max-width: 250px; font-size: 11px;">' + (detailsFormatted.join('<br>') || 'N/A') + '</td>' +
+            '<td><span class="' + stClass + '">' + stLabel + '</span></td>' +
+            '<td>' + resultDeliveryHtml + '</td>' +
+            '<td><button class="btn-action-small" onclick="openOrderClearanceAction(\'' + (o.orderId || key) + '\')">Deliver / Refund</button></td>';
+          tbody.appendChild(tr);
+        });
+      };
+
+      var localOrders = getSafeLocalData("all_portal_orders") || {};
+      renderRows(localOrders);
+
+      fetch(FIREBASE_URL + "/service_orders.json")
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (data) {
+            setSafeLocalData("all_portal_orders", data);
+            renderRows(data);
+          }
+        }).catch(function(){});
+    }
+
+    function openOrderClearanceAction(orderId) {
+      var allOrders = getSafeLocalData("all_portal_orders") || {};
+      var orderObj = allOrders[orderId];
+      if (!orderObj) return;
+
+      activeOrderContext = orderObj;
+      var box = document.getElementById('orderClearanceActionBox');
+      document.getElementById('clearanceOrderIdText').innerText = orderId + " (" + orderObj.serviceName + ")";
+      document.getElementById('clearanceOrderChargeInfo').innerText = "Retailer: " + orderObj.retailerName + " (" + orderObj.retailerPhone + ") | Service Charge: ₹" + orderObj.charge;
+      document.getElementById('orderDeliverFileLink').value = orderObj.deliveryResult || '';
+      box.style.display = 'block';
+      box.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function saveOrderDeliveryOrRefund() {
+      if (!activeOrderContext) return;
+
+      var orderId = activeOrderContext.orderId;
+      var selectedAction = document.getElementById('updateOrderStatusSelect').value;
+      var linkOrReason = (document.getElementById('orderDeliverFileLink').value || '').trim();
+      var charge = Number(activeOrderContext.charge || 0);
+      var retailerMob = String(activeOrderContext.retailerPhone).trim();
+
+      var allOrders = getSafeLocalData("all_portal_orders") || {};
+      var allRetailers = getSafeLocalData("all_portal_retailers") || {};
+
+      // 1. REFUND
+      if (selectedAction === 'Rejected_Refund') {
+        if (activeOrderContext.status === 'Refunded') {
+          alert('Is order ka payment pehle hi refund ho chuka hai!');
+          return;
+        }
+
+        var confirmRefund = confirm('Kya aap ₹' + charge + ' is retailer ke wallet me turant REFUND wapas karna chahte hain?');
+        if (!confirmRefund) return;
+
+        var ret = allRetailers[retailerMob] || getSafeLocalData("user_" + retailerMob) || {};
+        var currentWallet = Number(ret.wallet || 0);
+        var newRefundedWallet = currentWallet + charge;
+
+        ret.wallet = newRefundedWallet;
+        allRetailers[retailerMob] = ret;
+        setSafeLocalData("all_portal_retailers", allRetailers);
+        setSafeLocalData("user_" + retailerMob, ret);
+
+        var reasonText = linkOrReason ? "Refunded: " + linkOrReason : "Rejected & Refunded to Wallet";
+        allOrders[orderId].status = 'Refunded';
+        allOrders[orderId].deliveryResult = reasonText;
+        setSafeLocalData("all_portal_orders", allOrders);
+
+        try {
+          fetch(FIREBASE_URL + "/retailers/" + encodeURIComponent(retailerMob) + "/wallet.json", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(newRefundedWallet)
+          });
+          fetch(FIREBASE_URL + "/service_orders/" + encodeURIComponent(orderId) + ".json", {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status: "Refunded", deliveryResult: reasonText })
+          });
+        } catch(e) {}
+
+        alert('Payment Refund Safal! ₹' + charge + ' Retailer (' + retailerMob + ') ke wallet me wapas add ho gaya hai.');
+      } 
+      // 2. COMPLETE / PROCESSING
+      else {
+        allOrders[orderId].status = selectedAction;
+        allOrders[orderId].deliveryResult = linkOrReason;
+        setSafeLocalData("all_portal_orders", allOrders);
+
+        try {
+          fetch(FIREBASE_URL + "/service_orders/" + encodeURIComponent(orderId) + ".json", {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status: selectedAction, deliveryResult: linkOrReason })
+          });
+        } catch(e) {}
+
+        alert('Order status successfully save ho gaya!');
+      }
+
+      document.getElementById('orderClearanceActionBox').style.display = 'none';
+      fetchAdminOrdersList();
+    }
+
+    // ----------------- RETAILER ORDERS VIEW -----------------
+    function openRetailerOrdersPanel() {
+      closeAllModules();
+      var b = document.getElementById('retailerOrdersBox');
+      b.style.display = 'block';
+      b.scrollIntoView({ behavior: 'smooth' });
+      fetchRetailerMyOrders();
+    }
+
+    function fetchRetailerMyOrders() {
+      var tbody = document.getElementById('retailerOrdersTableBody');
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #64748b;">Aapke orders fetch ho rahe hain...</td></tr>';
+
+      var renderRows = function(ordersDict) {
+        tbody.innerHTML = '';
+        var myOrders = [];
+        var activePhone = String(activeUser.mobile || activeUser.id).trim();
+
+        for (var k in ordersDict) {
+          var oPhone = String(ordersDict[k].retailerPhone || '').trim();
+          if (oPhone === activePhone || oPhone === String(activeUser.id).trim()) {
+            myOrders.push(ordersDict[k]);
+          }
+        }
+
+        if (myOrders.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #ef4444;">Aapne abhi tak koi order nahi lagaya hai.</td></tr>';
+          return;
+        }
+
+        myOrders.reverse().forEach(function(o) {
+          var stClass = "st-pending";
+          var stLabel = o.status || 'Pending';
+
+          if (o.status === 'Completed') {
+            stClass = "st-completed";
+            stLabel = "Completed (✅)";
+          } else if (o.status === 'Processing') {
+            stClass = "st-processing";
+            stLabel = "Processing (⚙️)";
+          } else if (o.status === 'Refunded' || o.status === 'Rejected_Refund') {
+            stClass = "st-refunded";
+            stLabel = "Refunded (₹" + o.charge + " Wapas)";
+          }
+
+          var dlHtml = o.deliveryResult ? 
+            (o.deliveryResult.startsWith('http') ? '<a href="' + o.deliveryResult + '" target="_blank" style="color: #059669; font-weight: bold; background: #dcfce7; padding: 4px 10px; border-radius: 4px; text-decoration: none;">📥 Download PDF</a>' : '<strong style="color:#0f172a;">' + o.deliveryResult + '</strong>') 
+            : '<span style="color:#94a3b8;">Kaam chal raha hai...</span>';
+
+          var tr = document.createElement('tr');
+          tr.innerHTML = 
+            '<td><strong>' + o.orderId + '</strong></td>' +
+            '<td><strong style="color: #1e40af;">' + o.serviceName + '</strong></td>' +
+            '<td>' + (o.date || '') + '</td>' +
+            '<td>₹' + o.charge + '</td>' +
+            '<td><span class="' + stClass + '">' + stLabel + '</span></td>' +
+            '<td>' + dlHtml + '</td>';
+          tbody.appendChild(tr);
+        });
+      };
+
+      var localOrders = getSafeLocalData("all_portal_orders") || {};
+      renderRows(localOrders);
+
+      fetch(FIREBASE_URL + "/service_orders.json")
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (data) {
+            setSafeLocalData("all_portal_orders", data);
+            renderRows(data);
+          }
+        }).catch(function(){});
+    }
+
+    // ----------------- ADMIN RETAILER MANAGEMENT -----------------
+    function openAdminPanel() {
+      closeAllModules();
+      var aBox = document.getElementById('adminRetailerBox');
+      aBox.style.display = 'block';
+      aBox.scrollIntoView({ behavior: 'smooth' });
+      fetchRetailersList();
+    }
+
+    function fetchRetailersList() {
+      var tbody = document.getElementById('retailersTableBody');
+      tbody.innerHTML = '';
+
+      var renderRows = function(dict) {
+        tbody.innerHTML = '';
+        var keys = Object.keys(dict || {});
+        document.getElementById('totalRetailersCount').innerText = keys.length;
+
+        if (keys.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #ef4444;">Abhi koi retailer registered nahi hai.</td></tr>';
+          return;
+        }
+
+        keys.forEach(function(key) {
+          var ret = dict[key];
+          var tr = document.createElement('tr');
+          tr.innerHTML = 
+            '<td><strong>' + (ret.name || 'N/A') + '</strong></td>' +
+            '<td>' + key + '</td>' +
+            '<td>' + (ret.date || '-') + '</td>' +
+            '<td><strong style="color: #059669;">₹' + Number(ret.wallet || 0).toFixed(2) + '</strong></td>' +
+            '<td><button class="btn-action-small" onclick="prepareTransfer(\'' + key + '\')">➕ Transfer</button></td>';
+          tbody.appendChild(tr);
+        });
+      };
+
+      var localDict = getSafeLocalData("all_portal_retailers") || {};
+      renderRows(localDict);
+
+      fetch(FIREBASE_URL + "/retailers.json")
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (data) {
+            setSafeLocalData("all_portal_retailers", data);
+            renderRows(data);
+          }
+        }).catch(function(){});
+    }
+
+    function prepareTransfer(mobile) {
+      document.getElementById('adminTransferMobile').value = mobile;
+      document.getElementById('adminTransferAmt').focus();
+    }
+
+    function executeAdminTransfer() {
+      var mob = String(document.getElementById('adminTransferMobile').value || '').trim();
+      var amt = parseFloat(document.getElementById('adminTransferAmt').value);
+
+      if (!mob || !amt || amt <= 0) {
+        alert('Kripya valid Retailer Mobile ID aur Amount darj karein!');
+        return;
+      }
+
+      var all = getSafeLocalData("all_portal_retailers") || {};
+      var retailerData = all[mob] || getSafeLocalData("user_" + mob);
+
+      if (!retailerData) {
+        alert('Retailer (' + mob + ') ka record nahi mila! Kripya sahi Mobile Number dalein.');
+        return;
+      }
+
+      var oldBal = Number(retailerData.wallet || 0);
+      var updatedBal = oldBal + amt;
+
+      retailerData.wallet = updatedBal;
+      all[mob] = retailerData;
+      setSafeLocalData("all_portal_retailers", all);
+      setSafeLocalData("user_" + mob, retailerData);
+
+      if (activeUser && (String(activeUser.id).trim() === mob || String(activeUser.mobile).trim() === mob)) {
+        activeUser.wallet = updatedBal;
+        document.getElementById('barWalletAmt').innerText = Number(updatedBal).toFixed(2);
+        setSafeLocalData("raghu_active_user", activeUser);
+      }
+
+      try {
+        fetch(FIREBASE_URL + "/retailers/" + encodeURIComponent(mob) + "/wallet.json", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updatedBal)
+        });
+        
+        fetch(FIREBASE_URL + "/admin_transfers.json", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            retailer: retailerData.name || mob,
+            mobile: mob,
+            amount: amt,
+            newWallet: updatedBal,
+            date: new Date().toLocaleString()
+          })
+        });
+      } catch(e) {}
+
+      alert('Balance Safaltapoorvak Bhej Diya Gaya!\nRetailer: ' + (retailerData.name || mob) + '\nBheja Gaya Amount: ₹' + amt + '\nNaya Wallet Balance: ₹' + updatedBal.toFixed(2));
+      document.getElementById('adminTransferAmt').value = '';
+      fetchRetailersList();
+    }
+
+    // ----------------- SERVICE FORM OPEN & SUBMIT -----------------
+    function openOrderForm(serviceId) {
+      closeAllModules();
+      currentService = SERVICES_CONFIG.find(function(s) { return s.id === serviceId; });
+      if (!currentService) return;
+
+      document.getElementById('formTitleText').innerText = '📋 ' + currentService.name;
+      document.getElementById('formChargeText').innerText = 'Charge: ₹' + currentService.charge;
+
+      var noteEl = document.getElementById('formNoteText');
+      if (currentService.note) {
+        noteEl.style.display = 'block';
+        noteEl.innerText = currentService.note;
+      } else {
+        noteEl.style.display = 'none';
+      }
+
+      var container = document.getElementById('formInputsContainer');
+      container.innerHTML = '';
+
+      currentService.fields.forEach(function(f) {
+        var group = document.createElement('div');
+        group.className = 'input-group';
+        var label = document.createElement('label');
+        label.innerText = f.label + (f.required ? ' *' : '');
+        group.appendChild(label);
+
+        if (f.type === 'textarea') {
+          var ta = document.createElement('textarea');
+          ta.name = f.name;
+          ta.rows = 2;
+          ta.required = f.required;
+          group.appendChild(ta);
+        } else if (f.type === 'select') {
+          var sel = document.createElement('select');
+          sel.name = f.name;
+          sel.required = f.required;
+          f.options.forEach(function(opt) {
+            var o = document.createElement('option');
+            o.value = opt;
+            o.innerText = opt;
+            sel.appendChild(o);
+          });
+          group.appendChild(sel);
+        } else if (f.type === 'file') {
+          var inpFile = document.createElement('input');
+          inpFile.type = 'file';
+          inpFile.name = f.name;
+          inpFile.required = f.required;
+          group.appendChild(inpFile);
+        } else {
+          var inp = document.createElement('input');
+          inp.type = f.type;
+          inp.name = f.name;
+          inp.required = f.required;
+          inp.placeholder = f.label;
+          group.appendChild(inp);
+        }
+        container.appendChild(group);
+      });
+
+      var box = document.getElementById('formOrderBox');
+      box.style.display = 'block';
+      box.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function openRechargeModule() {
+      closeAllModules();
+      var rBox = document.getElementById('formRechargeBox');
+      rBox.style.display = 'block';
+      rBox.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function buildQrCode() {
+      var amt = parseFloat(document.getElementById('inputRechAmt').value);
+      var box = document.getElementById('qrImageBox');
+      if (amt && amt >= 1) {
+        var upi = "upi://pay?pa=8207827581-3@ybl&pn=Raghu%20Baba&am=" + amt + "&cu=INR";
+        document.getElementById('qrRenderImg').src = "https://api.qrserver.com/v1/create-qr-code/?size=175x175&data=" + encodeURIComponent(upi);
+        document.getElementById('qrAmountLabel').innerText = "Amount: ₹" + amt;
+        box.style.display = 'block';
+      } else {
+        box.style.display = 'none';
+      }
+    }
+
+    function submitRechargeDetails() {
+      var amt = parseFloat(document.getElementById('inputRechAmt').value);
+      var utr = (document.getElementById('inputRechUtr').value || '').trim();
+
+      if (!amt || amt < 1 || !utr) {
+        alert('Kripya valid Amount aur 12-digit UTR darj karein!');
+        return;
+      }
+
+      var newBalance = Number(activeUser.wallet || 0) + amt;
+      activeUser.wallet = newBalance;
+      document.getElementById('barWalletAmt').innerText = Number(newBalance).toFixed(2);
+
+      var all = getSafeLocalData("all_portal_retailers") || {};
+      all[activeUser.id] = activeUser;
+      setSafeLocalData("all_portal_retailers", all);
+      setSafeLocalData("user_" + activeUser.id, activeUser);
+      setSafeLocalData("raghu_active_user", activeUser);
+
+      try {
+        fetch(FIREBASE_URL + "/retailers/" + encodeURIComponent(activeUser.id) + "/wallet.json", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(newBalance)
+        });
+      } catch(e) {}
+
+      alert('Badhai ho! ₹' + amt + ' aapke wallet me AUTO ADD ho chuka hai.');
+      document.getElementById('inputRechAmt').value = '';
+      document.getElementById('inputRechUtr').value = '';
+      document.getElementById('qrImageBox').style.display = 'none';
+      document.getElementById('formRechargeBox').style.display = 'none';
+    }
+
+    function submitOrderAction() {
+      if (!currentService) return;
+
+      var charge = currentService.charge;
+      if (activeUser.role !== 'admin' && Number(activeUser.wallet || 0) < charge) {
+        alert('Wallet balance kam hai! Is service ke liye ₹' + charge + ' chahiye. Kripya pehle recharge karein.');
+        openRechargeModule();
+        return;
+      }
+
+      var form = document.getElementById('dynamicServiceForm');
+      var elements = form.elements;
+      var summaryTextList = [];
+      var formDataMap = {};
+
+      for (var i = 0; i < elements.length; i++) {
+        var el = elements[i];
+        if (!el.name) continue;
+
+        if (el.type === 'file') {
+          if (el.files && el.files[0]) {
+            var file = el.files[0];
+            if (file.size > 524288) {
+              alert(el.name + ' file ka size 500KB se chota hona chahiye!');
+              return;
+            }
+            formDataMap[el.name] = file.name;
+            summaryTextList.push(el.name + ': ' + file.name + ' [Attached]');
+          }
+        } else {
+          formDataMap[el.name] = el.value;
+          summaryTextList.push(el.name + ': ' + el.value);
+        }
+      }
+
+      var orderId = "RB" + Math.floor(100000 + Math.random() * 900000);
+      var newWalletBalance = Number(activeUser.wallet || 0) - (activeUser.role === 'admin' ? 0 : charge);
+
+      activeUser.wallet = newWalletBalance;
+      document.getElementById('barWalletAmt').innerText = Number(newWalletBalance).toFixed(2);
+
+      var all = getSafeLocalData("all_portal_retailers") || {};
+      all[activeUser.id] = activeUser;
+      setSafeLocalData("all_portal_retailers", all);
+      setSafeLocalData("user_" + activeUser.id, activeUser);
+      setSafeLocalData("raghu_active_user", activeUser);
+
+      var orderPayload = {
+        orderId: orderId,
+        serviceName: currentService.name,
+        retailerName: activeUser.name,
+        retailerPhone: activeUser.mobile || activeUser.id,
+        charge: charge,
+        formData: formDataMap,
+        status: "Pending",
+        deliveryResult: "",
+        date: new Date().toLocaleString()
+      };
+
+      var allOrders = getSafeLocalData("all_portal_orders") || {};
+      allOrders[orderId] = orderPayload;
+      setSafeLocalData("all_portal_orders", allOrders);
+
+      try {
+        fetch(FIREBASE_URL + "/retailers/" + encodeURIComponent(activeUser.id) + "/wallet.json", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(newWalletBalance)
+        });
+        fetch(FIREBASE_URL + "/service_orders/" + encodeURIComponent(orderId) + ".json", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(orderPayload)
+        });
+      } catch(e) {}
+
+      var waMessage = "🚨 *NAYA SERVICE ORDER AAYA HAI* 🚨" + "%0A" +
+                      "━━━━━━━━━━━━━━━━━━━" + "%0A" +
+                      "🏪 *Retailer:* " + activeUser.name + "%0A" +
+                      "📱 *Retailer Mob:* " + (activeUser.mobile || activeUser.id) + "%0A" +
+                      "⚡ *Service:* " + currentService.name + "%0A" +
+                      "💰 *Katoti:* ₹" + charge + "%0A" +
+                      "🆔 *Order ID:* " + orderId + "%0A" +
+                      "━━━━━━━━━━━━━━━━━━━" + "%0A" +
+                      "📝 *Details:*%0A" + summaryTextList.join("%0A");
+
+      var waUrl = "https://api.whatsapp.com/send?phone=" + ADMIN_WHATSAPP + "&text=" + waMessage;
+
+      alert('Order safal raha! Order ID: ' + orderId + '\nWallet se ₹' + charge + ' kat gaye hain. WhatsApp alert khul raha hai.');
+      window.open(waUrl, '_blank');
+      closeAllModules();
+    }
+  </script>
+</body>
+</html>
