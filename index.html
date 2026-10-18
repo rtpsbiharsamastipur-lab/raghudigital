@@ -89,6 +89,9 @@
     #dashboardView { display: none; }
     .panel-header { font-size: 19px; font-weight: 600; color: #ffffff; margin-bottom: 18px; border-left: 4px solid #ef4444; padding-left: 12px; }
 
+    /* Keep My Orders and Services Panel separate */
+    body.orders-only #retailerServicesSection { display: none !important; }
+
     /* Services Grid */
     .services-grid {
       display: grid;
@@ -731,6 +734,7 @@
     }
 
     function closeAllModules() {
+      document.body.classList.remove('orders-only');
       var ids = ['adminOrdersBox', 'adminRechargeBox', 'adminLedgerBox', 'retailerOrdersBox', 'adminRetailerBox', 'formOrderBox', 'formRechargeBox'];
       ids.forEach(function(id) {
         var el = document.getElementById(id);
@@ -1465,6 +1469,7 @@
 
     function openRetailerOrdersPanel() {
       closeAllModules();
+      document.body.classList.add('orders-only');
       var servicesSection = document.getElementById('retailerServicesSection');
       if (servicesSection) servicesSection.style.display = 'none';
       var b = document.getElementById('retailerOrdersBox');
