@@ -334,6 +334,17 @@
 
       <button type="button" class="btn-submit" id="btnSignIn" onclick="handleLoginAction()">लॉगिन करें</button>
       <button type="button" class="forgot-password-link" onclick="showForgotPasswordHelp()">Forgot Password?</button>
+      <div id="forgotPasswordBox" style="display:none;margin-top:22px;padding:20px;border:1px solid #d9def0;border-radius:12px;background:#f8faff;">
+        <h3 style="font-size:18px;margin-bottom:12px;color:#26345f;">🔐 Reset Password with OTP</h3>
+        <div class="input-group"><label>Registered Mobile Number</label><input id="resetMobile" type="tel" inputmode="numeric" maxlength="10" placeholder="10 digit mobile number"></div>
+        <div id="resetRecaptcha" style="margin:12px 0;"></div>
+        <button type="button" class="btn-submit" id="sendResetOtpBtn" onclick="sendResetOtp()" style="margin-bottom:12px;">Send OTP</button>
+        <div class="input-group"><label>OTP</label><input id="resetOtp" type="text" inputmode="numeric" maxlength="6" placeholder="6 digit OTP"></div>
+        <div class="input-group"><label>New Password</label><input id="resetNewPass" type="password" minlength="6" placeholder="At least 6 characters"></div>
+        <button type="button" class="btn-submit" id="confirmResetBtn" onclick="confirmResetOtp()">Verify OTP & Reset Password</button>
+        <button type="button" onclick="cancelForgotPassword()" style="margin-top:10px;width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:8px;background:white;font-weight:700;cursor:pointer;">Cancel</button>
+        <p style="font-size:12px;color:#64748b;margin-top:10px;">OTP registered mobile par aayega. SMS quota/charges apply ho sakte hain.</p>
+      </div>
 
       <div class="switch-tab">
         <a onclick="showRegister(true)">New Registration</a>
@@ -644,8 +655,23 @@
 
   </div>
 
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script>
     var FIREBASE_URL = "https://raghudigital-b685f-default-rtdb.firebaseio.com";
+    var firebaseConfig = {
+      apiKey: "AIzaSyBwdCqnKvmqoHqGzrpBF0XYbNJ_xIGr26M",
+      authDomain: "raghudigital-b685f.firebaseapp.com",
+      databaseURL: "https://raghudigital-b685f-default-rtdb.firebaseio.com",
+      projectId: "raghudigital-b685f",
+      storageBucket: "raghudigital-b685f.firebasestorage.app",
+      messagingSenderId: "581047177981",
+      appId: "1:581047177981:web:13bab8a9bf921d57af2494",
+      measurementId: "G-7DJ8QZMZRC"
+    };
+    if (window.firebase && !firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    var phoneAuth = window.firebase ? firebase.auth() : null;
+
     var activeUser = null;
     var currentService = null;
     var activeOrderContext = null;
@@ -833,8 +859,79 @@
       setInterval(syncPortalState, 8000);
     });
 
+    var resetConfirmationResult = null;
+    var resetRecaptchaVerifier = null;
     function showForgotPasswordHelp() {
-      alert('Password reset ke liye Admin se sampark karein. Security ke liye bina verified identity ke password change nahi kiya ja sakta.');
+      var box = document.getElementById('forgotPasswordBox');
+      box.style.display = box.style.display === 'block' ? 'none' : 'block';
+      if (box.style.display === 'block') {
+        document.getElementById('resetMobile').focus();
+        if (window.firebase && !resetRecaptchaVerifier) {
+          try {
+            resetRecaptchaVerifier = new firebase.auth.RecaptchaVerifier('resetRecaptcha', { size: 'normal' });
+            resetRecaptchaVerifier.render();
+          } catch(e) { console.warn('reCAPTCHA setup:', e); }
+        }
+      }
+    }
+    function cancelForgotPassword() {
+      document.getElementById('forgotPasswordBox').style.display = 'none';
+      document.getElementById('resetMobile').value = '';
+      document.getElementById('resetOtp').value = '';
+      document.getElementById('resetNewPass').value = '';
+      resetConfirmationResult = null;
+    }
+    function sendResetOtp() {
+      var mobile = (document.getElementById('resetMobile').value || '').replace(/\\D/g, '');
+      if (!/^[6-9]\\d{9}$/.test(mobile)) { alert('Sahi 10 digit Indian mobile number dalein.'); return; }
+      var btn = document.getElementById('sendResetOtpBtn');
+      btn.disabled = true; btn.textContent = 'Checking retailer...';
+      fetch(FIREBASE_URL + '/retailers/' + encodeURIComponent(mobile) + '.json')
+        .then(function(res){ return res.json(); })
+        .then(function(retailer) {
+          if (!retailer) throw new Error('Is mobile number se retailer account nahi mila.');
+          if (!phoneAuth) throw new Error('Firebase Phone Authentication load nahi hua. Page refresh karke try karein.');
+          btn.textContent = 'Sending OTP...';
+          return phoneAuth.signInWithPhoneNumber('+91' + mobile, resetRecaptchaVerifier)
+            .then(function(result){ resetConfirmationResult = result; alert('OTP bhej diya gaya hai. SMS check karein.'); });
+        })
+        .catch(function(err) {
+          if (resetRecaptchaVerifier) { resetRecaptchaVerifier.clear(); resetRecaptchaVerifier = null; }
+          alert(err.message || 'OTP bhejne mein dikkat hui. Dobara try karein.');
+        })
+        .finally(function(){ btn.disabled = false; btn.textContent = 'Send OTP'; });
+    }
+    function confirmResetOtp() {
+      var mobile = (document.getElementById('resetMobile').value || '').replace(/\\D/g, '');
+      var otp = (document.getElementById('resetOtp').value || '').trim();
+      var newPass = document.getElementById('resetNewPass').value || '';
+      if (!resetConfirmationResult) { alert('Pehle Send OTP dabayein.'); return; }
+      if (!/^\\d{6}$/.test(otp)) { alert('6 digit OTP dalein.'); return; }
+      if (newPass.length < 6) { alert('Naya password kam se kam 6 characters ka rakhein.'); return; }
+      var btn = document.getElementById('confirmResetBtn');
+      btn.disabled = true; btn.textContent = 'Verifying...';
+      resetConfirmationResult.confirm(otp)
+        .then(function(credential) {
+          if (!credential.user || credential.user.phoneNumber !== '+91' + mobile) throw new Error('Verified mobile number match nahi hua.');
+          return fetch(FIREBASE_URL + '/retailers/' + encodeURIComponent(mobile) + '.json')
+            .then(function(res){ return res.json(); })
+            .then(function(retailer) {
+              if (!retailer) throw new Error('Retailer account nahi mila.');
+              retailer.pass = newPass;
+              return fetch(FIREBASE_URL + '/retailers/' + encodeURIComponent(mobile) + '.json', {
+                method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(retailer)
+              }).then(function(res){ if(!res.ok) throw new Error('Database update nahi ho paya.'); return retailer; });
+            });
+        })
+        .then(function(retailer) {
+          var all = getSafeLocalData('all_portal_retailers') || {};
+          all[mobile] = retailer; setSafeLocalData('all_portal_retailers', all);
+          setSafeLocalData('user_' + mobile, retailer);
+          alert('Password reset ho gaya. Ab naye password se login karein.');
+          cancelForgotPassword();
+        })
+        .catch(function(err){ alert(err.message || 'OTP verify/reset nahi ho paya.'); })
+        .finally(function(){ btn.disabled = false; btn.textContent = 'Verify OTP & Reset Password'; });
     }
 
     function showRegister(flag) {
