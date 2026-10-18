@@ -305,6 +305,7 @@
   <div id="userBar">
     <div>Dukandar: <strong id="barUserName" style="color: #facc15; font-size: 14px;"></strong> (<span id="barUserPhone"></span>)</div>
     <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+      <button class="btn-bar-action" id="btnAdminHome" onclick="openAdminHomePanel()" style="background:#0f766e;display:none;">🏠 Home</button>
       <button class="btn-bar-action btn-admin-orders" id="btnAdminOrders" onclick="openAdminOrdersPanel()">📦 Orders Desk (<span id="countAdminPending">0</span>)</button>
       <button class="btn-bar-action btn-admin-recharge" id="btnAdminRecharge" onclick="openAdminRechargePanel()">💳 Recharges (<span id="countAdminRech">0</span>)</button>
       <button class="btn-bar-action btn-admin-ledger" id="btnAdminLedger" onclick="openAdminLedgerPanel()">📊 Din Bhar Ka Khata</button>
@@ -385,6 +386,42 @@
 
     <!-- 3. MAIN DASHBOARD VIEW -->
     <div id="dashboardView">
+
+      <!-- MASTER ADMIN HOME PAGE -->
+      <div class="module-card" id="adminHomeBox" style="display:none;border-top-color:#0f766e;">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px;">
+          <div>
+            <h2 style="font-size:24px;color:#0f766e;font-weight:900;">🏠 Master Admin Home</h2>
+            <p style="font-size:14px;color:#64748b;margin-top:5px;">RAGHU BABA ONLINE SERVICE — Portal Control Center</p>
+          </div>
+          <button type="button" class="c-btn btn-open" style="max-width:130px;" onclick="refreshAdminHome()">🔄 Refresh</button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:22px;">
+          <div style="background:#eff6ff;border-left:5px solid #2563eb;border-radius:10px;padding:18px;">
+            <div style="font-size:13px;font-weight:800;color:#1d4ed8;">📦 Pending Orders</div>
+            <div id="homePendingOrders" style="font-size:30px;font-weight:900;color:#1e3a8a;margin-top:8px;">—</div>
+            <button class="c-btn btn-open" style="margin-top:12px;" onclick="openAdminOrdersPanel()">Orders Desk खोलें ➜</button>
+          </div>
+          <div style="background:#faf5ff;border-left:5px solid #7c3aed;border-radius:10px;padding:18px;">
+            <div style="font-size:13px;font-weight:800;color:#6d28d9;">💳 Pending Recharge</div>
+            <div id="homePendingRecharges" style="font-size:30px;font-weight:900;color:#5b21b6;margin-top:8px;">—</div>
+            <button class="c-btn btn-open" style="margin-top:12px;background:#7c3aed;" onclick="openAdminRechargePanel()">Recharge खोलें ➜</button>
+          </div>
+          <div style="background:#f0fdfa;border-left:5px solid #0f766e;border-radius:10px;padding:18px;">
+            <div style="font-size:13px;font-weight:800;color:#0f766e;">👥 Retailer Management</div>
+            <div style="font-size:16px;font-weight:800;color:#115e59;margin-top:12px;">Account &amp; Wallet</div>
+            <button class="c-btn btn-open" style="margin-top:12px;background:#0f766e;" onclick="openAdminPanel()">Retailers खोलें ➜</button>
+          </div>
+          <div style="background:#f0fdf4;border-left:5px solid #16a34a;border-radius:10px;padding:18px;">
+            <div style="font-size:13px;font-weight:800;color:#166534;">📊 Daily Ledger</div>
+            <div style="font-size:16px;font-weight:800;color:#14532d;margin-top:12px;">Transfer &amp; Order Report</div>
+            <button class="c-btn btn-open" style="margin-top:12px;background:#16a34a;" onclick="openAdminLedgerPanel()">Khata खोलें ➜</button>
+          </div>
+        </div>
+        <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:15px;color:#9a3412;">
+          <strong>⚠️ Admin Reminder:</strong> Wallet transfer, recharge approval aur order refund karne se pehle amount aur retailer details verify karein.
+        </div>
+      </div>
 
       <!-- ADMIN EXCLUSIVE: ORDER CLEARANCE & REFUND DESK -->
       <div class="module-card" id="adminOrdersBox" style="border-top-color: #2563eb; display: none;">
@@ -951,7 +988,7 @@
       var actionBox = document.getElementById('orderClearanceActionBox');
       if (actionBox) actionBox.style.display = 'none';
       document.body.classList.remove('orders-only');
-      var ids = ['adminOrdersBox', 'adminRechargeBox', 'adminLedgerBox', 'retailerOrdersBox', 'adminRetailerBox', 'formOrderBox', 'formRechargeBox'];
+      var ids = ['adminHomeBox', 'adminOrdersBox', 'adminRechargeBox', 'adminLedgerBox', 'retailerOrdersBox', 'adminRetailerBox', 'formOrderBox', 'formRechargeBox'];
       ids.forEach(function(id) {
         var el = document.getElementById(id);
         if (el) el.style.display = 'none';
@@ -1089,15 +1126,17 @@
 
       if (activeUser.role === 'admin') {
         document.getElementById('btnAdminPanel').style.display = 'inline-block';
+        document.getElementById('btnAdminHome').style.display = 'inline-block';
         document.getElementById('btnAdminOrders').style.display = 'inline-block';
         document.getElementById('btnAdminRecharge').style.display = 'inline-block';
         document.getElementById('btnAdminLedger').style.display = 'inline-block';
         document.getElementById('btnMyOrders').style.display = 'none';
         document.getElementById('barWalletPill').style.display = 'none';
         document.getElementById('retailerServicesSection').style.display = 'none';
-        openAdminOrdersPanel();
+        openAdminHomePanel();
       } else {
         document.getElementById('btnAdminPanel').style.display = 'none';
+        document.getElementById('btnAdminHome').style.display = 'none';
         document.getElementById('btnAdminOrders').style.display = 'none';
         document.getElementById('btnAdminRecharge').style.display = 'none';
         document.getElementById('btnAdminLedger').style.display = 'none';
@@ -1166,6 +1205,51 @@
             document.getElementById('countAdminRech').innerText = count;
           }).catch(function(){});
       }
+    }
+
+    function openAdminHomePanel() {
+      if (!activeUser || activeUser.role !== 'admin') return;
+      closeAllModules();
+      var home = document.getElementById('adminHomeBox');
+      if (home) {
+        home.style.display = 'block';
+        home.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      refreshAdminHome();
+    }
+
+    function refreshAdminHome() {
+      if (!activeUser || activeUser.role !== 'admin') return;
+      var pendingOrdersEl = document.getElementById('homePendingOrders');
+      var pendingRechargesEl = document.getElementById('homePendingRecharges');
+      if (pendingOrdersEl) pendingOrdersEl.textContent = '...';
+      if (pendingRechargesEl) pendingRechargesEl.textContent = '...';
+
+      fetch(FIREBASE_URL + '/service_orders.json')
+        .then(function(res) { if (!res.ok) throw new Error('Orders load nahi hue'); return res.json(); })
+        .then(function(data) {
+          var count = 0;
+          Object.keys(data || {}).forEach(function(k) {
+            if (data[k] && data[k].status === 'Pending') count++;
+          });
+          if (pendingOrdersEl) pendingOrdersEl.textContent = String(count);
+          var barCount = document.getElementById('countAdminPending');
+          if (barCount) barCount.textContent = String(count);
+        })
+        .catch(function() { if (pendingOrdersEl) pendingOrdersEl.textContent = '—'; });
+
+      fetch(FIREBASE_URL + '/recharge_requests.json')
+        .then(function(res) { if (!res.ok) throw new Error('Recharge load nahi hua'); return res.json(); })
+        .then(function(data) {
+          var count = 0;
+          Object.keys(data || {}).forEach(function(k) {
+            if (data[k] && data[k].status === 'Pending') count++;
+          });
+          if (pendingRechargesEl) pendingRechargesEl.textContent = String(count);
+          var barCount = document.getElementById('countAdminRech');
+          if (barCount) barCount.textContent = String(count);
+        })
+        .catch(function() { if (pendingRechargesEl) pendingRechargesEl.textContent = '—'; });
     }
 
     function openAdminOrdersPanel() {
