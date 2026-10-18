@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RAGHU BABA ONLINE SERVICE - B2B Digital Portal</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
     body { background: #0b1329; color: #1e293b; min-height: 100vh; padding-bottom: 50px; }
 
     /* Top Colorful Header */
@@ -96,4 +96,68 @@
     .service-card h3 { font-size: 16px; font-weight: 600; color: #0f172a; margin-bottom: 6px; }
     .tag-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 10px; }
     .b-blue { background: #e0f2fe; color: #0369a1; }
-    .b-red { background: #ffe4e6; color: #be1
+    .b-red { background: #ffe4e6; color: #be123c; }
+
+    .card-btns { display: flex; gap: 8px; margin-top: 14px; }
+    .c-btn { flex: 1; padding: 9px; border-radius: 6px; font-size: 12px; font-weight: 600; border: none; cursor: pointer; text-align: center; }
+    .btn-open { background: #2563eb; color: white; }
+
+    /* Dynamic Module Box */
+    .module-card {
+      display: none; background: #ffffff; border-radius: 10px; padding: 24px;
+      border-top: 5px solid #059669; margin-bottom: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; }
+    .qr-container { text-align: center; background: #f8fafc; padding: 15px; border: 1.5px dashed #cbd5e1; border-radius: 8px; margin: 15px 0; }
+
+    /* Tables */
+    .admin-table-wrap { overflow-x: auto; margin-top: 15px; border-radius: 8px; border: 1px solid #e2e8f0; }
+    .admin-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
+    .admin-table th { background: #0f172a; color: #ffffff; padding: 12px 14px; font-weight: 600; }
+    .admin-table td { padding: 12px 14px; border-bottom: 1px solid #e2e8f0; color: #334155; }
+    .admin-table tr:hover { background: #f8fafc; }
+    .btn-action-small { background: #059669; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 12px; }
+
+    /* Status Badges */
+    .st-pending { background: #fef3c7; color: #b45309; padding: 4px 8px; border-radius: 12px; font-weight: 600; font-size: 11px; }
+    .st-processing { background: #e0f2fe; color: #0284c7; padding: 4px 8px; border-radius: 12px; font-weight: 600; font-size: 11px; }
+    .st-completed { background: #dcfce7; color: #15803d; padding: 4px 8px; border-radius: 12px; font-weight: 600; font-size: 11px; }
+    .st-refunded { background: #ffe4e6; color: #b91c1c; padding: 4px 8px; border-radius: 12px; font-weight: 700; font-size: 11px; }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header -->
+  <div class="site-header">
+    <h1>RAGHU BABA ONLINE SERVICE</h1>
+    <p>⚡ All B2B Digital &amp; Printing Services • Dedicated Retailer Portal ⚡</p>
+  </div>
+
+  <!-- Top Bar -->
+  <div id="userBar">
+    <div>Dukandar: <strong id="barUserName" style="color: #facc15; font-size: 14px;"></strong> (<span id="barUserPhone"></span>)</div>
+    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+      <button class="btn-bar-action btn-admin-orders" id="btnAdminOrders" onclick="openAdminOrdersPanel()">📦 Orders Desk</button>
+      <button class="btn-bar-action btn-admin-manage" id="btnAdminPanel" onclick="openAdminPanel()">👑 Retailer Control</button>
+      <button class="btn-bar-action btn-my-orders" id="btnMyOrders" onclick="openRetailerOrdersPanel()">📑 Mere Orders</button>
+      <div class="wallet-pill" onclick="openRechargeModule()">💰 Wallet: ₹<span id="barWalletAmt">0.00</span> ➕</div>
+      <button class="btn-bar-action btn-exit" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="main-wrap">
+
+    <!-- 1. LOGIN SCREEN -->
+    <div class="card-box" id="loginBox">
+      <h2>🔐 Retailer Login</h2>
+      <p class="subtitle">Apna ID aur Password darj karein</p>
+
+      <div class="input-group">
+        <label>User ID / Mobile Number</label>
+        <input type="text" id="loginId" placeholder="User ID ya Mobile number">
+      </div>
+
+      <div class="input-group">
+        <label>Password</label>
+        <input type="password" id="loginPass" placeholder="Password">
+      </div>
