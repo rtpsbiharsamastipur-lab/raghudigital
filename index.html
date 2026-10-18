@@ -40,7 +40,7 @@
     .btn-admin-recharge { background: #7c3aed; display: none; }
     .btn-admin-ledger { background: #0891b2; display: none; }
     .btn-my-orders { background: #0284c7; }
-    .btn-exit { background: #dc2626; border-radius: 6px; }
+    .btn-exit { background: #dc2626; border-radius: 6px; padding: 7px 14px; border: none; color: white; font-weight: 700; cursor: pointer; }
 
     /* Container */
     .main-wrap { max-width: 1200px; margin: 25px auto; padding: 0 15px; }
@@ -59,15 +59,6 @@
       text-align: center;
       display: block;
       position: relative;
-    }
-    .card-box::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: #ffffff;
     }
     .card-box h2 { 
       font-size: 24px; 
@@ -131,7 +122,6 @@
     .service-card h3 { font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 6px; }
     .tag-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-bottom: 10px; }
     .b-blue { background: #e0f2fe; color: #0369a1; }
-    .b-red { background: #ffe4e6; color: #be123c; }
 
     .card-btns { display: flex; gap: 8px; margin-top: 14px; }
     .c-btn { flex: 1; padding: 10px; border-radius: 6px; font-size: 13px; font-weight: 700; border: none; cursor: pointer; text-align: center; }
@@ -139,45 +129,9 @@
 
     /* Dynamic Module Box */
     .module-card {
-      display: none; background: #ffffff; border-radius: 10px; padding: 22px;
+      background: #ffffff; border-radius: 10px; padding: 22px;
       border-top: 5px solid #046a38; margin-bottom: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
     }
-    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; }
-    .qr-container { text-align: center; background: #f8fafc; padding: 15px; border: 1.5px dashed #cbd5e1; border-radius: 8px; margin: 15px 0; }
-
-    /* Tables */
-    .admin-table-wrap { overflow-x: auto; margin-top: 15px; border-radius: 8px; border: 1px solid #cbd5e1; }
-    .admin-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
-    .admin-table th { background: #0f172a; color: #ffffff; padding: 12px 14px; font-weight: 700; }
-    .admin-table td { padding: 12px 14px; border-bottom: 1px solid #e2e8f0; color: #334155; vertical-align: top; }
-    .admin-table tr:hover { background: #f8fafc; }
-    
-    .btn-action-small { background: #046a38; color: white; border: none; padding: 7px 12px; border-radius: 4px; font-weight: 700; cursor: pointer; font-size: 12px; }
-    .btn-delete-small { background: #dc2626; color: white; border: none; padding: 7px 10px; border-radius: 4px; font-weight: 700; cursor: pointer; font-size: 12px; margin-left: 5px; }
-
-    /* Badges */
-    .st-pending { background: #fef3c7; color: #b45309; padding: 4px 8px; border-radius: 12px; font-weight: 700; font-size: 11px; }
-    .st-processing { background: #e0f2fe; color: #0284c7; padding: 4px 8px; border-radius: 12px; font-weight: 700; font-size: 11px; }
-    .st-completed { background: #dcfce7; color: #15803d; padding: 4px 8px; border-radius: 12px; font-weight: 700; font-size: 11px; }
-    .st-refunded { background: #ffe4e6; color: #b91c1c; padding: 4px 8px; border-radius: 12px; font-weight: 800; font-size: 11px; }
-
-    .order-data-box {
-      font-size: 13px;
-      line-height: 1.6;
-      background: #f1f5f9;
-      padding: 10px 12px;
-      border-radius: 6px;
-      border: 1px solid #cbd5e1;
-      color: #0f172a;
-      max-width: 380px;
-    }
-    .order-data-box strong {
-      color: #06038d;
-      display: inline-block;
-      min-width: 95px;
-    }
-
-    /* Live Notification Banner */
     #adminNoticeAlert {
       display: none;
       background: #dc2626;
@@ -188,12 +142,6 @@
       font-size: 16px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.4);
       cursor: pointer;
-      animation: pulseAlert 1.5s infinite;
-    }
-    @keyframes pulseAlert {
-      0% { opacity: 1; }
-      50% { opacity: 0.8; }
-      100% { opacity: 1; }
     }
   </style>
 </head>
@@ -204,7 +152,7 @@
     <source src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" type="audio/mpeg">
   </audio>
 
-  <!-- Flashing Notification Bar for Master Admin -->
+  <!-- Live Notification Bar for Master Admin -->
   <div id="adminNoticeAlert" onclick="openAdminOrdersPanel()">
     🔔 NAYA ORDER AAYA HAI! Yahan click karke Orders Desk kholein.
   </div>
@@ -225,7 +173,7 @@
       <button class="btn-bar-action btn-admin-manage" id="btnAdminPanel" onclick="openAdminPanel()">👑 Retailers</button>
       <button class="btn-bar-action btn-my-orders" id="btnMyOrders" onclick="openRetailerOrdersPanel()">📑 Mere Orders</button>
       <div class="wallet-pill" id="barWalletPill" onclick="openRechargeModule()">💰 Wallet: ₹<span id="barWalletAmt">0.00</span> ➕</div>
-      <button class="btn-bar-action btn-exit" onclick="doLogout()">Logout</button>
+      <button class="btn-exit" onclick="doLogout()">Logout</button>
     </div>
   </div>
 
@@ -238,63 +186,12 @@
 
       <div class="input-group">
         <label>User ID / Mobile Number</label>
-        <input type="text" id="loginId" placeholder="10-digit mobile ya admin ID">
+        <input type="text" id="loginId" placeholder="10-digit mobile ya admin ID" autocomplete="username">
       </div>
 
       <div class="input-group">
         <label>Password</label>
-        <input type="password" id="loginPass" placeholder="Apna password darj karein">
+        <input type="password" id="loginPass" placeholder="Apna password darj karein" autocomplete="current-password">
       </div>
 
-      <button type="button" class="btn-submit" id="btnSignIn" onclick="handleLoginAction()">लॉगिन करें (LOGIN)</button>
-
-      <div class="switch-tab">
-        Naye dukandar hain? <a onclick="showRegister(true)">Naya Registration Karein ➔</a>
-      </div>
-    </div>
-
-    <!-- 2. REGISTRATION SCREEN -->
-    <div class="card-box" id="regBox" style="display: none; border-top-color: #046a38; border-bottom-color: #ff671f;">
-      <h2>📝 Naya Registration</h2>
-      <p class="subtitle">Apna portal account turant banayein</p>
-
-      <div class="input-group">
-        <label>Dukan / Operator ka Naam</label>
-        <input type="text" id="newUserName" placeholder="Poora naam likhein">
-      </div>
-
-      <div class="input-group">
-        <label>Mobile Number (Yehi Login ID banegi)</label>
-        <input type="number" id="newUserMobile" placeholder="10 anko ka mobile number">
-      </div>
-
-      <div class="input-group">
-        <label>Password Banayein</label>
-        <input type="password" id="newUserPass" placeholder="Surakshit password banayein">
-      </div>
-
-      <button type="button" class="btn-submit btn-reg" id="btnSignUp" onclick="handleRegistrationAction()">रजिस्टर करें (REGISTER)</button>
-
-      <div class="switch-tab">
-        Pehle se account hai? <a onclick="showRegister(false)">Login Karein ➔</a>
-      </div>
-    </div>
-
-    <!-- 3. MAIN DASHBOARD VIEW -->
-    <div id="dashboardView">
-
-      <!-- ADMIN EXCLUSIVE: ORDER CLEARANCE & REFUND DESK -->
-      <div class="module-card" id="adminOrdersBox" style="border-top-color: #2563eb; display: none;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
-          <div>
-            <h3 style="color: #1e3a8a; font-size: 19px; font-weight:800;">📦 Admin Orders &amp; Slip Delivery Desk</h3>
-            <p style="font-size: 13px; color: #64748b;">Orders clear karein, final receipt/slip upload karein ya refund bhejein.</p>
-          </div>
-          <div style="display: flex; gap: 8px;">
-            <button class="c-btn btn-open" style="max-width: 110px;" onclick="fetchAdminOrdersList()">🔄 Refresh</button>
-            <button type="button" class="btn-exit" style="background: #475569;" onclick="closeAllModules()">Close</button>
-          </div>
-        </div>
-
-        <!-- Order Action Clearance Box with Slip File Upload -->
-        <div id="orderClearanceActionBox" style="display
+      <button type="button" class="btn-submit" id="btn
