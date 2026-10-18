@@ -5,413 +5,60 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RAGHU BABA ONLINE SERVICE - B2B Digital Portal</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
     body { background: #f0f4f8; color: #1e293b; min-height: 100vh; }
 
     /* Colorful Header */
     header {
-      background: linear-gradient(135deg, #ff6b6b, #4834d4, #1dd1a1);
+      background: linear-gradient(135deg, #ff4757, #2ed573, #1e90ff);
       padding: 18px 20px;
       text-align: center;
       color: #ffffff;
       box-shadow: 0 4px 15px rgba(0,0,0,0.15);
     }
     header h1 { font-size: 24px; font-weight: 800; text-shadow: 1px 1px 3px rgba(0,0,0,0.3); }
-    header p { font-size: 13px; font-weight: 600; margin-top: 4px; opacity: 0.95; }
+    header p { font-size: 13px; font-weight: 600; margin-top: 4px; }
 
     /* Top User Bar */
     #topBar {
       display: none;
       background: #0f172a;
       color: #ffffff;
-      padding: 10px 20px;
+      padding: 12px 20px;
       justify-content: space-between;
       align-items: center;
       font-size: 13px;
-      border-bottom: 3px solid #ff9f43;
+      border-bottom: 3px solid #ffa502;
     }
-    .wallet-btn { background: #10b981; color: white; padding: 6px 14px; border-radius: 20px; font-weight: bold; cursor: pointer; border: none; }
-    .btn-logout { background: #ef4444; color: white; border: none; padding: 6px 14px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+    .wallet-btn { background: #2ed573; color: white; padding: 6px 14px; border-radius: 20px; font-weight: bold; cursor: pointer; border: none; }
+    .btn-logout { background: #ff4757; color: white; border: none; padding: 6px 14px; border-radius: 6px; font-weight: bold; cursor: pointer; }
 
     /* Main Container */
     .container { max-width: 1100px; margin: 25px auto; padding: 0 15px; }
 
-    /* Auth Forms Container */
-    .auth-box {
+    /* Auth Box */
+    .auth-card {
       max-width: 420px;
       margin: 40px auto;
       background: #ffffff;
       padding: 30px 25px;
-      border-radius: 14px;
+      border-radius: 12px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-      border-top: 5px solid #4834d4;
+      border-top: 5px solid #1e90ff;
     }
-    .auth-box h2 { text-align: center; color: #1e293b; font-size: 20px; margin-bottom: 6px; }
-    .auth-box p.desc { text-align: center; font-size: 12px; color: #64748b; margin-bottom: 20px; }
+    .auth-card h2 { text-align: center; color: #1e293b; font-size: 20px; margin-bottom: 6px; }
+    .auth-card p.desc { text-align: center; font-size: 12px; color: #64748b; margin-bottom: 20px; }
 
     .field { margin-bottom: 15px; text-align: left; }
     .field label { display: block; font-size: 12px; font-weight: bold; color: #334155; margin-bottom: 5px; }
-    .field input, .field textarea, .field select {
+    .field input, .field textarea {
       width: 100%; padding: 11px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 14px; outline: none;
     }
-    .field input:focus { border-color: #4834d4; }
+    .field input:focus { border-color: #1e90ff; }
 
-    .btn-primary {
-      width: 100%; background: linear-gradient(90deg, #4834d4, #686de0);
-      color: white; padding: 12px; border: none; border-radius: 6px;
-      font-size: 15px; font-weight: bold; cursor: pointer;
+    .btn-action {
+      width: 100%; background: #1e90ff; color: white; padding: 12px;
+      border: none; border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer;
     }
-    .btn-green { background: #10b981; }
-
-    .switch-link { text-align: center; margin-top: 15px; font-size: 13px; }
-    .switch-link a { color: #4834d4; font-weight: bold; text-decoration: none; cursor: pointer; }
-
-    /* Dashboard Layout */
-    #dashView { display: none; }
-    .dash-heading { font-size: 19px; font-weight: bold; color: #1e3a8a; margin-bottom: 15px; border-left: 5px solid #ff6b6b; padding-left: 10px; }
-
-    /* Colorful Service Cards Grid */
-    .service-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 18px;
-      margin-bottom: 30px;
-    }
-    .srv-card {
-      background: #ffffff;
-      border-radius: 12px;
-      padding: 18px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-      border-top: 5px solid #4834d4;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-    .srv-card h3 { font-size: 16px; color: #0f172a; margin-bottom: 6px; }
-    .srv-card .charge-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; margin-bottom: 10px; }
-    .bg-mob { background: #e0f2fe; color: #0284c7; }
-    .bg-abha { background: #dcfce7; color: #15803d; }
-    .bg-farmer { background: #fef3c7; color: #b45309; }
-    .bg-qr { background: #ede9fe; color: #6d28d9; }
-
-    .card-actions { display: flex; gap: 8px; margin-top: 15px; }
-    .btn-card {
-      flex: 1; padding: 8px; border-radius: 6px; font-size: 12px; font-weight: bold; border: none; cursor: pointer; text-align: center; text-decoration: none;
-    }
-    .btn-apply { background: #4834d4; color: white; }
-    .btn-link { background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; }
-
-    /* Module Box */
-    .module-card {
-      display: none; background: #ffffff; border-radius: 10px; padding: 22px;
-      border: 1px solid #cbd5e1; border-top: 5px solid #10b981; margin-bottom: 25px;
-    }
-
-    .qr-area { text-align: center; background: #f8fafc; padding: 15px; border: 1px dashed #cbd5e1; border-radius: 8px; margin: 15px 0; }
-  </style>
-</head>
-<body>
-
-  <!-- Top Header -->
-  <header>
-    <h1>RAGHU BABA ONLINE SERVICE</h1>
-    <p>⚡ All B2B Digital &amp; Printing Services • Samastipur Portal ⚡</p>
-  </header>
-
-  <!-- User Status Bar -->
-  <div id="topBar">
-    <div>Dukandar: <strong id="retailerName" style="color: #facc15;"></strong></div>
-    <div style="display: flex; gap: 10px; align-items: center;">
-      <button class="wallet-btn" onclick="openModule('recharge')">💰 Wallet: ₹<span id="walletAmt">0.00</span> ➕</button>
-      <button class="btn-logout" onclick="logoutSession()">लॉगआउट</button>
-    </div>
-  </div>
-
-  <div class="container">
-
-    <!-- 1. LOGIN SCREEN -->
-    <div class="auth-box" id="loginCard">
-      <h2>🔐 पोर्टल लॉगिन</h2>
-      <p class="desc">Raghu Baba Digital Network me Login karein</p>
-
-      <div class="field">
-        <label>User ID / Mobile Number</label>
-        <input type="text" id="logUser" placeholder="ID darj karein (e.g. admin)">
-      </div>
-
-      <div class="field">
-        <label>Password</label>
-        <input type="password" id="logPass" placeholder="Password darj karein">
-      </div>
-
-      <button type="button" class="btn-primary" onclick="processLogin()">लॉगिन करें</button>
-
-      <div class="switch-link">
-        Naye dukandar hain? <a onclick="toggleAuth(true)">Naya Registration Karein ➔</a>
-      </div>
-    </div>
-
-    <!-- 2. SELF REGISTRATION SCREEN -->
-    <div class="auth-box" id="regCard" style="display: none; border-top-color: #10b981;">
-      <h2>📝 नया दुकानदार रजिस्ट्रेशन</h2>
-      <p class="desc">Turant apni Dukandar ID banayein</p>
-
-      <div class="field">
-        <label>Dukan / Operator ka Naam</label>
-        <input type="text" id="regName" placeholder="Poora naam darj karein">
-      </div>
-
-      <div class="field">
-        <label>Mobile Number (Aapki User ID banegi)</label>
-        <input type="number" id="regMobile" placeholder="10 anko ka mobile number">
-      </div>
-
-      <div class="field">
-        <label>Password banayein</label>
-        <input type="password" id="regPass" placeholder="Apna password chunein">
-      </div>
-
-      <button type="button" class="btn-primary btn-green" onclick="processRegistration()">अकाउंट बनाएँ</button>
-
-      <div class="switch-link">
-        Pehle se account hai? <a onclick="toggleAuth(false)">Lekin Login Karein ➔</a>
-      </div>
-    </div>
-
-    <!-- 3. MAIN DASHBOARD VIEW -->
-    <div id="dashView">
-      <div class="dash-heading">📌 Digital Services Portal</div>
-
-      <!-- Services Grid -->
-      <div class="service-grid">
-
-        <!-- 1. Mobile se Details -->
-        <div class="srv-card" style="border-top-color: #0284c7;">
-          <div>
-            <h3>📲 Mobile No se Details</h3>
-            <span class="charge-badge bg-mob">Service Charge: ₹50</span>
-            <p style="font-size: 13px; color: #64748b;">Mobile number darj karke customer ki complete details nikalein.</p>
-          </div>
-          <div class="card-actions">
-            <button class="btn-card btn-apply" onclick="openServiceForm('Mobile No se Details', 50, 'Customer Mobile Number', '')">Apply / Form</button>
-            <button class="btn-card btn-link" onclick="openExternalUrl('https://telecom.gov.in')">Open URL 🌐</button>
-          </div>
-        </div>
-
-        <!-- 2. ABHA PDF Download -->
-        <div class="srv-card" style="border-top-color: #15803d;">
-          <div>
-            <h3>🏥 ABHA Card PDF Download</h3>
-            <span class="charge-badge bg-abha">Service Charge: ₹40</span>
-            <p style="font-size: 13px; color: #64748b;">ABHA Number ya registered number se official ABHA card PDF prapt karein.</p>
-          </div>
-          <div class="card-actions">
-            <button class="btn-card btn-apply" onclick="openServiceForm('ABHA Card PDF Download', 40, 'ABHA Number / Mobile', 'Customer Full Name')">Apply / Form</button>
-            <button class="btn-card btn-link" onclick="openExternalUrl('https://abha.abdm.gov.in')">Open URL 🌐</button>
-          </div>
-        </div>
-
-        <!-- 3. Farmer ID PDF Download -->
-        <div class="srv-card" style="border-top-color: #b45309;">
-          <div>
-            <h3>🌾 Farmer ID PDF Download</h3>
-            <span class="charge-badge bg-farmer">Service Charge: ₹25</span>
-            <p style="font-size: 13px; color: #64748b;">Kisan panjikaran number se Farmer ID card PDF nikaalein.</p>
-          </div>
-          <div class="card-actions">
-            <button class="btn-card btn-apply" onclick="openServiceForm('Farmer ID PDF Download', 25, 'Kisan Panjikaran / Farmer ID', 'District / Jila')">Apply / Form</button>
-            <button class="btn-card btn-link" onclick="openExternalUrl('https://dbtagriculture.bihar.gov.in')">Open URL 🌐</button>
-          </div>
-        </div>
-
-        <!-- 4. Wallet Recharge (₹1 limit) -->
-        <div class="srv-card" style="border-top-color: #7c3aed;">
-          <div>
-            <h3>💳 QR Code Wallet Recharge</h3>
-            <span class="charge-badge bg-qr">Minimum: ₹1</span>
-            <p style="font-size: 13px; color: #64748b;">QR code scan karke wallet balance turant add karein.</p>
-          </div>
-          <div class="card-actions">
-            <button class="btn-card btn-apply" style="background: #7c3aed;" onclick="openModule('recharge')">Recharge ➔</button>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- SERVICE APPLICATION FORM MODULE -->
-      <div class="module-card" id="serviceFormBox">
-        <h3 id="srvFormTitle" style="color: #1e3a8a; margin-bottom: 12px;"></h3>
-        <p style="font-size: 13px; color: #e11d48; margin-bottom: 15px; font-weight: bold;">Wallet Katoti: ₹<span id="srvFormCharge">0</span></p>
-
-        <div class="field" style="max-width: 450px;">
-          <label id="srvFieldLabel1">Data Input</label>
-          <input type="text" id="srvInput1" placeholder="Yahan darj karein">
-        </div>
-
-        <div class="field" id="srvFieldWrap2" style="max-width: 450px; display: none;">
-          <label id="srvFieldLabel2">Extra Input</label>
-          <input type="text" id="srvInput2" placeholder="Yahan darj karein">
-        </div>
-
-        <div class="field" style="max-width: 450px;">
-          <label>Dukandar WhatsApp Number (Update hetu)</label>
-          <input type="number" id="srvDukandarPhone" placeholder="Aapka 10 anko ka mobile number">
-        </div>
-
-        <button type="button" class="btn-primary" style="max-width: 250px;" onclick="submitServiceOrder()">Order Lagayein &amp; WhatsApp Alert</button>
-      </div>
-
-      <!-- WALLET RECHARGE MODULE -->
-      <div class="module-card" id="rechargeBox">
-        <h3 style="color: #10b981; margin-bottom: 12px;">💳 QR Code Se Wallet Recharge</h3>
-        <div style="max-width: 420px;">
-          <div class="field">
-            <label>Recharge Amount (₹) [Minimum Limit: ₹1]</label>
-            <input type="number" id="rechargeAmt" placeholder="Jaise 1, 50, 100" oninput="generateQR()">
-          </div>
-
-          <div class="qr-area" id="qrContainer" style="display: none;">
-            <p style="font-size: 13px; font-weight: bold; color: #1e3a8a;">Scan &amp; Pay via UPI</p>
-            <img id="qrImg" src="" style="width: 170px; height: 170px; margin: 10px 0; border: 2px solid #000; padding: 4px; background: white;">
-            <p id="qrAmtText" style="font-size: 14px; font-weight: bold; color: #10b981;"></p>
-            <p style="font-size: 11px; color: #64748b;">UPI ID: 8207827581-3@ybl</p>
-          </div>
-
-          <div class="field">
-            <label>12 Ankon ka UTR / Ref Number</label>
-            <input type="text" id="rechargeUtr" placeholder="Payment ke baad prapt UTR number">
-          </div>
-
-          <button type="button" class="btn-primary btn-green" onclick="submitRechargeRequest()">Recharge Submit Karein</button>
-        </div>
-      </div>
-
-    </div>
-
-  </div>
-
-  <script>
-    var FIREBASE_URL = "https://raghudigital-b685f-default-rtdb.firebaseio.com";
-    var ADMIN_WHATSAPP = "918207827581"; // Aapka WhatsApp Number Alert ke liye
-    var currentUser = null;
-    var currentActiveService = {};
-
-    function toggleAuth(showReg) {
-      document.getElementById('loginCard').style.display = showReg ? 'none' : 'block';
-      document.getElementById('regCard').style.display = showReg ? 'block' : 'none';
-    }
-
-    // Direct Login
-    function processLogin() {
-      var u = (document.getElementById('logUser').value || '').trim();
-      var p = (document.getElementById('logPass').value || '').trim();
-
-      if (!u || !p) {
-        alert('Kripya ID aur Password dono darj karein!');
-        return;
-      }
-
-      // Master Admin Direct
-      if (u === 'admin' && p === 'admin123') {
-        currentUser = { role: 'admin', id: 'admin', name: 'Master Admin (Raghu Baba)', wallet: 99999 };
-        openDashboard();
-        return;
-      }
-
-      // Retailer Firebase Check
-      fetch(FIREBASE_URL + "/retailers/" + encodeURIComponent(u) + ".json")
-        .then(function(res) { return res.json(); })
-        .then(function(data) {
-          if (!data) {
-            alert('Ye ID (' + u + ') nahi mili! Kripya naya registration karein.');
-            return;
-          }
-          if (data.pass === p) {
-            currentUser = { role: 'retailer', id: u, name: data.name, wallet: data.wallet || 0 };
-            openDashboard();
-          } else {
-            alert('Galat Password! Kripya sahi password darj karein.');
-          }
-        })
-        .catch(function(err) {
-          alert('Database connection error: ' + err.message);
-        });
-    }
-
-    // Self Registration
-    function processRegistration() {
-      var name = (document.getElementById('regName').value || '').trim();
-      var mob = (document.getElementById('regMobile').value || '').trim();
-      var pass = (document.getElementById('regPass').value || '').trim();
-
-      if (!name || !mob || !pass) {
-        alert('Sabhi details bharna anivarya hai!');
-        return;
-      }
-      if (mob.length !== 10) {
-        alert('Mobile number 10 anko ka hona chahiye!');
-        return;
-      }
-
-      fetch(FIREBASE_URL + "/retailers/" + encodeURIComponent(mob) + ".json", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name, pass: pass, wallet: 0, date: new Date().toLocaleDateString() })
-      }).then(function() {
-        alert('Registration Safal! Ab aap apne Mobile number aur Password se login kar sakte hain.');
-        toggleAuth(false);
-        document.getElementById('logUser').value = mob;
-      }).catch(function(err) {
-        alert('Registration Error: ' + err.message);
-      });
-    }
-
-    function openDashboard() {
-      document.getElementById('loginCard').style.display = 'none';
-      document.getElementById('regCard').style.display = 'none';
-      document.getElementById('topBar').style.display = 'flex';
-      document.getElementById('dashView').style.display = 'block';
-
-      document.getElementById('retailerName').innerText = currentUser.name;
-      document.getElementById('walletAmt').innerText = currentUser.wallet + ".00";
-    }
-
-    function logoutSession() {
-      currentUser = null;
-      document.getElementById('topBar').style.display = 'none';
-      document.getElementById('dashView').style.display = 'none';
-      toggleAuth(false);
-    }
-
-    // New URL external open
-    function openExternalUrl(url) {
-      window.open(url, '_blank');
-    }
-
-    // Open Service Form
-    function openServiceForm(title, charge, field1, field2) {
-      document.getElementById('rechargeBox').style.display = 'none';
-      var box = document.getElementById('serviceFormBox');
-
-      currentActiveService = { title: title, charge: charge };
-      document.getElementById('srvFormTitle').innerText = '📋 ' + title;
-      document.getElementById('srvFormCharge').innerText = charge;
-      document.getElementById('srvFieldLabel1').innerText = field1;
-
-      var w2 = document.getElementById('srvFieldWrap2');
-      if (field2) {
-        w2.style.display = 'block';
-        document.getElementById('srvFieldLabel2').innerText = field2;
-      } else {
-        w2.style.display = 'none';
-      }
-
-      box.style.display = 'block';
-      box.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function openModule(m) {
-      document.getElementById('serviceFormBox').style.display = 'none';
-      var rBox = document.getElementById('rechargeBox');
-      if (m === 'recharge') {
-        rBox.style
+    .btn-action:hover { opacity: 0.95; }
+    .btn-green {
