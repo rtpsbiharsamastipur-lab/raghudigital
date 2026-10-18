@@ -57,6 +57,25 @@
     /* Container */
     .main-wrap { max-width: 1200px; margin: 25px auto; padding: 0 15px; }
 
+    /* Larger, clearer login and registration screen */
+    .card-box {
+      max-width: 520px !important;
+      margin: 48px auto !important;
+      padding: 38px 34px !important;
+      border-radius: 16px !important;
+      border-top-width: 7px !important;
+    }
+    .card-box h2 { font-size: 28px !important; font-weight: 900 !important; margin-bottom: 10px !important; }
+    .card-box p.subtitle { font-size: 16px !important; margin-bottom: 24px !important; }
+    .input-group { margin-bottom: 20px !important; }
+    .input-group label { font-size: 15px !important; font-weight: 800 !important; margin-bottom: 8px !important; }
+    .input-group input, .input-group select, .input-group textarea {
+      padding: 15px !important; font-size: 17px !important; border-radius: 8px !important;
+    }
+    .btn-submit { padding: 15px !important; font-size: 18px !important; font-weight: 900 !important; border-radius: 8px !important; }
+    .switch-tab { margin-top: 22px !important; font-size: 16px !important; font-weight: 600 !important; }
+    .switch-tab a { font-size: 17px !important; font-weight: 900 !important; }
+    
     /* Card Box (Login & Reg) */
     .card-box {
       max-width: 420px;
@@ -244,7 +263,7 @@
       <button type="button" class="btn-submit" id="btnSignIn" onclick="handleLoginAction()">लॉगिन करें</button>
 
       <div class="switch-tab">
-        Naye dukandar hain? <a onclick="showRegister(true)">Naya Registration Karein ➔</a>
+        Naye dukandar hain? <a onclick="showRegister(true)">New Registration</a>
       </div>
     </div>
 
