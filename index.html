@@ -3,165 +3,81 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RAGHU BABA ONLINE SERVICE - Login</title>
+  <title>RAGHU BABA ONLINE SERVICE - B2B Digital Portal</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
-    body { background: #1e1b4b; min-height: 100vh; padding: 25px 15px; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', Arial, sans-serif; }
+    body { background: #0f172a; color: #1e293b; min-height: 100vh; }
 
-    .top-header {
-      max-width: 440px; margin: 0 auto 20px auto; background: #ffffff;
-      padding: 12px; border-radius: 8px; text-align: center;
-      font-weight: bold; color: #2563eb; font-size: 16px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    /* Top User Bar */
+    .user-bar { background: #090d16; color: white; padding: 12px 20px; display: none; justify-content: space-between; align-items: center; font-size: 14px; border-bottom: 2px solid #3b82f6; }
+    .wallet-badge { background: #1e3a8a; padding: 6px 14px; border-radius: 6px; color: #4ade80; font-weight: bold; cursor: pointer; }
+    .btn-exit { background: #dc2626; color: white; border: none; padding: 6px 16px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+
+    /* Login Area (Dark Luxury Glass Look) */
+    #authSection {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      padding: 20px;
     }
-
-    /* Login Card */
-    #loginCard {
-      max-width: 440px; margin: 0 auto; background: #ffffff;
-      padding: 30px 22px; border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      border-top: 5px solid #2563eb;
+    .login-card {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
+      padding: 35px 25px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 10px 35px rgba(0,0,0,0.5);
+      text-align: center;
+      color: #ffffff;
     }
+    .login-card h2 { font-size: 22px; font-weight: 700; margin-bottom: 5px; color: #ffffff; }
+    .login-card p.sub { font-size: 13px; color: #94a3b8; margin-bottom: 22px; }
 
-    .brand-title { font-size: 20px; color: #0f172a; text-align: center; font-weight: 800; margin-bottom: 4px; }
-    .brand-subtitle { font-size: 13px; color: #64748b; text-align: center; margin-bottom: 22px; }
-
-    .form-group { margin-bottom: 16px; }
-    .form-group label { display: block; font-size: 13px; font-weight: bold; color: #334155; margin-bottom: 6px; }
-    .form-group input { width: 100%; padding: 12px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 15px; outline: none; }
-    .form-group input:focus { border-color: #2563eb; }
-
-    .btn-login {
-      width: 100%; background: #2563eb; color: #ffffff; border: none;
-      padding: 13px; font-size: 16px; font-weight: bold; border-radius: 6px;
-      cursor: pointer; margin-top: 8px;
+    .input-box { margin-bottom: 18px; text-align: left; }
+    .input-box label { display: block; font-size: 12px; font-weight: 600; color: #cbd5e1; margin-bottom: 6px; }
+    .input-box input {
+      width: 100%; padding: 12px; border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff; font-size: 14px; outline: none;
     }
-    .btn-login:hover { background: #1d4ed8; }
+    .input-box input:focus { border-color: #38bdf8; }
 
-    .help-box { margin-top: 20px; text-align: center; font-size: 13px; color: #64748b; }
-
-    /* Dashboard View */
-    #dashboardView {
-      display: none; max-width: 800px; margin: 0 auto;
-      background: #ffffff; padding: 25px; border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    .btn-submit-login {
+      width: 100%; background: linear-gradient(90deg, #6a11cb, #2575fc);
+      color: white; padding: 13px; border: none; border-radius: 6px;
+      font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 5px;
     }
-    .dash-top { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 20px; }
-    .btn-logout { background: #dc2626; color: white; border: none; padding: 8px 18px; border-radius: 5px; font-weight: bold; cursor: pointer; }
-    
-    .admin-box { background: #fff7ed; border: 1.5px solid #fdba74; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-    .admin-box h3 { color: #c2410c; margin-bottom: 10px; font-size: 16px; }
-    .admin-form { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
-    .admin-form input { padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px; }
-    .btn-green { background: #16a34a; color: white; border: none; padding: 8px 14px; border-radius: 4px; font-weight: bold; cursor: pointer; }
-    
-    .status-msg { font-size: 13px; font-weight: bold; color: #16a34a; margin-top: 8px; }
-  </style>
-</head>
-<body>
+    .btn-submit-login:hover { opacity: 0.95; }
 
-  <div class="top-header">
-    Raghu Baba Digital Services
-  </div>
+    /* Dashboard Layout */
+    #dashView { display: none; background: #f8fafc; min-height: 100vh; padding: 20px; }
+    .dash-wrap { max-width: 1100px; margin: 0 auto; }
+    .dash-title { font-size: 20px; font-weight: 800; color: #1e3a8a; margin-bottom: 18px; border-left: 5px solid #2563eb; padding-left: 10px; }
 
-  <!-- 1. LOGIN SCREEN -->
-  <div id="loginCard">
-    <div class="brand-title">RAGHU BABA ONLINE SERVICE</div>
-    <div class="brand-subtitle">Digital Portal Login</div>
+    /* Services Grid */
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; margin-bottom: 25px; }
+    .card { background: white; border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .card:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0,0,0,0.1); }
+    .card h3 { font-size: 15px; margin-bottom: 6px; color: #0f172a; }
+    .card p { font-size: 12px; color: #64748b; line-height: 1.4; min-height: 34px; }
+    .card .link-text { margin-top: 10px; font-size: 12px; font-weight: bold; text-align: right; }
 
-    <div class="form-group">
-      <label>User ID / Mobile Number</label>
-      <input type="text" id="userBox" placeholder="User ID darj karein (jaise admin)" autocomplete="off">
-    </div>
+    .c-qr { border-top: 4px solid #16a34a; }
+    .c-pa { border-top: 4px solid #1e3a8a; }
+    .c-fast { border-top: 4px solid #d97706; }
+    .c-pf { border-top: 4px solid #0284c7; }
+    .c-pd { border-top: 4px solid #059669; }
 
-    <div class="form-group">
-      <label>Password</label>
-      <input type="password" id="passBox" placeholder="Password darj karein (jaise admin123)" autocomplete="off">
-    </div>
-
-    <button type="button" class="btn-login" id="submitBtn" onclick="processLogin()">लॉगिन करें</button>
-
-    <div class="help-box">
-      WhatsApp sahayata: <strong>8207827581</strong>
-    </div>
-  </div>
-
-  <!-- 2. DASHBOARD SCREEN -->
-  <div id="dashboardView">
-    <div class="dash-top">
-      <div>
-        <h2 style="color: #1e3a8a;">Digital Portal Active</h2>
-        <p style="font-size: 13px; color: #64748b; margin-top: 4px;">User: <strong id="welcomeUser" style="color: #059669;"></strong></p>
-      </div>
-      <button class="btn-logout" onclick="logout()">Logout</button>
-    </div>
-
-    <!-- Admin Panel -->
-    <div id="adminArea" class="admin-box" style="display: none;">
-      <h3>🛠️ Master Admin Console - Naya Retailer Banayein</h3>
-      <div class="admin-form">
-        <input type="text" id="rName" placeholder="Dukandar ka naam">
-        <input type="text" id="rId" placeholder="User ID / Mobile">
-        <input type="text" id="rPass" placeholder="Password">
-        <input type="number" id="rBal" placeholder="Wallet ₹" style="width: 100px;">
-        <button class="btn-green" type="button" onclick="saveRetailer()">Dukandar Save Karein</button>
-      </div>
-      <div id="adminMsg" class="status-msg"></div>
-    </div>
-
-    <div style="background: #f8fafc; border: 1.5px dashed #cbd5e1; border-radius: 8px; padding: 25px; text-align: center;">
-      <h3 style="color: #15803d; margin-bottom: 8px;">✅ Login Safal Ho Gaya!</h3>
-      <p style="font-size: 13px; color: #64748b;">Aapka account active hai aur Realtime Database se connected hai.</p>
-    </div>
-  </div>
-
-  <script>
-    var FIREBASE_URL = "https://raghudigital-b685f-default-rtdb.firebaseio.com";
-
-    function processLogin() {
-      var u = (document.getElementById('userBox').value || '').trim();
-      var p = (document.getElementById('passBox').value || '').trim();
-      var btn = document.getElementById('submitBtn');
-
-      if (!u || !p) {
-        alert('Kripya User ID aur Password dono bharein!');
-        return;
-      }
-
-      btn.innerText = "Checking...";
-      btn.disabled = true;
-
-      // 1. Direct Admin Login (Immediate Access)
-      if (u === 'admin' && p === 'admin123') {
-        btn.innerText = "लॉगिन करें";
-        btn.disabled = false;
-        openDashboard('Master Admin (Raghu Baba)', true);
-        return;
-      }
-
-      // 2. Retailer Database Check
-      fetch(FIREBASE_URL + "/retailers/" + encodeURIComponent(u) + ".json")
-        .then(function(res) { return res.json(); })
-        .then(function(data) {
-          btn.innerText = "लॉगिन करें";
-          btn.disabled = false;
-
-          if (!data) {
-            alert('Ye ID (' + u + ') registered nahi hai! Pehle admin se banwayein.');
-            return;
-          }
-
-          if (data.pass === p) {
-            openDashboard(data.name + ' (Wallet: ₹' + (data.wallet || 0) + ')', false);
-          } else {
-            alert('Galat Password! Kripya sahi password dalein.');
-          }
-        })
-        .catch(function(err) {
-          btn.innerText = "लॉगिन करें";
-          btn.disabled = false;
-          alert('Database Error: ' + err.message);
-        });
-    }
-
-    function openDashboard(userLabel, isAdmin
+    /* Admin Box */
+    #adminBox { background: #fff7ed; border: 1.5px solid #fed7aa; border-top: 4px solid #ea580c; border-radius: 8px; padding: 18px; margin-bottom: 25px; }
+    .admin-form { display: flex; gap: 8px; flex
