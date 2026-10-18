@@ -59,4 +59,493 @@
 
     .btn-submit {
       width: 100%; background: #3b82f6; color: white; border: none;
-      padding: 12px; border-radius: 6px; font-size: 15px;
+      padding: 12px; border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer;
+    }
+    .btn-submit:hover { opacity: 0.95; }
+    .btn-reg { background: #10b981 !important; }
+
+    .switch-tab { margin-top: 15px; font-size: 13px; }
+    .switch-tab a { color: #3b82f6; font-weight: bold; text-decoration: none; cursor: pointer; }
+
+    /* Dashboard Layout */
+    #dashboardView { display: none; }
+    .panel-header { font-size: 18px; font-weight: bold; color: #ffffff; margin-bottom: 15px; border-left: 4px solid #ef4444; padding-left: 10px; }
+
+    /* Services Grid */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+    .service-card {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 16px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      border-top: 5px solid #3b82f6;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .service-card h3 { font-size: 15px; color: #0f172a; margin-bottom: 6px; }
+    .tag-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; margin-bottom: 10px; }
+    .b-blue { background: #e0f2fe; color: #0369a1; }
+    .b-green { background: #dcfce7; color: #15803d; }
+    .b-yellow { background: #fef3c7; color: #b45309; }
+    .b-purple { background: #ede9fe; color: #6d28d9; }
+
+    .card-btns { display: flex; gap: 6px; margin-top: 12px; }
+    .c-btn { flex: 1; padding: 8px; border-radius: 5px; font-size: 12px; font-weight: bold; border: none; cursor: pointer; text-align: center; }
+    .btn-open { background: #3b82f6; color: white; }
+    .btn-link { background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; }
+
+    /* Module Box */
+    .module-card {
+      display: none; background: #ffffff; border-radius: 8px; padding: 20px;
+      border-top: 4px solid #10b981; margin-bottom: 25px;
+    }
+    .qr-container { text-align: center; background: #f8fafc; padding: 15px; border: 1px dashed #cbd5e1; border-radius: 8px; margin: 15px 0; }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="site-header">
+    <h1>RAGHU BABA ONLINE SERVICE</h1>
+    <p>⚡ All B2B Digital &amp; Printing Services • Samastipur Portal ⚡</p>
+  </div>
+
+  <!-- Top Bar -->
+  <div id="userBar">
+    <div>Dukandar: <strong id="barUserName" style="color: #facc15;"></strong></div>
+    <div style="display: flex; gap: 10px; align-items: center;">
+      <div class="wallet-pill" onclick="openSection('recharge')">💰 Wallet: ₹<span id="barWalletAmt">0.00</span> ➕</div>
+      <button class="btn-exit" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="main-wrap">
+
+    <!-- 1. LOGIN SCREEN -->
+    <div class="card-box" id="loginBox">
+      <h2>🔐 Portal Login</h2>
+      <p class="subtitle">User ID aur Password se login karein</p>
+
+      <div class="input-group">
+        <label>User ID / Mobile Number</label>
+        <input type="text" id="loginId" placeholder="ID dalein (jaise admin)">
+      </div>
+
+      <div class="input-group">
+        <label>Password</label>
+        <input type="password" id="loginPass" placeholder="Password dalein (jaise admin123)">
+      </div>
+
+      <button type="button" class="btn-submit" id="btnSignIn" onclick="handleLoginAction()">लॉगिन करें</button>
+
+      <div class="switch-tab">
+        Naye dukandar hain? <a onclick="showRegister(true)">Naya Registration Karein ➔</a>
+      </div>
+    </div>
+
+    <!-- 2. REGISTRATION SCREEN -->
+    <div class="card-box" id="regBox" style="display: none; border-top-color: #10b981;">
+      <h2>📝 Naya Dukandar Registration</h2>
+      <p class="subtitle">Apna account turant banayein</p>
+
+      <div class="input-group">
+        <label>Dukan / Operator ka Naam</label>
+        <input type="text" id="newUserName" placeholder="Poora naam dalein">
+      </div>
+
+      <div class="input-group">
+        <label>Mobile Number (Yehi Login ID banegi)</label>
+        <input type="number" id="newUserMobile" placeholder="10 anko ka mobile number">
+      </div>
+
+      <div class="input-group">
+        <label>Password Banayein</label>
+        <input type="password" id="newUserPass" placeholder="Apna password dalein">
+      </div>
+
+      <button type="button" class="btn-submit btn-reg" id="btnSignUp" onclick="handleRegistrationAction()">Account Banayein</button>
+
+      <div class="switch-tab">
+        Pehle se account hai? <a onclick="showRegister(false)">Login Karein ➔</a>
+      </div>
+    </div>
+
+    <!-- 3. MAIN DASHBOARD VIEW -->
+    <div id="dashboardView">
+      <div class="panel-header">📌 Digital Services Panel</div>
+
+      <!-- Services Grid -->
+      <div class="services-grid">
+
+        <!-- Mobile No se Details -->
+        <div class="service-card" style="border-top-color: #0284c7;">
+          <div>
+            <h3>📲 Mobile No se Details</h3>
+            <span class="tag-badge b-blue">Service Charge: ₹50</span>
+            <p style="font-size: 13px; color: #64748b;">Mobile number darj karke complete details prapt karein.</p>
+          </div>
+          <div class="card-btns">
+            <button class="c-btn btn-open" onclick="openOrderForm('Mobile No se Details', 50, 'Customer Mobile Number', '')">Apply / Form</button>
+            <button class="c-btn btn-link" onclick="window.open('https://telecom.gov.in', '_blank')">Open URL 🌐</button>
+          </div>
+        </div>
+
+        <!-- ABHA Card PDF Download -->
+        <div class="service-card" style="border-top-color: #15803d;">
+          <div>
+            <h3>🏥 ABHA Card PDF Download</h3>
+            <span class="tag-badge b-green">Service Charge: ₹40</span>
+            <p style="font-size: 13px; color: #64748b;">ABHA Number ya mobile se original card PDF prapt karein.</p>
+          </div>
+          <div class="card-btns">
+            <button class="c-btn btn-open" onclick="openOrderForm('ABHA Card PDF Download', 40, 'ABHA Number / Mobile', 'Customer ka Naam')">Apply / Form</button>
+            <button class="c-btn btn-link" onclick="window.open('https://abha.abdm.gov.in', '_blank')">Open URL 🌐</button>
+          </div>
+        </div>
+
+        <!-- Farmer ID PDF Download -->
+        <div class="service-card" style="border-top-color: #b45309;">
+          <div>
+            <h3>🌾 Farmer ID PDF Download</h3>
+            <span class="tag-badge b-yellow">Service Charge: ₹25</span>
+            <p style="font-size: 13px; color: #64748b;">Kisan panjikaran number se Farmer ID card PDF nikaalein.</p>
+          </div>
+          <div class="card-btns">
+            <button class="c-btn btn-open" onclick="openOrderForm('Farmer ID PDF Download', 25, 'Kisan Panjikaran / Farmer ID', 'District / Jila')">Apply / Form</button>
+            <button class="c-btn btn-link" onclick="window.open('https://dbtagriculture.bihar.gov.in', '_blank')">Open URL 🌐</button>
+          </div>
+        </div>
+
+        <!-- Wallet Recharge Card -->
+        <div class="service-card" style="border-top-color: #6d28d9;">
+          <div>
+            <h3>💳 QR Code Wallet Recharge</h3>
+            <span class="tag-badge b-purple">Minimum: ₹1</span>
+            <p style="font-size: 13px; color: #64748b;">QR code scan karke wallet balance turant add karein.</p>
+          </div>
+          <div class="card-btns">
+            <button class="c-btn btn-open" style="background: #6d28d9;" onclick="openSection('recharge')">Recharge ➔</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SERVICE ORDER FORM -->
+      <div class="module-card" id="formOrderBox">
+        <h3 id="formTitleText" style="color: #1e3a8a; margin-bottom: 8px;"></h3>
+        <p style="font-size: 13px; color: #ef4444; margin-bottom: 15px; font-weight: bold;">Wallet Katoti: ₹<span id="formChargeText">0</span></p>
+
+        <div class="input-group" style="max-width: 440px;">
+          <label id="formLabel1">Data Input</label>
+          <input type="text" id="formInput1" placeholder="Yahan darj karein">
+        </div>
+
+        <div class="input-group" id="formWrap2" style="max-width: 440px; display: none;">
+          <label id="formLabel2">Extra Input</label>
+          <input type="text" id="formInput2" placeholder="Yahan darj karein">
+        </div>
+
+        <div class="input-group" style="max-width: 440px;">
+          <label>Dukandar WhatsApp Number (Alert hetu)</label>
+          <input type="number" id="formUserPhone" placeholder="10 anko ka mobile number">
+        </div>
+
+        <button type="button" class="btn-submit" style="max-width: 250px;" onclick="submitOrderWithAlert()">Order Lagayein &amp; WhatsApp Alert</button>
+      </div>
+
+      <!-- RECHARGE BOX -->
+      <div class="module-card" id="formRechargeBox">
+        <h3 style="color: #10b981; margin-bottom: 12px;">💳 QR Code Se Wallet Recharge</h3>
+        <div style="max-width: 420px;">
+          <div class="input-group">
+            <label>Recharge Amount (₹) [Minimum Limit: ₹1]</label>
+            <input type="number" id="inputRechAmt" placeholder="Jaise 1, 50, 100" oninput="buildQrCode()">
+          </div>
+
+          <div class="qr-container" id="qrImageBox" style="display: none;">
+            <p style="font-size: 13px; font-weight: bold; color: #1e3a8a;">Scan &amp; Pay via UPI</p>
+            <img id="qrRenderImg" src="" style="width: 170px; height: 170px; margin: 10px 0; border: 2px solid #000; padding: 4px; background: white;" alt="UPI QR">
+            <p id="qrAmountLabel" style="font-size: 14px; font-weight: bold; color: #10b981;"></p>
+            <p style="font-size: 11px; color: #64748b;">UPI ID: 8207827581-3@ybl</p>
+          </div>
+
+          <div class="input-group">
+            <label>12 Ankon ka UTR / Ref Number</label>
+            <input type="text" id="inputRechUtr" placeholder="Payment ke baad mila 12 anko ka UTR">
+          </div>
+
+          <button type="button" class="btn-submit btn-reg" onclick="submitRechargeDetails()">Recharge Submit Karein</button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    var FIREBASE_URL = "https://raghudigital-b685f-default-rtdb.firebaseio.com";
+    var ADMIN_WHATSAPP = "918207827581";
+    var activeUser = null;
+    var currentSelectedService = {};
+
+    function showRegister(flag) {
+      document.getElementById('loginBox').style.display = flag ? 'none' : 'block';
+      document.getElementById('regBox').style.display = flag ? 'block' : 'none';
+    }
+
+    function handleLoginAction() {
+      var u = (document.getElementById('loginId').value || '').trim();
+      var p = (document.getElementById('loginPass').value || '').trim();
+      var btn = document.getElementById('btnSignIn');
+
+      if (!u || !p) {
+        alert('Kripya User ID aur Password dono darj karein!');
+        return;
+      }
+
+      btn.innerText = "Checking...";
+      btn.disabled = true;
+
+      // Master Admin Direct Login
+      if (u === 'admin' && p === 'admin123') {
+        activeUser = { role: 'admin', id: 'admin', name: 'Master Admin (Raghu Baba)', wallet: 99999 };
+        openDashboardPanel();
+        btn.innerText = "लॉगिन करें";
+        btn.disabled = false;
+        return;
+      }
+
+      // Check Firebase Database
+      fetch(FIREBASE_URL + "/retailers/" + encodeURIComponent(u) + ".json")
+        .then(function(res) { 
+          if (!res.ok) throw new Error("Firebase Rules locked ya Network issue");
+          return res.json(); 
+        })
+        .then(function(data) {
+          btn.innerText = "लॉगिन करें";
+          btn.disabled = false;
+
+          if (!data) {
+            // Local storage fallback check
+            var localData = localStorage.getItem("user_" + u);
+            if (localData) {
+              var parsedUser = JSON.parse(localData);
+              if (parsedUser.pass === p) {
+                activeUser = { role: 'retailer', id: u, name: parsedUser.name, wallet: parsedUser.wallet || 0 };
+                openDashboardPanel();
+                return;
+              }
+            }
+            alert('Ye User ID (' + u + ') nahi mili! Pehle naya registration karein.');
+            return;
+          }
+
+          if (data.pass === p) {
+            activeUser = { role: 'retailer', id: u, name: data.name, wallet: data.wallet || 0 };
+            localStorage.setItem("user_" + u, JSON.stringify(data));
+            openDashboardPanel();
+          } else {
+            alert('Galat Password! Kripya sahi password darj karein.');
+          }
+        })
+        .catch(function(err) {
+          // If Firebase fails, check LocalStorage
+          var localData = localStorage.getItem("user_" + u);
+          if (localData) {
+            var parsedUser = JSON.parse(localData);
+            if (parsedUser.pass === p) {
+              activeUser = { role: 'retailer', id: u, name: parsedUser.name, wallet: parsedUser.wallet || 0 };
+              openDashboardPanel();
+              btn.innerText = "लॉगिन करें";
+              btn.disabled = false;
+              return;
+            }
+          }
+          btn.innerText = "लॉगिन करें";
+          btn.disabled = false;
+          alert('Firebase Error: ' + err.message + '\n(Check karein Firebase Database Rules me read/write true hai ya nahi)');
+        });
+    }
+
+    function handleRegistrationAction() {
+      var name = (document.getElementById('newUserName').value || '').trim();
+      var mob = (document.getElementById('newUserMobile').value || '').trim();
+      var pass = (document.getElementById('newUserPass').value || '').trim();
+      var btn = document.getElementById('btnSignUp');
+
+      if (!name || !mob || !pass) {
+        alert('Sabhi details bharna zaroori hai!');
+        return;
+      }
+      if (mob.length !== 10) {
+        alert('Mobile number 10 anko ka hona chahiye!');
+        return;
+      }
+
+      btn.innerText = "Saving...";
+      btn.disabled = true;
+
+      var newUserData = { name: name, pass: pass, wallet: 0, date: new Date().toLocaleDateString() };
+
+      // Save locally
+      localStorage.setItem("user_" + mob, JSON.stringify(newUserData));
+
+      // Save to Firebase
+      fetch(FIREBASE_URL + "/retailers/" + encodeURIComponent(mob) + ".json", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newUserData)
+      }).then(function(res) {
+        btn.innerText = "Account Banayein";
+        btn.disabled = false;
+        alert('Registration Safal! Ab aap Login kar sakte hain.');
+        showRegister(false);
+        document.getElementById('loginId').value = mob;
+      }).catch(function(err) {
+        btn.innerText = "Account Banayein";
+        btn.disabled = false;
+        alert('Registration Local Memory me save ho gaya hai (Offline Mode). Ab login karein.');
+        showRegister(false);
+        document.getElementById('loginId').value = mob;
+      });
+    }
+
+    function openDashboardPanel() {
+      document.getElementById('loginBox').style.display = 'none';
+      document.getElementById('regBox').style.display = 'none';
+      document.getElementById('userBar').style.display = 'flex';
+      document.getElementById('dashboardView').style.display = 'block';
+
+      document.getElementById('barUserName').innerText = activeUser.name;
+      document.getElementById('barWalletAmt').innerText = Number(activeUser.wallet).toFixed(2);
+    }
+
+    function doLogout() {
+      activeUser = null;
+      document.getElementById('userBar').style.display = 'none';
+      document.getElementById('dashboardView').style.display = 'none';
+      showRegister(false);
+    }
+
+    function openOrderForm(title, charge, field1, field2) {
+      document.getElementById('formRechargeBox').style.display = 'none';
+      var box = document.getElementById('formOrderBox');
+
+      currentSelectedService = { title: title, charge: charge };
+      document.getElementById('formTitleText').innerText = '📋 ' + title;
+      document.getElementById('formChargeText').innerText = charge;
+      document.getElementById('formLabel1').innerText = field1;
+
+      var w2 = document.getElementById('formWrap2');
+      if (field2) {
+        w2.style.display = 'block';
+        document.getElementById('formLabel2').innerText = field2;
+      } else {
+        w2.style.display = 'none';
+      }
+
+      box.style.display = 'block';
+      box.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function openSection(name) {
+      document.getElementById('formOrderBox').style.display = 'none';
+      var rBox = document.getElementById('formRechargeBox');
+      if (name === 'recharge') {
+        rBox.style.display = 'block';
+        rBox.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    function buildQrCode() {
+      var amt = parseFloat(document.getElementById('inputRechAmt').value);
+      var box = document.getElementById('qrImageBox');
+      if (amt && amt >= 1) {
+        var upi = "upi://pay?pa=8207827581-3@ybl&pn=Raghu%20Baba&am=" + amt + "&cu=INR";
+        document.getElementById('qrRenderImg').src = "https://api.qrserver.com/v1/create-qr-code/?size=170x170&data=" + encodeURIComponent(upi);
+        document.getElementById('qrAmountLabel').innerText = "Amount to Pay: ₹" + amt;
+        box.style.display = 'block';
+      } else {
+        box.style.display = 'none';
+      }
+    }
+
+    function submitRechargeDetails() {
+      var amt = document.getElementById('inputRechAmt').value;
+      var utr = (document.getElementById('inputRechUtr').value || '').trim();
+
+      if (!amt || parseFloat(amt) < 1 || !utr) {
+        alert('Kripya minimum ₹1 amount aur UTR number darj karein!');
+        return;
+      }
+
+      fetch(FIREBASE_URL + "/recharge_requests.json", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user: activeUser.name, userId: activeUser.id, amount: amt, utr: utr, date: new Date().toLocaleString() })
+      }).then(function() {
+        alert('Recharge request bhej di gayi hai! Verification ke baad balance update ho jayega.');
+        document.getElementById('inputRechAmt').value = '';
+        document.getElementById('inputRechUtr').value = '';
+        document.getElementById('qrImageBox').style.display = 'none';
+      }).catch(function(err) {
+        alert('Recharge submit error: ' + err.message);
+      });
+    }
+
+    function submitOrderWithAlert() {
+      var val1 = (document.getElementById('formInput1').value || '').trim();
+      var val2 = (document.getElementById('formInput2').value || '').trim();
+      var phone = (document.getElementById('formUserPhone').value || '').trim();
+
+      if (!val1) {
+        alert('Kripya details darj karein!');
+        return;
+      }
+
+      var orderId = 'ORD' + Math.floor(100000 + Math.random() * 900000);
+      var title = currentSelectedService.title;
+      var charge = currentSelectedService.charge;
+
+      fetch(FIREBASE_URL + "/service_orders/" + orderId + ".json", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          retailer: activeUser.name,
+          retailerId: activeUser.id,
+          phone: phone || activeUser.id,
+          service: title,
+          data1: val1,
+          data2: val2,
+          charge: charge,
+          date: new Date().toLocaleString()
+        })
+      }).then(function() {
+        var msg = "🔔 *Naya Service Order Lag Gaya Hai!*" + "%0A" +
+                  "*Portal:* Raghu Baba Online Service" + "%0A" +
+                  "*Dukandar:* " + activeUser.name + " (" + (phone || activeUser.id) + ")" + "%0A" +
+                  "*Service:* " + title + "%0A" +
+                  "*Details:* " + val1 + (val2 ? " | " + val2 : "") + "%0A" +
+                  "*Order ID:* " + orderId;
+
+        var waUrl = "https://api.whatsapp.com/send?phone=" + ADMIN_WHATSAPP + "&text=" + msg;
+
+        alert('Order submit ho gaya! Admin WhatsApp alert open ho raha hai.');
+        window.open(waUrl, '_blank');
+
+        document.getElementById('formInput1').value = '';
+        document.getElementById('formInput2').value = '';
+        document.getElementById('formOrderBox').style.display = 'none';
+      }).catch(function(err) {
+        alert('Order submit error: ' + err.message);
+      });
+    }
+  </script>
+</body>
+</html>
