@@ -882,8 +882,8 @@
       resetConfirmationResult = null;
     }
     function sendResetOtp() {
-      var mobile = (document.getElementById('resetMobile').value || '').replace(/\\D/g, '');
-      if (!/^[6-9]\\d{9}$/.test(mobile)) { alert('Sahi 10 digit Indian mobile number dalein.'); return; }
+      var mobile = (document.getElementById('resetMobile').value || '').replace(/\D/g, '');
+      if (!/^[6-9]\d{9}$/.test(mobile)) { alert('Sahi 10 digit Indian mobile number dalein.'); return; }
       var btn = document.getElementById('sendResetOtpBtn');
       btn.disabled = true; btn.textContent = 'Checking retailer...';
       fetch(FIREBASE_URL + '/retailers/' + encodeURIComponent(mobile) + '.json')
@@ -902,11 +902,11 @@
         .finally(function(){ btn.disabled = false; btn.textContent = 'Send OTP'; });
     }
     function confirmResetOtp() {
-      var mobile = (document.getElementById('resetMobile').value || '').replace(/\\D/g, '');
+      var mobile = (document.getElementById('resetMobile').value || '').replace(/\D/g, '');
       var otp = (document.getElementById('resetOtp').value || '').trim();
       var newPass = document.getElementById('resetNewPass').value || '';
       if (!resetConfirmationResult) { alert('Pehle Send OTP dabayein.'); return; }
-      if (!/^\\d{6}$/.test(otp)) { alert('6 digit OTP dalein.'); return; }
+      if (!/^\d{6}$/.test(otp)) { alert('6 digit OTP dalein.'); return; }
       if (newPass.length < 6) { alert('Naya password kam se kam 6 characters ka rakhein.'); return; }
       var btn = document.getElementById('confirmResetBtn');
       btn.disabled = true; btn.textContent = 'Verifying...';
