@@ -367,6 +367,11 @@
       </div>
 
       <div class="input-group">
+        <label>Email Address (Password Reset ke liye)</label>
+        <input type="email" id="newUserEmail" placeholder="Apna active email dalein" autocomplete="email">
+      </div>
+
+      <div class="input-group">
         <label>Password Banayein</label>
         <input type="password" id="newUserPass" placeholder="Apna password banayein">
       </div>
@@ -559,13 +564,14 @@
               <tr>
                 <th>Dukan / Naam</th>
                 <th>Mobile (User ID)</th>
+                <th>Email</th>
                 <th>Reg. Date</th>
                 <th>Current Balance</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody id="retailersTableBody">
-              <tr><td colspan="5" style="text-align: center; color: #64748b;">Retailers load ho rahe hain...</td></tr>
+              <tr><td colspan="6" style="text-align: center; color: #64748b;">Retailers load ho rahe hain...</td></tr>
             </tbody>
           </table>
         </div>
@@ -1038,9 +1044,14 @@
       var name = (document.getElementById('newUserName').value || '').trim();
       var mob = (document.getElementById('newUserMobile').value || '').trim();
       var pass = (document.getElementById('newUserPass').value || '').trim();
+      var email = (document.getElementById('newUserEmail').value || '').trim().toLowerCase();
 
-      if (!name || !mob || !pass) {
-        alert('Sabhi details bharna zaroori hai!');
+      if (!name || !mob || !pass || !email) {
+        alert('Naam, mobile, email aur password sabhi bharna zaroori hai!');
+        return;
+      }
+      if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {
+        alert('Sahi email address dalein!');
         return;
       }
       if (mob.length !== 10) {
@@ -1048,7 +1059,7 @@
         return;
       }
 
-      var newUserData = { name: name, pass: pass, wallet: 0, mobile: mob, date: new Date().toLocaleDateString() };
+      var newUserData = { name: name, pass: pass, email: email, wallet: 0, mobile: mob, date: new Date().toLocaleDateString() };
 
       var allRetailers = getSafeLocalData("all_portal_retailers") || {};
       allRetailers[mob] = newUserData;
@@ -1332,7 +1343,7 @@
           document.getElementById('totalRetailersCount').innerText = keys.length;
 
           if (keys.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #ef4444;">Abhi koi retailer registered nahi hai.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #ef4444;">Abhi koi retailer registered nahi hai.</td></tr>';
             return;
           }
 
@@ -1342,15 +1353,37 @@
             tr.innerHTML = 
               '<td><strong>' + (ret.name || 'N/A') + '</strong></td>' +
               '<td>' + key + '</td>' +
+              '<td>' + (ret.email || '<span style="color:#b45309;">Not added</span>') + '</td>' +
               '<td>' + (ret.date || '-') + '</td>' +
               '<td><strong style="color: #059669; font-size:14px;">₹' + Number(ret.wallet || 0).toFixed(2) + '</strong></td>' +
               '<td>' +
-                '<button class="btn-action-small" onclick="prepareTransfer(\'' + key + '\')">➕ Transfer</button>' +
+                '<button class="btn-action-small" onclick="updateRetailerEmail(\'' + key + '\')">✉️ Email</button>' +
+              '<button class="btn-action-small" onclick="prepareTransfer(\'' + key + '\')">➕ Transfer</button>' +
                 '<button class="btn-delete-small" onclick="deleteRetailerAccount(\'' + key + '\', \'' + (ret.name || key) + '\')">🗑️ Delete</button>' +
               '</td>';
             tbody.appendChild(tr);
           });
         }).catch(function(){});
+    }
+
+    function updateRetailerEmail(mob) {
+      var current = prompt('Retailer ' + mob + ' ka email address dalein:');
+      if (current === null) return;
+      var email = current.trim().toLowerCase();
+      if (email && !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {
+        alert('Sahi email address dalein.'); return;
+      }
+      fetch(FIREBASE_URL + '/retailers/' + encodeURIComponent(mob) + '.json')
+        .then(function(res){ return res.json(); })
+        .then(function(ret){
+          if (!ret) throw new Error('Retailer account nahi mila.');
+          ret.email = email;
+          return fetch(FIREBASE_URL + '/retailers/' + encodeURIComponent(mob) + '.json', {
+            method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(ret)
+          });
+        })
+        .then(function(res){ if(!res.ok) throw new Error('Email save nahi hua.'); alert('Email update ho gaya.'); fetchRetailersList(); })
+        .catch(function(err){ alert(err.message || 'Email update nahi ho paya.'); });
     }
 
     function deleteRetailerAccount(mob, name) {
