@@ -196,6 +196,36 @@
     /* Keep My Orders and Services Panel separate */
     body.orders-only #retailerServicesSection { display: none !important; }
 
+    /* Retailer dashboard: modern sidebar + workspace */
+    #retailerSidebar { display:none; }
+    body.retailer-dashboard #retailerSidebar {
+      display:flex; position:fixed; z-index:1000; left:0; top:0; bottom:0; width:220px;
+      padding:22px 12px; flex-direction:column; gap:8px; color:#fff;
+      background:linear-gradient(180deg,#172554 0%,#3730a3 52%,#0f766e 100%);
+      box-shadow:5px 0 22px rgba(15,23,42,.18);
+    }
+    .retailer-side-brand {font-size:16px;font-weight:900;line-height:1.35;padding:8px 10px 20px;border-bottom:1px solid rgba(255,255,255,.2);margin-bottom:8px;}
+    .retailer-side-brand small {display:block;font-size:10px;font-weight:600;opacity:.8;margin-top:5px;letter-spacing:.5px;}
+    .retailer-side-link {display:flex;align-items:center;gap:10px;width:100%;padding:12px 13px;border:0;border-radius:9px;background:transparent;color:#e0e7ff;text-align:left;font-size:13px;font-weight:800;cursor:pointer;}
+    .retailer-side-link:hover,.retailer-side-link:focus {background:rgba(255,255,255,.16);color:#fff;outline:none;}
+    body.retailer-dashboard #userBar {margin-left:220px;min-height:58px;}
+    body.retailer-dashboard .main-wrap {max-width:none;margin:22px 22px 22px 242px;padding:0 12px;}
+    body.retailer-dashboard #retailerHomeBox {border:0;border-radius:16px;padding:26px;background:linear-gradient(145deg,#fff 0%,#f8fbff 100%);box-shadow:0 12px 32px rgba(15,23,42,.1);}
+    body.retailer-dashboard .retailer-home-cards {display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;}
+    body.retailer-dashboard .retailer-home-tile {border:1px solid #e2e8f0;border-radius:14px;padding:20px;background:#fff;box-shadow:0 5px 16px rgba(15,23,42,.05);transition:transform .18s ease,box-shadow .18s ease;}
+    body.retailer-dashboard .retailer-home-tile:hover {transform:translateY(-3px);box-shadow:0 12px 24px rgba(15,23,42,.1);}
+    body.retailer-dashboard .retailer-home-tile h3 {font-size:14px;font-weight:900;letter-spacing:.4px;margin:12px 0 7px;color:#0f172a;}
+    body.retailer-dashboard .retailer-home-tile p {font-size:12px;color:#64748b;line-height:1.5;margin-bottom:14px;}
+    .retailer-tile-icon {width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:23px;background:#eff6ff;}
+    @media(max-width:760px) {
+      body.retailer-dashboard #retailerSidebar {position:static;width:auto;display:flex;flex-direction:row;overflow-x:auto;gap:5px;padding:8px;background:#1e3a8a;}
+      .retailer-side-brand {display:none;}
+      .retailer-side-link {white-space:nowrap;width:auto;flex:0 0 auto;padding:10px;font-size:12px;}
+      body.retailer-dashboard #userBar {margin-left:0;}
+      body.retailer-dashboard .main-wrap {margin:14px auto;padding:0 10px;}
+      body.retailer-dashboard #retailerHomeBox {padding:16px;}
+    }
+
     /* Services Grid */
     .services-grid {
       display: grid;
@@ -316,6 +346,16 @@
       <button class="btn-bar-action btn-exit" onclick="doLogout()">Logout</button>
     </div>
   </div>
+
+  <nav id="retailerSidebar" aria-label="Retailer navigation">
+    <div class="retailer-side-brand">⚡ RAGHU BABA<small>ONLINE SERVICE</small></div>
+    <button class="retailer-side-link" onclick="openRetailerHomePanel()">🏠 Dashboard</button>
+    <button class="retailer-side-link" onclick="openRetailerServicesPanel()">🧾 Digital Services</button>
+    <button class="retailer-side-link" onclick="openRetailerOrdersPanel()">📑 My Orders</button>
+    <button class="retailer-side-link" onclick="openRetailerRechargePanel()">💳 Wallet / Recharge</button>
+    <button class="retailer-side-link" onclick="showRetailerAccount()">👤 My Account</button>
+    <button class="retailer-side-link" onclick="doLogout()">↪ Logout</button>
+  </nav>
 
   <div class="main-wrap">
 
@@ -658,10 +698,10 @@
       <div class="module-card" id="retailerHomeBox" style="display:none;border-top-color:#0f766e;">
         <h2 style="font-size:24px;color:#0f766e;font-weight:900;">🏠 RETAILER HOME</h2>
         <p style="font-size:14px;color:#64748b;margin:5px 0 18px;">RAGHU BABA ONLINE SERVICE — AAPKA SERVICE DASHBOARD</p>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;">
-          <div style="background:#eff6ff;border-left:5px solid #2563eb;border-radius:10px;padding:18px;"><b>🧾 DIGITAL SERVICES</b><p style="margin:10px 0;font-weight:900;">ALL SERVICES</p><button type="button" class="c-btn btn-open" onclick="openRetailerServicesPanel()">SERVICES KHOLEN ➜</button></div>
-          <div style="background:#f0fdfa;border-left:5px solid #0f766e;border-radius:10px;padding:18px;"><b>📑 MY ORDERS</b><p style="margin:10px 0;font-weight:900;">ORDER STATUS &amp; SLIPS</p><button type="button" class="c-btn btn-open" style="background:#0f766e;" onclick="openRetailerOrdersPanel()">ORDERS KHOLEN ➜</button></div>
-          <div style="background:#f5f3ff;border-left:5px solid #7c3aed;border-radius:10px;padding:18px;"><b>💳 WALLET</b><p style="margin:10px 0;font-weight:900;">BALANCE &amp; RECHARGE</p><p style="font-size:12px;color:#6b7280;">Wallet balance top bar mein dekhein.</p><button type="button" class="c-btn btn-open" style="background:#7c3aed;" onclick="openRetailerRechargePanel()">RECHARGE ➜</button></div>
+        <div class="retailer-home-cards">
+          <div class="retailer-home-tile"><div class="retailer-tile-icon">🧾</div><h3>DIGITAL SERVICES</h3><p>Available online services aur application forms kholen.</p><button type="button" class="c-btn btn-open" onclick="openRetailerServicesPanel()">BROWSE SERVICES ➜</button></div>
+          <div class="retailer-home-tile"><div class="retailer-tile-icon" style="background:#ccfbf1;">📑</div><h3>MY ORDERS</h3><p>Apne orders ka status dekhein aur available slips download karein.</p><button type="button" class="c-btn btn-open" style="background:#0f766e;" onclick="openRetailerOrdersPanel()">VIEW ORDERS ➜</button></div>
+          <div class="retailer-home-tile"><div class="retailer-tile-icon" style="background:#f3e8ff;">💳</div><h3>WALLET &amp; RECHARGE</h3><p>Wallet balance top bar mein dekhein aur recharge request bhejein.</p><button type="button" class="c-btn btn-open" style="background:#7c3aed;" onclick="openRetailerRechargePanel()">OPEN WALLET ➜</button></div>
         </div>
         <div style="margin-top:16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px;color:#334155;"><b>WELCOME!</b> Apni zaroorat ki service chunen, order status dekhein aur wallet balance check karein.</div>
       </div>
@@ -1162,6 +1202,7 @@
       document.getElementById('barUserPhone').innerText = activeUser.mobile || activeUser.id;
 
       if (activeUser.role === 'admin') {
+        document.body.classList.remove('retailer-dashboard');
         document.getElementById('btnAdminPanel').style.display = 'inline-block';
         document.getElementById('btnAdminHome').style.display = 'inline-block';
         document.getElementById('btnRetailerHome').style.display = 'none';
@@ -1173,6 +1214,7 @@
         document.getElementById('retailerServicesSection').style.display = 'none';
         openAdminHomePanel();
       } else {
+        document.body.classList.add('retailer-dashboard');
         document.getElementById('btnAdminPanel').style.display = 'none';
         document.getElementById('btnAdminHome').style.display = 'none';
         document.getElementById('btnRetailerHome').style.display = 'inline-block';
@@ -1190,6 +1232,7 @@
     }
 
     function doLogout() {
+      document.body.classList.remove('retailer-dashboard');
       activeUser = null;
       try { localStorage.removeItem("raghu_active_user"); } catch(e){}
       document.getElementById('userBar').style.display = 'none';
@@ -1254,6 +1297,11 @@
       if (home) { home.style.display = 'block'; home.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
       var services = document.getElementById('retailerServicesSection');
       if (services) services.style.display = 'none';
+    }
+
+    function showRetailerAccount() {
+      if (!activeUser || activeUser.role === 'admin') return;
+      alert('Retailer: ' + (activeUser.name || '') + '\nMobile / User ID: ' + (activeUser.mobile || activeUser.id || '') + '\nWallet balance top bar mein dekhein.');
     }
 
     function openRetailerServicesPanel() {
