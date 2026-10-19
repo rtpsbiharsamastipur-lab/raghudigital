@@ -213,7 +213,7 @@
       flex-direction: column;
       justify-content: space-between;
     }
-    .service-card h3 { font-size: 16px; font-weight: 600; color: #0f172a; margin-bottom: 6px; }
+    .service-card h3 { font-size: 16px; font-weight: 800; letter-spacing: .35px; text-transform: uppercase; background: linear-gradient(90deg, #0f766e, #1d4ed8); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 8px; line-height: 1.35; }
     .tag-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 10px; }
     .b-blue { background: #e0f2fe; color: #0369a1; }
     .b-red { background: #ffe4e6; color: #be123c; }
@@ -727,11 +727,11 @@
         name: "DL PASSING",
         charge: 1300,
         fields: [
-          { name: "name", label: "Full Name", type: "text", required: true },
-          { name: "father_name", label: "Father Name", type: "text", required: true },
-          { name: "app_no", label: "Application Number", type: "text", required: true },
-          { name: "dob", label: "Date of Birth (DOB)", type: "date", required: true },
-          { name: "doc_pdf", label: "PDF / Document Upload (Under 500KB)", type: "file", required: true }
+          { name: "NAME", label: "Full Name", type: "text", required: true },
+          { name: "FATHER_NAME", label: "Father Name", type: "text", required: true },
+          { name: "APP_NO", label: "Application Number", type: "text", required: true },
+          { name: "DOB", label: "Date of Birth (DOB)", type: "date", required: true },
+          { name: "DOC_PDF", label: "PDF / Document Upload (Under 500KB)", type: "file", required: true }
         ]
       },
       {
@@ -739,101 +739,101 @@
         name: "LL PASSING",
         charge: 800,
         fields: [
-          { name: "name", label: "Full Name", type: "text", required: true },
-          { name: "father_name", label: "Father Name", type: "text", required: true },
-          { name: "app_no", label: "Application Number", type: "text", required: true },
-          { name: "dob", label: "Date of Birth (DOB)", type: "date", required: true },
-          { name: "doc_pdf", label: "PDF / Document Upload (Under 500KB)", type: "file", required: true }
+          { name: "NAME", label: "Full Name", type: "text", required: true },
+          { name: "FATHER_NAME", label: "Father Name", type: "text", required: true },
+          { name: "APP_NO", label: "Application Number", type: "text", required: true },
+          { name: "DOB", label: "Date of Birth (DOB)", type: "date", required: true },
+          { name: "DOC_PDF", label: "PDF / Document Upload (Under 500KB)", type: "file", required: true }
         ]
       },
       {
         id: "voter_link",
-        name: "Voter link mobile no",
+        name: "VOTER LINK MOBILE NO",
         charge: 50,
         fields: [
-          { name: "voter_no", label: "Customer Voter No", type: "text", required: true },
-          { name: "mobile_no", label: "Mobile No", type: "number", required: true }
+          { name: "VOTER_NO", label: "Customer Voter No", type: "text", required: true },
+          { name: "MOBILE_NO", label: "Mobile No", type: "number", required: true }
         ]
       },
       {
         id: "pan_new",
-        name: "Pan Card New apply",
+        name: "PAN CARD NEW APPLY",
         charge: 150,
         note: "Note: Pan Card apply karne me kam se kam 2 documents lagana zaroori hai.",
         fields: [
-          { name: "name", label: "Full Name", type: "text", required: true },
-          { name: "father_name", label: "Father Name", type: "text", required: true },
-          { name: "mother_name", label: "Mother Name", type: "text", required: true },
-          { name: "mobile_no", label: "Mobile No", type: "number", required: true },
-          { name: "identity_no", label: "Customer Identity No", type: "text", required: true },
-          { name: "address", label: "Full Address", type: "textarea", required: true },
-          { name: "doc_upload", label: "Identity Document Upload (PDF/Image)", type: "file", required: true },
-          { name: "photo_doc", label: "Photo Upload", type: "file", required: true },
-          { name: "sig_doc", label: "Signature Upload", type: "file", required: true },
-          { name: "other_doc", label: "Other Document Upload", type: "file", required: false }
+          { name: "NAME", label: "Full Name", type: "text", required: true },
+          { name: "FATHER_NAME", label: "Father Name", type: "text", required: true },
+          { name: "MOTHER_NAME", label: "Mother Name", type: "text", required: true },
+          { name: "MOBILE_NO", label: "Mobile No", type: "number", required: true },
+          { name: "IDENTITY_NO", label: "Customer Identity No", type: "text", required: true },
+          { name: "ADDRESS", label: "Full Address", type: "textarea", required: true },
+          { name: "DOC_UPLOAD", label: "Identity Document Upload (PDF/Image)", type: "file", required: true },
+          { name: "PHOTO_DOC", label: "Photo Upload", type: "file", required: true },
+          { name: "SIG_DOC", label: "Signature Upload", type: "file", required: true },
+          { name: "OTHER_DOC", label: "Other Document Upload", type: "file", required: false }
         ]
       },
       {
         id: "pan_find",
-        name: "Pan find",
+        name: "PAN FIND",
         charge: 30,
         fields: [
-          { name: "identity_no", label: "Customer Identity No", type: "text", required: true }
+          { name: "IDENTITY_NO", label: "Customer Identity No", type: "text", required: true }
         ]
       },
       {
         id: "vehicle_rc",
-        name: "Vehicle RC PDF",
+        name: "VEHICLE RC PDF",
         charge: 50,
         fields: [
-          { name: "vehicle_no", label: "Vehicle Number (RC)", type: "text", required: true }
+          { name: "VEHICLE_NO", label: "Vehicle Number (RC)", type: "text", required: true }
         ]
       },
       {
         id: "dl_pdf",
-        name: "DL pdf",
+        name: "DL PDF",
         charge: 20,
         fields: [
-          { name: "dl_no", label: "Driving Licence Number", type: "text", required: true },
-          { name: "dob", label: "Date of Birth (DOB)", type: "date", required: true }
+          { name: "DL_NO", label: "Driving Licence Number", type: "text", required: true },
+          { name: "DOB", label: "Date of Birth (DOB)", type: "date", required: true }
         ]
       },
       {
         id: "ll_new",
-        name: "LL New Apply",
+        name: "LL NEW APPLY",
         charge: 2000,
         fields: [
-          { name: "name", label: "Name", type: "text", required: true },
-          { name: "father_name", label: "Father Name", type: "text", required: true },
-          { name: "mother_name", label: "Mother Name", type: "text", required: true },
-          { name: "dob", label: "Date of Birth", type: "date", required: true },
-          { name: "identity_mark", label: "Pahchan Chinh (Identity Mark)", type: "text", required: true },
-          { name: "address", label: "Full Address", type: "textarea", required: true },
-          { name: "mobile_no", label: "Mobile No", type: "number", required: true },
-          { name: "email_id", label: "Email ID", type: "text", required: false },
-          { name: "blood_group", label: "Blood Group", type: "text", required: true },
-          { name: "gender", label: "Gender", type: "select", options: ["Male", "Female", "Other"], required: true },
-          { name: "doc_pdf", label: "Identity Document Upload PDF (Under 500KB)", type: "file", required: true },
-          { name: "photo_doc", label: "Photo Upload", type: "file", required: true },
-          { name: "sig_doc", label: "Signature Upload", type: "file", required: true },
-          { name: "marksheet_pan", label: "10th Marksheet ya Pan Card Upload", type: "file", required: true }
+          { name: "NAME", label: "Name", type: "text", required: true },
+          { name: "FATHER_NAME", label: "Father Name", type: "text", required: true },
+          { name: "MOTHER_NAME", label: "Mother Name", type: "text", required: true },
+          { name: "DOB", label: "Date of Birth", type: "date", required: true },
+          { name: "IDENTITY_MARK", label: "Pahchan Chinh (Identity Mark)", type: "text", required: true },
+          { name: "ADDRESS", label: "Full Address", type: "textarea", required: true },
+          { name: "MOBILE_NO", label: "Mobile No", type: "number", required: true },
+          { name: "EMAIL_ID", label: "Email ID", type: "text", required: false },
+          { name: "BLOOD_GROUP", label: "Blood Group", type: "text", required: true },
+          { name: "GENDER", label: "Gender", type: "select", options: ["Male", "Female", "Other"], required: true },
+          { name: "DOC_PDF", label: "Identity Document Upload PDF (Under 500KB)", type: "file", required: true },
+          { name: "PHOTO_DOC", label: "Photo Upload", type: "file", required: true },
+          { name: "SIG_DOC", label: "Signature Upload", type: "file", required: true },
+          { name: "MARKSHEET_PAN", label: "10th Marksheet ya Pan Card Upload", type: "file", required: true }
         ]
       },
       {
         id: "scan_to_pdf",
-        name: "Identity Document Scan to Original PDF",
+        name: "IDENTITY DOCUMENT SCAN TO ORIGINAL PDF",
         charge: 50,
         fields: [
-          { name: "doc_copy", label: "Photo Copy Upload (Image/PDF)", type: "file", required: true },
-          { name: "customer_mobile", label: "Customer Mobile No (Optional)", type: "number", required: false }
+          { name: "DOC_COPY", label: "Photo Copy Upload (Image/PDF)", type: "file", required: true },
+          { name: "CUSTOMER_MOBILE", label: "Customer Mobile No (Optional)", type: "number", required: false }
         ]
       },
       {
         id: "farmer_id",
-        name: "Farmer ID PDF",
+        name: "FARMER ID PDF",
         charge: 25,
         fields: [
-          { name: "identity_no", label: "Customer Identity No", type: "text", required: true }
+          { name: "IDENTITY_NO", label: "Customer Identity No", type: "text", required: true }
         ]
       },
       {
@@ -841,28 +841,28 @@
         name: "RASHAN NO TO AADHAAR NO",
         charge: 250,
         fields: [
-          { name: "rashan_no", label: "Ration Card Number", type: "text", required: true }
+          { name: "RASHAN_NO", label: "Ration Card Number", type: "text", required: true }
         ]
       },
       {
         id: "ll_print",
-        name: "LL Print PDF",
+        name: "LL PRINT PDF",
         charge: 25,
         fields: [
-          { name: "ll_no", label: "Learning Licence Number", type: "text", required: true },
-          { name: "dob", label: "Date of Birth (DOB)", type: "date", required: true },
-          { name: "card_type", label: "Card Type", type: "select", options: ["Non PVC", "Normal PVC"], required: true },
-          { name: "bg_color", label: "Card Background", type: "select", options: ["Light Blue", "White"], required: true }
+          { name: "LL_NO", label: "Learning Licence Number", type: "text", required: true },
+          { name: "DOB", label: "Date of Birth (DOB)", type: "date", required: true },
+          { name: "CARD_TYPE", label: "Card Type", type: "select", options: ["Non PVC", "Normal PVC"], required: true },
+          { name: "BG_COLOR", label: "Card Background", type: "select", options: ["Light Blue", "White"], required: true }
         ]
       },
       {
         id: "dl_apply",
-        name: "DL Apply",
+        name: "DL APPLY",
         charge: 3500,
         fields: [
-          { name: "app_no", label: "Application Number", type: "text", required: true },
-          { name: "dob", label: "Date of Birth (DOB)", type: "date", required: true },
-          { name: "ll_pdf", label: "LL PDF Upload", type: "file", required: true }
+          { name: "APP_NO", label: "Application Number", type: "text", required: true },
+          { name: "DOB", label: "Date of Birth (DOB)", type: "date", required: true },
+          { name: "LL_PDF", label: "LL PDF Upload", type: "file", required: true }
         ]
       }
     ];
