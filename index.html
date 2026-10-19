@@ -1084,7 +1084,7 @@
         if (el) el.style.display = 'none';
       });
       var servicesSection = document.getElementById('retailerServicesSection');
-      if (servicesSection) servicesSection.style.display = 'block';
+      if (servicesSection) servicesSection.style.display = (activeUser && activeUser.role === 'admin') ? 'none' : 'block';
     }
 
     function getServiceVisual(service) {
