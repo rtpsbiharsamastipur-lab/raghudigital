@@ -1099,7 +1099,7 @@
             '<span class="tag-badge b-blue">Charge: ₹' + s.charge + '</span>' +
           '</div>' +
           '<div class="card-btns">' +
-            '<button class="c-btn btn-open" onclick="openOrderForm(\\'' + s.id + '\\')">Apply / Open Form ➔</button>' +
+            '<button class="c-btn btn-open" onclick="openOrderForm(this.dataset.serviceId)" data-service-id="' + s.id + '">Apply / Open Form ➔</button>' +
           '</div>';
         grid.appendChild(card);
       });
