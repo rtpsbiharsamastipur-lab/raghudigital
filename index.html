@@ -226,6 +226,12 @@
       body.retailer-dashboard #retailerHomeBox {padding:16px;}
     }
 
+    .service-visual {height:104px;width:100%;display:flex;align-items:center;justify-content:center;border-radius:10px;margin-bottom:14px;overflow:hidden;position:relative;background:linear-gradient(135deg,#eff6ff,#e0f2fe);}
+    .service-visual:before {content:"";position:absolute;width:115px;height:115px;border-radius:50%;background:rgba(255,255,255,.55);right:-22px;top:-48px;}
+    .service-visual .service-visual-icon {font-size:48px;line-height:1;filter:drop-shadow(0 5px 4px rgba(15,23,42,.12));position:relative;z-index:1;}
+    .service-visual .service-visual-label {position:absolute;left:10px;bottom:8px;font-size:9px;font-weight:900;letter-spacing:1px;color:#334155;opacity:.75;}
+    .service-card {overflow:hidden;transition:transform .18s ease,box-shadow .18s ease;}
+    .service-card:hover {transform:translateY(-3px);box-shadow:0 12px 24px rgba(15,23,42,.16);}
     /* Services Grid */
     .services-grid {
       display: grid;
@@ -1061,6 +1067,20 @@
       if (servicesSection) servicesSection.style.display = 'block';
     }
 
+    function getServiceVisual(service) {
+      var n = String(service.name || '').toUpperCase();
+      if (n.indexOf('PAN') >= 0) return { icon: '🪪', label: 'PAN SERVICES', bg: 'linear-gradient(135deg,#dbeafe,#bfdbfe)' };
+      if (n.indexOf('VOTER') >= 0) return { icon: '🗳️', label: 'VOTER SERVICES', bg: 'linear-gradient(135deg,#dcfce7,#bbf7d0)' };
+      if (n.indexOf('AADHAAR') >= 0 || n.indexOf('IDENTITY') >= 0) return { icon: '🪪', label: 'AADHAAR SERVICES', bg: 'linear-gradient(135deg,#ffedd5,#fed7aa)' };
+      if (n.indexOf('DL ') >= 0 || n.indexOf('DL-') >= 0 || n.indexOf('DRIVING') >= 0) return { icon: '🚘', label: 'DRIVING LICENCE', bg: 'linear-gradient(135deg,#e0e7ff,#c7d2fe)' };
+      if (n.indexOf('LL ') >= 0 || n.indexOf('LL-') >= 0 || n.indexOf('LICENCE') >= 0 || n.indexOf('LICENSE') >= 0) return { icon: '🛵', label: 'LEARNER LICENCE', bg: 'linear-gradient(135deg,#f3e8ff,#e9d5ff)' };
+      if (n.indexOf('VEHICLE') >= 0 || n.indexOf('RC ') >= 0) return { icon: '🚗', label: 'VEHICLE SERVICES', bg: 'linear-gradient(135deg,#cffafe,#a5f3fc)' };
+      if (n.indexOf('FARMER') >= 0) return { icon: '🌾', label: 'FARMER SERVICES', bg: 'linear-gradient(135deg,#ecfccb,#d9f99d)' };
+      if (n.indexOf('RASHAN') >= 0 || n.indexOf('RATION') >= 0) return { icon: '🍚', label: 'RATION SERVICES', bg: 'linear-gradient(135deg,#fef3c7,#fde68a)' };
+      if (n.indexOf('PDF') >= 0 || n.indexOf('SCAN') >= 0 || n.indexOf('PRINT') >= 0) return { icon: '📄', label: 'PDF & PRINT', bg: 'linear-gradient(135deg,#f1f5f9,#cbd5e1)' };
+      return { icon: '💻', label: 'DIGITAL SERVICES', bg: 'linear-gradient(135deg,#ccfbf1,#99f6e4)' };
+    }
+
     function renderServicesGrid() {
       var grid = document.getElementById('servicesGrid');
       if (!grid) return;
@@ -1068,13 +1088,18 @@
       SERVICES_CONFIG.forEach(function(s) {
         var card = document.createElement('div');
         card.className = 'service-card';
-        card.innerHTML = 
+        var visual = getServiceVisual(s);
+        card.innerHTML =
+          '<div class="service-visual" style="background:' + visual.bg + ';">' +
+            '<span class="service-visual-icon" aria-hidden="true">' + visual.icon + '</span>' +
+            '<span class="service-visual-label">' + visual.label + '</span>' +
+          '</div>' +
           '<div>' +
             '<h3>' + s.name + '</h3>' +
             '<span class="tag-badge b-blue">Charge: ₹' + s.charge + '</span>' +
           '</div>' +
           '<div class="card-btns">' +
-            '<button class="c-btn btn-open" onclick="openOrderForm(\'' + s.id + '\')">Apply / Open Form ➔</button>' +
+            '<button class="c-btn btn-open" onclick="openOrderForm(\\'' + s.id + '\\')">Apply / Open Form ➔</button>' +
           '</div>';
         grid.appendChild(card);
       });
