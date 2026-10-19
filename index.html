@@ -431,6 +431,17 @@
       </div>
     </div>
 
+    <!-- Retailer wallet warning shown after every retailer login -->
+    <div id="retailerWarningModal" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.58);z-index:100000;align-items:center;justify-content:center;padding:20px;">
+      <div style="width:min(100%,460px);background:#fff;border-radius:18px;padding:26px 22px;text-align:center;box-shadow:0 20px 60px rgba(15,23,42,.28);font-family:inherit;border-top:6px solid #dc2626;">
+        <div style="font-size:42px;margin-bottom:8px;">⚠️</div>
+        <h2 style="font-size:23px;color:#b91c1c;margin:0 0 14px;font-weight:900;">महत्वपूर्ण चेतावनी</h2>
+        <p style="font-size:16px;color:#334155;line-height:1.7;margin:0 0 12px;">सभी रिटेलर भाई अपने Wallet में कम से कम <strong>₹50 बैलेंस</strong> जल्द से जल्द Add कर लें।</p>
+        <p style="font-size:14px;color:#475569;line-height:1.7;margin:0 0 22px;">जिन Retailer ID में न्यूनतम बैलेंस नहीं होगा, उनकी ID प्रबंधन द्वारा हटाई जा सकती है। कृपया समय रहते बैलेंस Add करके अपना काम जारी रखें।</p>
+        <button type="button" onclick="closeRetailerWarningModal()" style="width:100%;background:#dc2626;color:#fff;border:0;border-radius:9px;padding:13px 18px;font-size:16px;font-weight:800;cursor:pointer;">समझ गया — आगे बढ़ें</button>
+      </div>
+    </div>
+
     <!-- 3. MAIN DASHBOARD VIEW -->
     <div id="loginSuccessModal" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.42);z-index:99999;align-items:center;justify-content:center;padding:20px;">
     <div style="width:min(100%,390px);background:#fff;border-radius:18px;padding:32px 24px 26px;text-align:center;box-shadow:0 20px 60px rgba(15,23,42,.22);font-family:inherit;">
@@ -1135,6 +1146,16 @@
       if (modal) modal.style.display = 'none';
     }
 
+    function showRetailerWarningModal() {
+      var modal = document.getElementById('retailerWarningModal');
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function closeRetailerWarningModal() {
+      var modal = document.getElementById('retailerWarningModal');
+      if (modal) modal.style.display = 'none';
+    }
+
     function handleLoginAction() {
       var u = (document.getElementById('loginId').value || '').trim();
       var p = (document.getElementById('loginPass').value || '').trim();
@@ -1160,7 +1181,7 @@
         activeUser = { role: 'retailer', id: u, name: userObj.name, mobile: u, wallet: Number(userObj.wallet || 0) };
         setSafeLocalData("raghu_active_user", activeUser);
         openDashboardPanel();
-        showLoginSuccess();
+        showRetailerWarningModal();
         return;
       }
 
@@ -1187,7 +1208,7 @@
             activeUser = { role: 'retailer', id: u, name: data.name, mobile: u, wallet: Number(data.wallet || 0) };
             setSafeLocalData("raghu_active_user", activeUser);
             openDashboardPanel();
-        showLoginSuccess();
+        showRetailerWarningModal();
           } else {
             alert('Galat Password! Sahi password dalein.');
           }
