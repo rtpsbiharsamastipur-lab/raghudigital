@@ -1837,9 +1837,17 @@
         container.appendChild(group);
       });
 
+      // Form view: hide the services catalogue so the form is shown on its own.
+      var servicesSection = document.getElementById('retailerServicesSection');
+      if (servicesSection) servicesSection.style.display = 'none';
+      var homePanel = document.getElementById('retailerHomeBox');
+      if (homePanel) homePanel.style.display = 'none';
+      document.body.classList.remove('orders-only');
+
       var box = document.getElementById('formOrderBox');
       box.style.display = 'block';
-      box.scrollIntoView({ behavior: 'smooth' });
+      box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     async function submitOrderAction() {
