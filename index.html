@@ -306,6 +306,7 @@
     <div>Dukandar: <strong id="barUserName" style="color: #facc15; font-size: 14px;"></strong> (<span id="barUserPhone"></span>)</div>
     <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
       <button class="btn-bar-action" id="btnAdminHome" onclick="openAdminHomePanel()" style="background:#0f766e;display:none;">🏠 Home</button>
+      <button class="btn-bar-action" id="btnRetailerHome" onclick="openRetailerHomePanel()" style="background:#0f766e;display:none;">🏠 Home</button>
       <button class="btn-bar-action btn-admin-orders" id="btnAdminOrders" onclick="openAdminOrdersPanel()">📦 Orders Desk (<span id="countAdminPending">0</span>)</button>
       <button class="btn-bar-action btn-admin-recharge" id="btnAdminRecharge" onclick="openAdminRechargePanel()">💳 Recharges (<span id="countAdminRech">0</span>)</button>
       <button class="btn-bar-action btn-admin-ledger" id="btnAdminLedger" onclick="openAdminLedgerPanel()">📊 Din Bhar Ka Khata</button>
@@ -642,6 +643,18 @@
             </tbody>
           </table>
         </div>
+      </div>
+
+      <!-- RETAILER HOME PAGE -->
+      <div class="module-card" id="retailerHomeBox" style="display:none;border-top-color:#0f766e;">
+        <h2 style="font-size:24px;color:#0f766e;font-weight:900;">🏠 RETAILER HOME</h2>
+        <p style="font-size:14px;color:#64748b;margin:5px 0 18px;">RAGHU BABA ONLINE SERVICE — AAPKA SERVICE DASHBOARD</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;">
+          <div style="background:#eff6ff;border-left:5px solid #2563eb;border-radius:10px;padding:18px;"><b>🧾 DIGITAL SERVICES</b><p style="margin:10px 0;font-weight:900;">ALL SERVICES</p><button type="button" class="c-btn btn-open" onclick="openRetailerServicesPanel()">SERVICES KHOLEN ➜</button></div>
+          <div style="background:#f0fdfa;border-left:5px solid #0f766e;border-radius:10px;padding:18px;"><b>📑 MY ORDERS</b><p style="margin:10px 0;font-weight:900;">ORDER STATUS &amp; SLIPS</p><button type="button" class="c-btn btn-open" style="background:#0f766e;" onclick="openRetailerOrdersPanel()">ORDERS KHOLEN ➜</button></div>
+          <div style="background:#f5f3ff;border-left:5px solid #7c3aed;border-radius:10px;padding:18px;"><b>💳 WALLET</b><p style="margin:10px 0;font-weight:900;">BALANCE &amp; RECHARGE</p><p style="font-size:12px;color:#6b7280;">Wallet balance top bar mein dekhein.</p><button type="button" class="c-btn btn-open" style="background:#7c3aed;" onclick="openRetailerRechargePanel()">RECHARGE ➜</button></div>
+        </div>
+        <div style="margin-top:16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px;color:#334155;"><b>WELCOME!</b> Apni zaroorat ki service chunen, order status dekhein aur wallet balance check karein.</div>
       </div>
 
       <!-- RETAILER EXCLUSIVE SERVICES AREA -->
@@ -989,7 +1002,7 @@
       var actionBox = document.getElementById('orderClearanceActionBox');
       if (actionBox) actionBox.style.display = 'none';
       document.body.classList.remove('orders-only');
-      var ids = ['adminHomeBox', 'adminOrdersBox', 'adminRechargeBox', 'adminLedgerBox', 'retailerOrdersBox', 'adminRetailerBox', 'formOrderBox', 'formRechargeBox'];
+      var ids = ['adminHomeBox', 'retailerHomeBox', 'adminOrdersBox', 'adminRechargeBox', 'adminLedgerBox', 'retailerOrdersBox', 'adminRetailerBox', 'formOrderBox', 'formRechargeBox'];
       ids.forEach(function(id) {
         var el = document.getElementById(id);
         if (el) el.style.display = 'none';
@@ -1128,6 +1141,7 @@
       if (activeUser.role === 'admin') {
         document.getElementById('btnAdminPanel').style.display = 'inline-block';
         document.getElementById('btnAdminHome').style.display = 'inline-block';
+        document.getElementById('btnRetailerHome').style.display = 'none';
         document.getElementById('btnAdminOrders').style.display = 'inline-block';
         document.getElementById('btnAdminRecharge').style.display = 'inline-block';
         document.getElementById('btnAdminLedger').style.display = 'inline-block';
@@ -1138,13 +1152,15 @@
       } else {
         document.getElementById('btnAdminPanel').style.display = 'none';
         document.getElementById('btnAdminHome').style.display = 'none';
+        document.getElementById('btnRetailerHome').style.display = 'inline-block';
         document.getElementById('btnAdminOrders').style.display = 'none';
         document.getElementById('btnAdminRecharge').style.display = 'none';
         document.getElementById('btnAdminLedger').style.display = 'none';
         document.getElementById('btnMyOrders').style.display = 'inline-block';
         document.getElementById('barWalletPill').style.display = 'inline-block';
-        document.getElementById('retailerServicesSection').style.display = 'block';
+        document.getElementById('retailerServicesSection').style.display = 'none';
         renderServicesGrid();
+        openRetailerHomePanel();
       }
 
       syncPortalState();
@@ -1206,6 +1222,22 @@
             document.getElementById('countAdminRech').innerText = count;
           }).catch(function(){});
       }
+    }
+
+    function openRetailerHomePanel() {
+      if (!activeUser || activeUser.role === 'admin') return;
+      closeAllModules();
+      var home = document.getElementById('retailerHomeBox');
+      if (home) { home.style.display = 'block'; home.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+      var services = document.getElementById('retailerServicesSection');
+      if (services) services.style.display = 'none';
+    }
+
+    function openRetailerServicesPanel() {
+      if (!activeUser || activeUser.role === 'admin') return;
+      closeAllModules();
+      var services = document.getElementById('retailerServicesSection');
+      if (services) { services.style.display = 'block'; services.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
     }
 
     function openAdminHomePanel() {
