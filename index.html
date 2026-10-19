@@ -927,7 +927,9 @@
         name: "RASHAN NO TO AADHAAR NO",
         charge: 250,
         fields: [
-          { name: "RASHAN_NO", label: "Ration Card Number", type: "text", required: true }
+          { name: "RASHAN_NO", label: "Ration Card Number", type: "text", required: true },
+          { name: "NAME", label: "Customer Name", type: "text", required: true },
+          { name: "STATE", label: "State", type: "select", options: ["Bihar", "Uttar Pradesh", "Assam", "Haryana", "Delhi", "Jharkhand", "West Bengal", "Other"], required: true }
         ]
       },
       {
