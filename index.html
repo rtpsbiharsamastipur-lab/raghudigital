@@ -2148,13 +2148,8 @@
       rows.forEach(function(order,index) {
         var status = String(order.status || 'Pending');
         var statusColor = status === 'Completed' ? '#047857' : (status === 'Processing' ? '#b45309' : (status === 'Refunded' || status === 'Rejected_Refund' ? '#b91c1c' : '#1d4ed8'));
+        // Show only the result entered by Admin; never expose the retailer-submitted input number here.
         var result = order.adminServiceNumber || '';
-        if (!result && order.formData && typeof order.formData === 'object') {
-          var keys = Object.keys(order.formData);
-          for (var k=0;k<keys.length;k++) {
-            if (/aadhaar|aadhar|pan|ration|eid|number|no\\b|identity/i.test(keys[k]) && order.formData[keys[k]] && typeof order.formData[keys[k]] !== 'object') { result = String(order.formData[keys[k]]); break; }
-          }
-        }
         var resultHtml = result ? '<span style="font-weight:700;color:#0f172a;">' + safe(result) + '</span>' : '<span style="color:#64748b;">—</span>';
         if (order.deliveryResult && (String(order.deliveryResult).indexOf('data:') === 0 || /^https?:\/\//i.test(String(order.deliveryResult)))) {
           resultHtml += '<div style="margin-top:5px;"><a href="' + safe(order.deliveryResult) + '" target="_blank" rel="noopener noreferrer" style="color:#047857;font-weight:800;">📥 View / Download</a></div>';
@@ -2165,7 +2160,7 @@
         var tr = document.createElement('tr');
         tr.setAttribute('data-order-date', dateKey);
         tr.innerHTML = '<td style="background:#fff;padding:13px 10px;text-align:center;">' + (index+1) + '</td>' +
-          '<td style="background:#fff;padding:13px 10px;text-align:center;">' + safe(order.orderId || window.currentServiceListServiceName || '') + '</td>' +
+          '<td style="background:#fff;padding:13px 10px;text-align:center;">' + safe(window.currentServiceListServiceName || '') + '</td>' +
           '<td style="background:#fff;padding:13px 10px;text-align:center;">' + resultHtml + '</td>' +
           '<td style="background:#fff;padding:13px 10px;text-align:center;white-space:nowrap;">' + safe(order.date || '—') + '</td>' +
           '<td style="background:#fff;padding:13px 10px;text-align:center;color:' + statusColor + ';font-weight:800;">' + safe(status) + '</td>';
