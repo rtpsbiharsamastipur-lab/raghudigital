@@ -1123,7 +1123,7 @@
         if (el) el.style.display = 'none';
       });
       var servicesSection = document.getElementById('retailerServicesSection');
-      if (servicesSection) servicesSection.style.display = (activeUser && activeUser.role === 'admin') ? 'none' : 'block';
+      if (servicesSection) servicesSection.style.display = 'none';
     }
 
     function getServiceVisual(service) {
@@ -1396,6 +1396,8 @@
       if (home) { home.style.display = 'block'; home.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
       var services = document.getElementById('retailerServicesSection');
       if (services) services.style.display = 'none';
+      var form = document.getElementById('formOrderBox');
+      if (form) form.style.display = 'none';
     }
 
     function showRetailerAccount() {
@@ -1406,6 +1408,8 @@
     function openRetailerServicesPanel() {
       if (!activeUser || activeUser.role === 'admin') return;
       closeAllModules();
+      var home = document.getElementById('retailerHomeBox');
+      if (home) home.style.display = 'none';
       var services = document.getElementById('retailerServicesSection');
       if (services) { services.style.display = 'block'; services.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
     }
