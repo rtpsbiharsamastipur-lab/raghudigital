@@ -2104,8 +2104,8 @@
             '<button type="button" onclick="resetServiceListFilter()" style="background:#7b8794;color:#fff;border:0;padding:10px 18px;border-radius:5px;font-weight:800;cursor:pointer;">RESET</button></div>' +
             '<div style="overflow-x:auto;border-radius:7px;"><table style="width:100%;min-width:760px;border-collapse:separate;border-spacing:1px;background:#dbeafe;" id="serviceListTable"><thead><tr>' +
             '<th style="background:#10c6dc;color:#071827;padding:15px 10px;font-size:11px;text-align:center;">SN.NO.</th>' +
-            '<th style="background:#10c6dc;color:#071827;padding:15px 10px;font-size:11px;text-align:center;">' + safe(service.name.toUpperCase()) + '</th>' +
-            '<th style="background:#10c6dc;color:#071827;padding:15px 10px;font-size:11px;text-align:center;">RESULT / NUMBER</th>' +
+            '<th style="background:#10c6dc;color:#071827;padding:15px 10px;font-size:11px;text-align:center;">EID NO.</th>' +
+            '<th style="background:#10c6dc;color:#071827;padding:15px 10px;font-size:11px;text-align:center;">AADHAAR NO.</th>' +
             '<th style="background:#10c6dc;color:#071827;padding:15px 10px;font-size:11px;text-align:center;">DATE</th>' +
             '<th style="background:#10c6dc;color:#071827;padding:15px 10px;font-size:11px;text-align:center;">STATUS</th></tr></thead><tbody id="serviceListTableBody"></tbody></table></div>' +
             '<p id="serviceListEmpty" style="display:none;padding:14px;text-align:center;color:#64748b;background:#fff;border-radius:8px;">Is date range mein koi record nahi mila.</p>';
@@ -2149,24 +2149,20 @@
       rows.forEach(function(order,index) {
         var status = String(order.status || 'Pending');
         var statusColor = status === 'Completed' ? '#047857' : (status === 'Processing' ? '#b45309' : (status === 'Refunded' || status === 'Rejected_Refund' ? '#b91c1c' : '#1d4ed8'));
-        // EID service: show the customer's submitted EID in RESULT / NUMBER.
-        // Other services: show the result number entered by Admin.
-        var result = order.adminServiceNumber || '';
-        if (window.currentServiceListServiceId === 'eid_to_aadhaar_find' && order.formData && typeof order.formData === 'object') {
-          result = order.formData.EID_NO || order.formData.EID || order.formData['EID / Enrolment ID Number'] || order.formData['EID / Enrolment ID Number (28 digits)'] || result;
-        }
-        var resultHtml = result ? '<span style="font-weight:700;color:#0f172a;">' + safe(result) + '</span>' : '<span style="color:#64748b;">—</span>';
+        // EID NO is the exact value submitted by the retailer; Aadhaar NO is entered by Admin.
+        var eidNo = order.formData && typeof order.formData === 'object' ? (order.formData.EID_NO || '') : '';
+        var aadhaarNo = order.adminServiceNumber || ''; 
+        var eidHtml = eidNo ? '<span style="font-weight:700;color:#0f172a;">' + safe(eidNo) + '</span>' : '<span style="color:#64748b;">—</span>';
+        var aadhaarHtml = aadhaarNo ? '<span style="font-weight:700;color:#0f172a;">' + safe(aadhaarNo) + '</span>' : '<span style="color:#64748b;">—</span>';
         if (order.deliveryResult && (String(order.deliveryResult).indexOf('data:') === 0 || /^https?:\/\//i.test(String(order.deliveryResult)))) {
-          resultHtml += '<div style="margin-top:5px;"><a href="' + safe(order.deliveryResult) + '" target="_blank" rel="noopener noreferrer" style="color:#047857;font-weight:800;">📥 View / Download</a></div>';
-        } else if (order.deliveryResult && !result) {
-          resultHtml = '<span style="font-weight:700;color:#047857;">' + safe(order.deliveryResult) + '</span>';
+          aadhaarHtml += '<div style="margin-top:5px;"><a href="' + safe(order.deliveryResult) + '" target="_blank" rel="noopener noreferrer" style="color:#047857;font-weight:800;">📥 View / Download</a></div>';
         }
         var dateKey = getServiceListDateKey(order.date);
         var tr = document.createElement('tr');
         tr.setAttribute('data-order-date', dateKey);
         tr.innerHTML = '<td style="background:#fff;padding:13px 10px;text-align:center;">' + (index+1) + '</td>' +
-          '<td style="background:#fff;padding:13px 10px;text-align:center;">' + safe(window.currentServiceListServiceName || '') + '</td>' +
-          '<td style="background:#fff;padding:13px 10px;text-align:center;">' + resultHtml + '</td>' +
+          '<td style="background:#fff;padding:13px 10px;text-align:center;">' + eidHtml + '</td>' +
+          '<td style="background:#fff;padding:13px 10px;text-align:center;">' + aadhaarHtml + '</td>' +
           '<td style="background:#fff;padding:13px 10px;text-align:center;white-space:nowrap;">' + safe(order.date || '—') + '</td>' +
           '<td style="background:#fff;padding:13px 10px;text-align:center;color:' + statusColor + ';font-weight:800;">' + safe(status) + '</td>';
         tbody.appendChild(tr);
