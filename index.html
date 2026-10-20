@@ -1995,7 +1995,13 @@
         } else {
           var inp = document.createElement('input');
           inp.type = f.type; inp.name = f.name; inp.required = f.required;
-          inp.placeholder = f.label;
+          inp.placeholder = currentService.id === 'eid_to_aadhaar_find' ? 'Enter 28-digit EID Number' : f.label;
+          if (currentService.id === 'eid_to_aadhaar_find') {
+            inp.maxLength = 28;
+            inp.inputMode = 'numeric';
+            inp.pattern = '[0-9]{28}';
+            inp.title = 'Enter the complete 28-digit EID';
+          }
           group.appendChild(inp);
         }
         container.appendChild(group);
