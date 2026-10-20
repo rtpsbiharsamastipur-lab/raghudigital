@@ -1158,8 +1158,8 @@
             '<span class="tag-badge b-blue">Charge: ₹' + s.charge + '</span>' +
           '</div>' +
           '<div class="card-btns" style="display:flex;gap:7px;flex-wrap:wrap;">' +
-            '<button class="c-btn btn-open" onclick="openServicePageInNewTab(\'form\', this.dataset.serviceId)" data-service-id="' + s.id + '">Apply / Open Form ➔</button>' +
-            '<button class="c-btn" style="background:#059669;color:#fff;border:0;" onclick="openServicePageInNewTab(\'list\', this.dataset.serviceId)" data-service-id="' + s.id + '">📋 Service List</button>' +
+            '<button class="c-btn btn-open" onclick="openOrderForm(this.dataset.serviceId)" data-service-id="' + s.id + '">Apply / Open Form ➔</button>' +
+            '<button class="c-btn" style="background:#059669;color:#fff;border:0;" onclick="openServiceResults(this.dataset.serviceId)" data-service-id="' + s.id + '">📋 Service List</button>' +
           '</div>';
         grid.appendChild(card);
       });
@@ -1866,6 +1866,8 @@
 
     function openOrderForm(serviceId) {
       closeAllModules();
+      var servicesSectionForForm = document.getElementById('retailerServicesSection');
+      if (servicesSectionForForm) servicesSectionForForm.style.display = 'none';
       currentService = SERVICES_CONFIG.find(function(s) { return s.id === serviceId; });
       if (!currentService) return;
 
@@ -2049,6 +2051,11 @@
     function closeServiceResults() {
       var box = document.getElementById('serviceResultsBox');
       if (box) box.style.display = 'none';
+      var grid = document.getElementById('servicesGrid');
+      if (grid) grid.style.display = 'grid';
+      var section = document.getElementById('retailerServicesSection');
+      var header = section ? section.querySelector('.panel-header') : null;
+      if (header) header.style.display = '';
     }
 
     function openServiceResults(serviceId) {
@@ -2057,6 +2064,10 @@
       if (!service) return;
       var servicesSection = document.getElementById('retailerServicesSection');
       if (servicesSection) servicesSection.style.display = 'block';
+      var servicesGrid = document.getElementById('servicesGrid');
+      if (servicesGrid) servicesGrid.style.display = 'none';
+      var servicesHeader = servicesSection ? servicesSection.querySelector('.panel-header') : null;
+      if (servicesHeader) servicesHeader.style.display = 'none';
       var box = document.getElementById('serviceResultsBox');
       var title = document.getElementById('serviceResultsTitle');
       var content = document.getElementById('serviceResultsContent');
