@@ -2111,6 +2111,7 @@
             '<p id="serviceListEmpty" style="display:none;padding:14px;text-align:center;color:#64748b;background:#fff;border-radius:8px;">Is date range mein koi record nahi mila.</p>';
           content.innerHTML = html;
           window.currentServiceListRows = matches;
+          window.currentServiceListServiceId = serviceId;
           window.currentServiceListServiceName = service.name;
           renderServiceListRows(matches);
         })
@@ -2148,8 +2149,12 @@
       rows.forEach(function(order,index) {
         var status = String(order.status || 'Pending');
         var statusColor = status === 'Completed' ? '#047857' : (status === 'Processing' ? '#b45309' : (status === 'Refunded' || status === 'Rejected_Refund' ? '#b91c1c' : '#1d4ed8'));
-        // Show only the result entered by Admin; never expose the retailer-submitted input number here.
+        // EID service: show the customer's submitted EID in RESULT / NUMBER.
+        // Other services: show the result number entered by Admin.
         var result = order.adminServiceNumber || '';
+        if (window.currentServiceListServiceId === 'eid_to_aadhaar_find' && order.formData && typeof order.formData === 'object') {
+          result = order.formData.EID_NO || order.formData.EID || order.formData['EID / Enrolment ID Number'] || order.formData['EID / Enrolment ID Number (28 digits)'] || result;
+        }
         var resultHtml = result ? '<span style="font-weight:700;color:#0f172a;">' + safe(result) + '</span>' : '<span style="color:#64748b;">—</span>';
         if (order.deliveryResult && (String(order.deliveryResult).indexOf('data:') === 0 || /^https?:\/\//i.test(String(order.deliveryResult)))) {
           resultHtml += '<div style="margin-top:5px;"><a href="' + safe(order.deliveryResult) + '" target="_blank" rel="noopener noreferrer" style="color:#047857;font-weight:800;">📥 View / Download</a></div>';
