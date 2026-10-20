@@ -2024,10 +2024,13 @@
 
     function openServicePageInNewTab(mode, serviceId) {
       var param = mode === 'form' ? 'openServiceForm' : 'openServiceList';
-      var url = window.location.pathname + '?' + param + '=' + encodeURIComponent(serviceId);
-      var newTab = window.open(url, '_blank', 'noopener,noreferrer');
-      if (!newTab) {
-        alert('Naya tab browser ne block kar diya. Is website ke liye pop-ups allow karein.');
+      var url = window.location.origin + window.location.pathname + '?' + param + '=' + encodeURIComponent(serviceId);
+      // Open directly from the click event so the browser treats it as user-initiated.
+      var newTab = window.open(url, '_blank');
+      if (newTab) {
+        try { newTab.opener = null; } catch(e) {}
+      } else {
+        alert('Naya tab browser ne block kar diya. Address bar ke paas Pop-ups Blocked icon par click karke Allow karein.');
       }
     }
 
@@ -2052,9 +2055,15 @@
       if (!activeUser || activeUser.role === 'admin') return;
       var service = SERVICES_CONFIG.find(function(item) { return item.id === serviceId; });
       if (!service) return;
+      var servicesSection = document.getElementById('retailerServicesSection');
+      if (servicesSection) servicesSection.style.display = 'block';
       var box = document.getElementById('serviceResultsBox');
       var title = document.getElementById('serviceResultsTitle');
       var content = document.getElementById('serviceResultsContent');
+      if (!box || !title || !content) {
+        alert('Service List panel load nahi hua. Page refresh karke dobara try karein.');
+        return;
+      }
       title.textContent = '📋 ' + service.name + ' — Service List & Results';
       content.innerHTML = '<p style="padding:12px;color:#64748b;">Aapke results load ho rahe hain...</p>';
       box.style.display = 'block';
