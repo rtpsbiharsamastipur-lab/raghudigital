@@ -1018,7 +1018,9 @@
         if (saved && saved.id) {
           activeUser = saved;
           openDashboardPanel();
-        showLoginSuccess();
+          var serviceDeepLink = new URLSearchParams(window.location.search).has('openServiceForm') || new URLSearchParams(window.location.search).has('openServiceList');
+          if (!serviceDeepLink) showLoginSuccess();
+          handleServicePageDeepLink();
         } else {
           showRegister(false);
         }
@@ -1156,8 +1158,8 @@
             '<span class="tag-badge b-blue">Charge: ₹' + s.charge + '</span>' +
           '</div>' +
           '<div class="card-btns" style="display:flex;gap:7px;flex-wrap:wrap;">' +
-            '<button class="c-btn btn-open" onclick="openOrderForm(this.dataset.serviceId)" data-service-id="' + s.id + '">Apply / Open Form ➔</button>' +
-            '<button class="c-btn" style="background:#059669;color:#fff;border:0;" onclick="openServiceResults(this.dataset.serviceId)" data-service-id="' + s.id + '">📋 Service List</button>' +
+            '<button class="c-btn btn-open" onclick="openServicePageInNewTab(\'form\', this.dataset.serviceId)" data-service-id="' + s.id + '">Apply / Open Form ➔</button>' +
+            '<button class="c-btn" style="background:#059669;color:#fff;border:0;" onclick="openServicePageInNewTab(\'list\', this.dataset.serviceId)" data-service-id="' + s.id + '">📋 Service List</button>' +
           '</div>';
         grid.appendChild(card);
       });
@@ -2018,6 +2020,27 @@
       btn.innerText = "Submit Order";
       btn.disabled = false;
       closeAllModules();
+    }
+
+    function openServicePageInNewTab(mode, serviceId) {
+      var param = mode === 'form' ? 'openServiceForm' : 'openServiceList';
+      var url = window.location.pathname + '?' + param + '=' + encodeURIComponent(serviceId);
+      var newTab = window.open(url, '_blank', 'noopener,noreferrer');
+      if (!newTab) {
+        alert('Naya tab browser ne block kar diya. Is website ke liye pop-ups allow karein.');
+      }
+    }
+
+    function handleServicePageDeepLink() {
+      var params = new URLSearchParams(window.location.search);
+      var formServiceId = params.get('openServiceForm');
+      var listServiceId = params.get('openServiceList');
+      if (!formServiceId && !listServiceId) return;
+      if (!activeUser || activeUser.role === 'admin') return;
+      window.setTimeout(function() {
+        if (formServiceId) openOrderForm(formServiceId);
+        else if (listServiceId) openServiceResults(listServiceId);
+      }, 450);
     }
 
     function closeServiceResults() {
