@@ -356,6 +356,7 @@
   <nav id="retailerSidebar" aria-label="Retailer navigation">
     <div class="retailer-side-brand">⚡ RAGHU BABA<small>ONLINE SERVICE</small></div>
     <button class="retailer-side-link" onclick="openRetailerHomePanel()">🏠 Dashboard</button>
+    <button class="retailer-side-link" onclick="openOfficialAllPortal()">🌐 अधिकृत All Portal</button>
     <button class="retailer-side-link" onclick="openRetailerServicesPanel()">🧾 Digital Services</button>
     <button class="retailer-side-link" onclick="openRetailerOrdersPanel()">📑 My Orders</button>
     <button class="retailer-side-link" onclick="openRetailerRechargePanel()">💳 Wallet / Recharge</button>
@@ -1368,6 +1369,10 @@
             document.getElementById('countAdminRech').innerText = count;
           }).catch(function(){});
       }
+    }
+
+    function openOfficialAllPortal() {
+      window.open("./official-all-portal.html", "_blank", "noopener,noreferrer");
     }
 
     function openRetailerHomePanel() {
