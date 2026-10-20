@@ -2097,17 +2097,17 @@
           });
           matches.sort(function(a,b) { return parseOrderDateForList(b.date) - parseOrderDateForList(a.date); });
           var safe = function(value) { return String(value == null ? '' : value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); };
+          var serviceListColumns = getServiceListColumns(serviceId, matches);
+          var tableHeaders = serviceListColumns.map(function(col) {
+            return '<th style="background:#10c6dc;color:#071827;padding:15px 10px;font-size:11px;text-align:center;">' + safe(col.label) + '</th>';
+          }).join('');
           var html = '<div style="display:flex;gap:14px;align-items:end;flex-wrap:wrap;margin:4px 0 18px;padding:14px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;">' +
             '<div style="flex:1;min-width:180px;"><label for="serviceListFromDate" style="display:block;font-size:12px;color:#475569;margin-bottom:6px;">FROM DATE</label><input id="serviceListFromDate" type="date" style="width:100%;padding:9px;border:1px solid #cbd5e1;border-radius:5px;"></div>' +
             '<div style="flex:1;min-width:180px;"><label for="serviceListToDate" style="display:block;font-size:12px;color:#475569;margin-bottom:6px;">TO DATE</label><input id="serviceListToDate" type="date" style="width:100%;padding:9px;border:1px solid #cbd5e1;border-radius:5px;"></div>' +
             '<button type="button" onclick="filterServiceListRows()" style="background:#078bff;color:#fff;border:0;padding:10px 18px;border-radius:5px;font-weight:800;cursor:pointer;">FILTER</button>' +
             '<button type="button" onclick="resetServiceListFilter()" style="background:#7b8794;color:#fff;border:0;padding:10px 18px;border-radius:5px;font-weight:800;cursor:pointer;">RESET</button></div>' +
             '<div style="overflow-x:auto;border-radius:7px;"><table style="width:100%;min-width:760px;border-collapse:separate;border-spacing:1px;background:#dbeafe;" id="serviceListTable"><thead><tr>' +
-            '<th style="background:#10c6dc;color:#071827;padding:15px 10px;font-size:11px;text-align:center;">SN.NO.</th>' +
-            '<th style="background:#10c6dc;color:#071827;padding:15px 10px;font-size:11px;text-align:center;">EID NO.</th>' +
-            '<th style="background:#10c6dc;color:#071827;padding:15px 10px;font-size:11px;text-align:center;">AADHAAR NO.</th>' +
-            '<th style="background:#10c6dc;color:#071827;padding:15px 10px;font-size:11px;text-align:center;">DATE</th>' +
-            '<th style="background:#10c6dc;color:#071827;padding:15px 10px;font-size:11px;text-align:center;">STATUS</th></tr></thead><tbody id="serviceListTableBody"></tbody></table></div>' +
+            tableHeaders + '</tr></thead><tbody id="serviceListTableBody"></tbody></table></div>' +
             '<p id="serviceListEmpty" style="display:none;padding:14px;text-align:center;color:#64748b;background:#fff;border-radius:8px;">Is date range mein koi record nahi mila.</p>';
           content.innerHTML = html;
           window.currentServiceListRows = matches;
@@ -2135,36 +2135,76 @@
       return date.getFullYear() + '-' + String(date.getMonth()+1).padStart(2,'0') + '-' + String(date.getDate()).padStart(2,'0');
     }
 
+    function getServiceListColumns(serviceId, rows) {
+      if (serviceId === 'eid_to_aadhaar_find') return [
+        { key: 'serial', label: 'SN NO.' }, { key: 'eid', label: 'EID NO.' },
+        { key: 'aadhaar', label: 'AADHAAR NO.' }, { key: 'date', label: 'DATE' }, { key: 'status', label: 'STATUS' }
+      ];
+      if (serviceId === 'pan_new') return [
+        { key: 'serial', label: 'SN NO.' }, { key: 'nameFather', label: 'NAME & FATHER NAME' },
+        { key: 'uploads', label: 'UPLOADED PDF / DOCUMENTS' }, { key: 'date', label: 'DATE' }, { key: 'status', label: 'STATUS' }
+      ];
+      return [
+        { key: 'serial', label: 'SN NO.' }, { key: 'customer', label: 'CUSTOMER DETAILS' },
+        { key: 'uploads', label: 'UPLOADED FILES' }, { key: 'result', label: 'RESULT' },
+        { key: 'date', label: 'DATE' }, { key: 'status', label: 'STATUS' }
+      ];
+    }
+
     function renderServiceListRows(rows) {
       var tbody = document.getElementById('serviceListTableBody');
       var empty = document.getElementById('serviceListEmpty');
       if (!tbody) return;
       var safe = function(value) { return String(value == null ? '' : value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); };
+      var isFileLink = function(value) { return typeof value === 'string' && (value.indexOf('data:') === 0 || value.indexOf('http://') === 0 || value.indexOf('https://') === 0); };
+      var serviceId = window.currentServiceListServiceId || '';
+      var columns = getServiceListColumns(serviceId, rows || []);
       tbody.innerHTML = '';
-      if (!rows || !rows.length) {
-        if (empty) empty.style.display = 'block';
-        return;
-      }
+      if (!rows || !rows.length) { if (empty) empty.style.display = 'block'; return; }
       if (empty) empty.style.display = 'none';
       rows.forEach(function(order,index) {
+        var formData = order.formData && typeof order.formData === 'object' ? order.formData : {};
         var status = String(order.status || 'Pending');
         var statusColor = status === 'Completed' ? '#047857' : (status === 'Processing' ? '#b45309' : (status === 'Refunded' || status === 'Rejected_Refund' ? '#b91c1c' : '#1d4ed8'));
-        // EID NO is the exact value submitted by the retailer; Aadhaar NO is entered by Admin.
-        var eidNo = order.formData && typeof order.formData === 'object' ? (order.formData.EID_NO || '') : '';
-        var aadhaarNo = order.adminServiceNumber || ''; 
-        var eidHtml = eidNo ? '<span style="font-weight:700;color:#0f172a;">' + safe(eidNo) + '</span>' : '<span style="color:#64748b;">—</span>';
-        var aadhaarHtml = aadhaarNo ? '<span style="font-weight:700;color:#0f172a;">' + safe(aadhaarNo) + '</span>' : '<span style="color:#64748b;">—</span>';
-        if (order.deliveryResult && (String(order.deliveryResult).indexOf('data:') === 0 || /^https?:\/\//i.test(String(order.deliveryResult)))) {
-          aadhaarHtml += '<div style="margin-top:5px;"><a href="' + safe(order.deliveryResult) + '" target="_blank" rel="noopener noreferrer" style="color:#047857;font-weight:800;">📥 View / Download</a></div>';
+        var eidNo = formData.EID_NO || '';
+        var aadhaarNo = order.adminServiceNumber || '';
+        var nameFather = [formData.NAME, formData.FATHER_NAME].filter(Boolean).join(' / ');
+        var uploadKeys = Object.keys(formData).filter(function(key) {
+          var value = formData[key];
+          return value && (key.indexOf('DOC') >= 0 || key.indexOf('PDF') >= 0 || key.indexOf('UPLOAD') >= 0 || isFileLink(value));
+        });
+        var uploadsHtml = uploadKeys.map(function(key) {
+          var value = formData[key];
+          var label = key.replace(/_/g, ' ');
+          if (isFileLink(value)) return '<div style="margin:3px 0;"><a href="' + safe(value) + '" target="_blank" rel="noopener noreferrer" download="' + safe(label) + '" style="color:#047857;font-weight:800;">📥 ' + safe(label) + ' — View / Download</a></div>';
+          return '<div style="margin:3px 0;color:#475569;">📎 ' + safe(label) + ': ' + safe(value) + '</div>';
+        }).join('') || '<span style="color:#64748b;">—</span>';
+        var detailKeys = Object.keys(formData).filter(function(key) { return formData[key] !== '' && formData[key] != null && uploadKeys.indexOf(key) < 0; });
+        var customerHtml = detailKeys.map(function(key) {
+          return '<div style="margin:2px 0;"><strong>' + safe(key.replace(/_/g,' ')) + ':</strong> ' + safe(formData[key]) + '</div>';
+        }).join('') || '<span style="color:#64748b;">—</span>';
+        var resultValue = order.adminServiceNumber || order.deliveryResult || '';
+        var resultHtml = resultValue ? (isFileLink(String(resultValue)) ?
+          '<a href="' + safe(resultValue) + '" target="_blank" rel="noopener noreferrer" style="color:#047857;font-weight:800;">📥 View / Download Result</a>' :
+          '<span style="font-weight:700;color:#0f172a;">' + safe(resultValue) + '</span>') : '<span style="color:#64748b;">—</span>';
+        if (order.deliveryResult && order.deliveryResult !== resultValue && isFileLink(String(order.deliveryResult))) {
+          resultHtml += '<div style="margin-top:5px;"><a href="' + safe(order.deliveryResult) + '" target="_blank" rel="noopener noreferrer" style="color:#047857;font-weight:800;">📥 View / Download File</a></div>';
         }
-        var dateKey = getServiceListDateKey(order.date);
         var tr = document.createElement('tr');
-        tr.setAttribute('data-order-date', dateKey);
-        tr.innerHTML = '<td style="background:#fff;padding:13px 10px;text-align:center;">' + (index+1) + '</td>' +
-          '<td style="background:#fff;padding:13px 10px;text-align:center;">' + eidHtml + '</td>' +
-          '<td style="background:#fff;padding:13px 10px;text-align:center;">' + aadhaarHtml + '</td>' +
-          '<td style="background:#fff;padding:13px 10px;text-align:center;white-space:nowrap;">' + safe(order.date || '—') + '</td>' +
-          '<td style="background:#fff;padding:13px 10px;text-align:center;color:' + statusColor + ';font-weight:800;">' + safe(status) + '</td>';
+        tr.setAttribute('data-order-date', getServiceListDateKey(order.date));
+        tr.innerHTML = columns.map(function(col) {
+          var value = '';
+          if (col.key === 'serial') value = String(index + 1);
+          else if (col.key === 'eid') value = eidNo ? '<strong>' + safe(eidNo) + '</strong>' : '—';
+          else if (col.key === 'aadhaar') value = aadhaarNo ? '<strong>' + safe(aadhaarNo) + '</strong>' + (order.deliveryResult && order.deliveryResult !== aadhaarNo ? '<div style="margin-top:5px;">' + resultHtml + '</div>' : '') : resultHtml;
+          else if (col.key === 'nameFather') value = nameFather ? '<strong>' + safe(nameFather) + '</strong>' : '—';
+          else if (col.key === 'uploads') value = uploadsHtml;
+          else if (col.key === 'customer') value = customerHtml;
+          else if (col.key === 'result') value = resultHtml;
+          else if (col.key === 'date') value = safe(order.date || '—');
+          else if (col.key === 'status') value = '<span style="color:' + statusColor + ';font-weight:800;">' + safe(status) + '</span>';
+          return '<td style="background:#fff;padding:13px 10px;text-align:center;vertical-align:top;">' + value + '</td>';
+        }).join('');
         tbody.appendChild(tr);
       });
     }
