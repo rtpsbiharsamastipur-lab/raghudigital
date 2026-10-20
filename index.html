@@ -1495,6 +1495,9 @@
                 }
               }
             }
+            if (o.adminServiceNumber) {
+              detailsFormatted.push('<div><strong>Admin Entered Service Number:</strong> ' + String(o.adminServiceNumber).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</div>');
+            }
 
             var resultDeliveryHtml = o.deliveryResult ? 
               (o.deliveryResult.startsWith('data:') || o.deliveryResult.startsWith('http') ? '<a href="' + o.deliveryResult + '" target="_blank" download="Slip_' + (o.orderId || key) + '" style="color:#059669; font-weight:bold; background:#dcfce7; padding:4px 8px; border-radius:4px; text-decoration:none;">📄 Open Slip</a>' : o.deliveryResult) 
