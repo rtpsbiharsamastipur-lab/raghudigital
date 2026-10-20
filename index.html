@@ -1958,8 +1958,11 @@
       document.getElementById('formChargeText').innerText = 'Charge: ₹' + currentService.charge;
 
       var noteEl = document.getElementById('formNoteText');
-      if (currentService.note) {
-        noteEl.style.display = 'block';
+      if (currentService.id === 'eid_to_aadhaar_find') {
+        noteEl.style.cssText = 'display:block;font-size:14px;color:#1e3a8a;background:#eff6ff;border-left:4px solid #2563eb;padding:16px 20px;border-radius:8px;margin-bottom:18px;line-height:1.7;';
+        noteEl.innerHTML = '<div style="font-size:19px;font-weight:800;color:#1e40af;margin-bottom:8px;">🪪 Generate EID Number To Aadhaar Find — Instant</div><div><strong style="color:#1d4ed8;">EID Verification:</strong> Enter the complete 28-digit EID only with the Aadhaar holder consent and valid authorization. Official verification may be required; OTP-free retrieval is not guaranteed.</div><div style="margin-top:6px;color:#047857;">आधार धारक की सहमति और वैध अनुमति के साथ पूरा 28 अंकों का EID दर्ज करें। आधिकारिक सत्यापन आवश्यक हो सकता है।</div>';
+      } else if (currentService.note) {
+        noteEl.style.cssText = 'display:block;font-size:13px;color:#b45309;background:#fef3c7;padding:10px;border-radius:6px;margin-bottom:15px;';
         noteEl.innerText = currentService.note;
       } else {
         noteEl.style.display = 'none';
