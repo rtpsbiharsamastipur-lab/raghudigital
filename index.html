@@ -526,6 +526,10 @@
               <input type="file" id="slipUploadFile" style="width: 100%; padding: 6px; background: white; border: 1px solid #cbd5e1; border-radius: 5px;">
             </div>
             <div>
+              <label style="font-size: 12px; font-weight: 700; display: block; margin-bottom: 4px;">Customer / Service Number (Aadhaar, PAN, Ration, EID etc.)</label>
+              <input type="text" id="adminServiceNumber" autocomplete="off" placeholder="Authorized customer number enter karein" style="width: 100%; padding: 9px; border: 1px solid #cbd5e1; border-radius: 5px;">
+            </div>
+            <div>
               <label style="font-size: 12px; font-weight: 700; display: block; margin-bottom: 4px;">Ya Web Link / Refund Karan Likhein</label>
               <input type="text" id="orderDeliverFileLink" placeholder="Link ya Refund ka karan dalein" style="width: 100%; padding: 9px; border: 1px solid #cbd5e1; border-radius: 5px;">
             </div>
@@ -1523,6 +1527,7 @@
           document.getElementById('clearanceOrderIdText').innerText = orderId + " (" + orderObj.serviceName + ")";
           document.getElementById('clearanceOrderChargeInfo').innerText = "Retailer: " + orderObj.retailerName + " (" + orderObj.retailerPhone + ") | Charge: ₹" + orderObj.charge;
           document.getElementById('orderDeliverFileLink').value = (orderObj.deliveryResult && !orderObj.deliveryResult.startsWith('data:')) ? orderObj.deliveryResult : '';
+          document.getElementById('adminServiceNumber').value = orderObj.adminServiceNumber || '';
           document.getElementById('slipUploadFile').value = '';
           box.style.display = 'block';
           box.scrollIntoView({ behavior: 'smooth' });
@@ -1535,6 +1540,7 @@
       var orderId = activeOrderContext.orderId;
       var selectedAction = document.getElementById('updateOrderStatusSelect').value;
       var linkOrReason = (document.getElementById('orderDeliverFileLink').value || '').trim();
+      var adminServiceNumber = (document.getElementById('adminServiceNumber').value || '').trim();
       var slipFileInput = document.getElementById('slipUploadFile');
       var charge = Number(activeOrderContext.charge || 0);
       var retailerMob = String(activeOrderContext.retailerPhone).trim();
@@ -1577,7 +1583,7 @@
         await fetch(FIREBASE_URL + "/service_orders/" + encodeURIComponent(orderId) + ".json", {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status: "Refunded", deliveryResult: reasonText })
+          body: JSON.stringify({ status: "Refunded", deliveryResult: reasonText, adminServiceNumber: adminServiceNumber })
         });
 
         alert('Payment Refund Safal! ₹' + charge + ' wapas add ho gaye.');
@@ -1585,7 +1591,7 @@
         await fetch(FIREBASE_URL + "/service_orders/" + encodeURIComponent(orderId) + ".json", {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status: selectedAction, deliveryResult: finalResultData })
+          body: JSON.stringify({ status: selectedAction, deliveryResult: finalResultData, adminServiceNumber: adminServiceNumber })
         });
         alert('Order status aur delivery slip safaltapoorvak update ho gayi!');
       }
