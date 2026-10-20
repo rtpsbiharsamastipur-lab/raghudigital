@@ -868,7 +868,8 @@
           { name: "DOC_UPLOAD", label: "Aadhaar Card Upload (PDF under 200 KB)", type: "file", required: true, accept: ".pdf,application/pdf", maxSize: 204800 },
           { name: "PHOTO_DOC", label: "Photo Upload", type: "file", required: true },
           { name: "SIG_DOC", label: "Signature Upload", type: "file", required: true },
-          { name: "OTHER_DOC", label: "Other Document Upload - Voter ID / 10th Marksheet / ABHA ID (any one)", type: "file", required: true, accept: ".pdf,application/pdf", maxSize: 204800 }
+          { name: "OTHER_DOC", label: "Other Document Type", type: "select", required: true, options: ["Select one document", "Voter ID", "10th Marksheet", "ABHA ID"] },
+          { name: "OTHER_DOC_FILE", label: "Upload Selected Document (PDF under 200 KB)", type: "file", required: true, accept: ".pdf,application/pdf", maxSize: 204800 }
         ]
       },
       {
@@ -1916,11 +1917,23 @@
           var inpFile = document.createElement('input');
           inpFile.type = 'file'; inpFile.name = f.name; inpFile.required = f.required;
           if (f.accept) inpFile.accept = f.accept;
-          if (currentService.id === 'pan_new' && (f.name === 'DOC_UPLOAD' || f.name === 'OTHER_DOC')) {
+          if (currentService.id === 'pan_new' && (f.name === 'DOC_UPLOAD' || f.name === 'OTHER_DOC_FILE')) {
             inpFile.accept = '.pdf,application/pdf';
             inpFile.dataset.maxSize = String(f.maxSize || 204800);
           }
           group.appendChild(inpFile);
+        } else if (f.type === 'select') {
+          var sel = document.createElement('select');
+          sel.name = f.name; sel.required = f.required;
+          f.options.forEach(function(opt, optIndex) {
+            var option = document.createElement('option');
+            option.value = optIndex === 0 ? '' : opt;
+            option.innerText = opt;
+            option.disabled = optIndex === 0;
+            option.selected = optIndex === 0;
+            sel.appendChild(option);
+          });
+          group.appendChild(sel);
         } else {
           var inp = document.createElement('input');
           inp.type = f.type; inp.name = f.name; inp.required = f.required;
@@ -1975,14 +1988,14 @@
           if (el.files && el.files[0]) {
             var file = el.files[0];
             var maxFileSize = el.dataset && el.dataset.maxSize ? Number(el.dataset.maxSize) : 524288;
-            if (file.size > maxFileSize) {
-              alert(el.name + (maxFileSize <= 204800 ? ' PDF file 200 KB se kam honi chahiye!' : ' file ka size 500KB se kam hona chahiye!'));
+            if (el.dataset && el.dataset.maxSize && file.type !== 'application/pdf') {
+              alert(el.name + ' ke liye sirf PDF file upload karein.');
               btn.innerText = "Submit Order";
               btn.disabled = false;
               return;
             }
-            if (el.dataset && el.dataset.maxSize && file.type !== 'application/pdf') {
-              alert(el.name + ' ke liye sirf PDF file upload karein.');
+            if (file.size > maxFileSize) {
+              alert(el.name + (maxFileSize <= 204800 ? ' PDF file 200 KB se kam honi chahiye!' : ' file ka size 500KB se kam hona chahiye!'));
               btn.innerText = "Submit Order";
               btn.disabled = false;
               return;
