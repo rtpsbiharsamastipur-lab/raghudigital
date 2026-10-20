@@ -863,12 +863,12 @@
           { name: "FATHER_NAME", label: "Father Name", type: "text", required: true },
           { name: "MOTHER_NAME", label: "Mother Name", type: "text", required: true },
           { name: "MOBILE_NO", label: "Mobile No", type: "number", required: true },
-          { name: "IDENTITY_NO", label: "Customer Identity No", type: "text", required: true },
+          { name: "IDENTITY_NO", label: "Aadhaar No", type: "text", required: true },
           { name: "ADDRESS", label: "Full Address", type: "textarea", required: true },
-          { name: "DOC_UPLOAD", label: "Identity Document Upload (PDF/Image)", type: "file", required: true },
+          { name: "DOC_UPLOAD", label: "Aadhaar Card Upload (PDF under 200 KB)", type: "file", required: true, accept: ".pdf,application/pdf", maxSize: 204800 },
           { name: "PHOTO_DOC", label: "Photo Upload", type: "file", required: true },
           { name: "SIG_DOC", label: "Signature Upload", type: "file", required: true },
-          { name: "OTHER_DOC", label: "Second Document Upload (PDF/Image)", type: "file", required: true }
+          { name: "OTHER_DOC", label: "Second Document Upload (PDF/Image under 200 KB)", type: "file", required: true, accept: ".pdf,application/pdf", maxSize: 204800 }
         ]
       },
       {
@@ -1915,6 +1915,11 @@
         } else if (f.type === 'file') {
           var inpFile = document.createElement('input');
           inpFile.type = 'file'; inpFile.name = f.name; inpFile.required = f.required;
+          if (f.accept) inpFile.accept = f.accept;
+          if (currentService.id === 'pan_new' && (f.name === 'DOC_UPLOAD' || f.name === 'OTHER_DOC')) {
+            inpFile.accept = '.pdf,application/pdf';
+            inpFile.dataset.maxSize = String(f.maxSize || 204800);
+          }
           group.appendChild(inpFile);
         } else {
           var inp = document.createElement('input');
@@ -1969,8 +1974,15 @@
         if (el.type === 'file') {
           if (el.files && el.files[0]) {
             var file = el.files[0];
-            if (file.size > 524288) {
-              alert(el.name + ' file ka size 500KB se kam hona chahiye!');
+            var maxFileSize = el.dataset && el.dataset.maxSize ? Number(el.dataset.maxSize) : 524288;
+            if (file.size > maxFileSize) {
+              alert(el.name + (maxFileSize <= 204800 ? ' PDF file 200 KB se kam honi chahiye!' : ' file ka size 500KB se kam hona chahiye!'));
+              btn.innerText = "Submit Order";
+              btn.disabled = false;
+              return;
+            }
+            if (el.dataset && el.dataset.maxSize && file.type !== 'application/pdf') {
+              alert(el.name + ' ke liye sirf PDF file upload karein.');
               btn.innerText = "Submit Order";
               btn.disabled = false;
               return;
