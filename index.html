@@ -2156,7 +2156,7 @@
           }
         }
         var resultHtml = result ? '<span style="font-weight:700;color:#0f172a;">' + safe(result) + '</span>' : '<span style="color:#64748b;">—</span>';
-        if (order.deliveryResult && (String(order.deliveryResult).indexOf('data:') === 0 || /^https?:\\/\\//i.test(String(order.deliveryResult)))) {
+        if (order.deliveryResult && (String(order.deliveryResult).indexOf('data:') === 0 || /^https?:\/\//i.test(String(order.deliveryResult)))) {
           resultHtml += '<div style="margin-top:5px;"><a href="' + safe(order.deliveryResult) + '" target="_blank" rel="noopener noreferrer" style="color:#047857;font-weight:800;">📥 View / Download</a></div>';
         } else if (order.deliveryResult && !result) {
           resultHtml = '<span style="font-weight:700;color:#047857;">' + safe(order.deliveryResult) + '</span>';
