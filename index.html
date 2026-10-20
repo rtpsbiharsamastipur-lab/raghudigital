@@ -1157,7 +1157,7 @@
           '</div>' +
           '<div class="card-btns" style="display:flex;gap:7px;flex-wrap:wrap;">' +
             '<button class="c-btn btn-open" onclick="openOrderForm(this.dataset.serviceId)" data-service-id="' + s.id + '">Apply / Open Form ➔</button>' +
-            '<button class="c-btn" style="background:#059669;color:#fff;border:0;" onclick="openServiceResults(this.dataset.serviceId)" data-service-id="' + s.id + '">📥 My Result</button>' +
+            '<button class="c-btn" style="background:#059669;color:#fff;border:0;" onclick="openServiceResults(this.dataset.serviceId)" data-service-id="' + s.id + '">📋 Service List</button>' +
           '</div>';
         grid.appendChild(card);
       });
@@ -2032,7 +2032,7 @@
       var box = document.getElementById('serviceResultsBox');
       var title = document.getElementById('serviceResultsTitle');
       var content = document.getElementById('serviceResultsContent');
-      title.textContent = '📥 ' + service.name + ' — My Results';
+      title.textContent = '📋 ' + service.name + ' — Service List & Results';
       content.innerHTML = '<p style="padding:12px;color:#64748b;">Aapke results load ho rahe hain...</p>';
       box.style.display = 'block';
       box.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -2053,19 +2053,30 @@
             content.innerHTML = '<p style="padding:14px;background:#f8fafc;border-radius:8px;color:#64748b;">Is service ka abhi koi order nahi hai. Apply karne ke baad result yahin dikhega.</p>';
             return;
           }
-          var html = '<div style="display:grid;gap:10px;">';
+          var html = '<div style="display:grid;gap:12px;">';
           matches.forEach(function(order) {
+            var safe = function(value) { return String(value == null ? '' : value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); };
             var status = String(order.status || 'Pending');
             var statusColor = status === 'Completed' ? '#047857' : (status === 'Processing' ? '#b45309' : (status === 'Refunded' || status === 'Rejected_Refund' ? '#b91c1c' : '#1d4ed8'));
             var delivery = order.deliveryResult || '';
-            var deliveryHtml = '<span style="color:#64748b;">Result abhi available nahi hai.</span>';
+            var deliveryHtml = '<div style="padding:10px;background:#f8fafc;border-radius:8px;color:#64748b;">⏳ Admin result/slip abhi upload nahi hua hai.</div>';
             if (delivery && (delivery.indexOf('data:') === 0 || /^https?:\/\//i.test(delivery))) {
-              deliveryHtml = '<a href="' + delivery.replace(/"/g, '&quot;') + '" target="_blank" rel="noopener noreferrer" style="display:inline-block;padding:8px 12px;background:#dcfce7;color:#047857;border-radius:7px;text-decoration:none;font-weight:800;">📥 Open / Download Result</a>';
+              deliveryHtml = '<a href="' + safe(delivery) + '" target="_blank" rel="noopener noreferrer" style="display:inline-block;padding:9px 13px;background:#dcfce7;color:#047857;border-radius:7px;text-decoration:none;font-weight:800;">📥 Download / View Your Result</a>';
             } else if (delivery) {
-              deliveryHtml = '<div style="font-weight:700;color:#334155;white-space:pre-wrap;">' + String(delivery).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div>';
+              deliveryHtml = '<div style="padding:10px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;font-weight:700;color:#166534;white-space:pre-wrap;">' + safe(delivery) + '</div>';
             }
-            var numberHtml = order.adminServiceNumber ? '<div style="margin-top:6px;"><b>Service Number:</b> ' + String(order.adminServiceNumber).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div>' : '';
-            html += '<article style="border:1px solid #d1fae5;background:#fff;padding:13px;border-radius:10px;"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;"><b>Order: ' + String(order.orderId || '').replace(/</g,'&lt;') + '</b><span style="color:' + statusColor + ';font-weight:800;">' + status + '</span></div><div style="font-size:12px;color:#64748b;margin:5px 0 10px;">' + String(order.date || '') + ' · Charge ₹' + Number(order.charge || 0) + '</div>' + numberHtml + '<div style="margin-top:8px;">' + deliveryHtml + '</div></article>';
+            var numberHtml = order.adminServiceNumber ? '<div style="margin-top:8px;padding:9px;background:#eff6ff;border-radius:7px;"><b>Result / Service Number:</b> ' + safe(order.adminServiceNumber) + '</div>' : '';
+            var detailsHtml = '';
+            if (order.formData && typeof order.formData === 'object') {
+              var detailRows = [];
+              Object.keys(order.formData).forEach(function(key) {
+                var value = order.formData[key];
+                if (typeof value === 'string' && (value.indexOf('data:') === 0 || value.length > 500)) return;
+                detailRows.push('<div style="display:flex;gap:8px;flex-wrap:wrap;padding:5px 0;border-bottom:1px solid #e2e8f0;"><b style="min-width:115px;color:#475569;">' + safe(key.replace(/_/g,' ')) + ':</b><span style="color:#0f172a;">' + safe(value) + '</span></div>');
+              });
+              if (detailRows.length) detailsHtml = '<details style="margin-top:10px;"><summary style="cursor:pointer;color:#1d4ed8;font-weight:800;">🧾 Submitted Application Details</summary><div style="margin-top:6px;">' + detailRows.join('') + '</div></details>';
+            }
+            html += '<article style="border:1px solid #cbd5e1;background:#fff;padding:14px;border-radius:12px;box-shadow:0 2px 8px rgba(15,23,42,.05);"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;"><b style="color:#1e3a8a;font-size:15px;">🧾 Order: ' + safe(order.orderId || '') + '</b><span style="padding:5px 9px;border-radius:20px;background:' + (status === 'Completed' ? '#dcfce7' : status === 'Processing' ? '#fef3c7' : (status === 'Refunded' || status === 'Rejected_Refund' ? '#fee2e2' : '#dbeafe')) + ';color:' + statusColor + ';font-weight:800;font-size:12px;">' + safe(status) + '</span></div><div style="font-size:12px;color:#64748b;margin:7px 0 10px;">📅 ' + safe(order.date || '') + ' &nbsp;·&nbsp; 💳 Charge ₹' + Number(order.charge || 0) + '</div>' + detailsHtml + '<div style="margin-top:12px;"><div style="font-weight:800;color:#065f46;margin-bottom:6px;">📥 Admin Sent Result / Slip</div>' + deliveryHtml + numberHtml + '</div></article>';
           });
           html += '</div>';
           content.innerHTML = html;
