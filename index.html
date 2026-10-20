@@ -2122,7 +2122,7 @@
       var text = String(value).trim();
       var iso = Date.parse(text);
       if (!isNaN(iso)) return iso;
-      var m = text.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})/);
+      var m = text.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})/);
       if (m) return new Date(Number(m[3]), Number(m[2])-1, Number(m[1])).getTime();
       return 0;
     }
