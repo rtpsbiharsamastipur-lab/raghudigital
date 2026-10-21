@@ -675,6 +675,9 @@
           <button class="c-btn btn-open" style="max-width: 120px;" onclick="fetchRetailersList()">🔄 Refresh List</button>
         </div>
 
+        <div style="margin:10px 0 12px;">
+          <input id="retailerSearchInput" type="search" placeholder="🔎 Search retailer by name, mobile, email..." oninput="filterRetailersTable()" style="width:100%;max-width:420px;padding:10px 12px;border:1px solid #cbd5e1;border-radius:8px;font-size:14px;box-sizing:border-box;">
+        </div>
         <div class="admin-table-wrap">
           <table class="admin-table">
             <thead>
@@ -1638,6 +1641,16 @@
       aBox.style.display = 'block';
       aBox.scrollIntoView({ behavior: 'smooth' });
       fetchRetailersList();
+    }
+
+    function filterRetailersTable() {
+      var input = document.getElementById('retailerSearchInput');
+      var query = (input ? input.value : '').trim().toLowerCase();
+      var tbody = document.getElementById('retailersTableBody');
+      if (!tbody) return;
+      Array.prototype.forEach.call(tbody.querySelectorAll('tr'), function(row) {
+        row.style.display = row.innerText.toLowerCase().indexOf(query) !== -1 ? '' : 'none';
+      });
     }
 
     function fetchRetailersList() {
