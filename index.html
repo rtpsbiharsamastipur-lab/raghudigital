@@ -1172,11 +1172,18 @@
           '<div>' +
             '<h3>' + s.name + '</h3>' +
             '<span class="tag-badge b-blue">Charge: ₹' + s.charge + '</span>' +
+            (s.id === 'eid_to_aadhaar_find' ? '<span style="display:inline-block;margin:8px 0 0 5px;padding:4px 9px;border-radius:999px;background:#fee2e2;color:#b91c1c;font-size:12px;font-weight:800;">⛔ फिलहाल बंद है</span>' : '') +
           '</div>' +
-          '<div class="card-btns" style="display:flex;gap:7px;flex-wrap:wrap;">' +
-            '<button class="c-btn btn-open" onclick="openOrderForm(this.dataset.serviceId)" data-service-id="' + s.id + '">Apply / Open Form ➔</button>' +
-            '<button class="c-btn" style="background:#059669;color:#fff;border:0;" onclick="openServiceResults(this.dataset.serviceId)" data-service-id="' + s.id + '">📋 Service List</button>' +
-          '</div>';
+          (s.id === 'eid_to_aadhaar_find' ?
+            '<div style="padding:10px;border-radius:8px;background:#fff7ed;color:#9a3412;font-size:13px;font-weight:700;">यह सेवा फिलहाल उपलब्ध नहीं है। इसे अस्थायी रूप से बंद रखा गया है।</div>' +
+            '<div class="card-btns" style="display:flex;gap:7px;flex-wrap:wrap;">' +
+              '<button class="c-btn btn-open" disabled style="opacity:.5;cursor:not-allowed;" title="Service temporarily unavailable">⛔ फिलहाल बंद</button>' +
+              '<button class="c-btn" disabled style="background:#94a3b8;color:#fff;border:0;opacity:.6;cursor:not-allowed;">📋 Service List बंद</button>' +
+            '</div>' :
+            '<div class="card-btns" style="display:flex;gap:7px;flex-wrap:wrap;">' +
+              '<button class="c-btn btn-open" onclick="openOrderForm(this.dataset.serviceId)" data-service-id="' + s.id + '">Apply / Open Form ➔</button>' +
+              '<button class="c-btn" style="background:#059669;color:#fff;border:0;" onclick="openServiceResults(this.dataset.serviceId)" data-service-id="' + s.id + '">📋 Service List</button>' +
+            '</div>');
         grid.appendChild(card);
       });
     }
