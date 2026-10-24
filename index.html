@@ -1041,7 +1041,8 @@
         showRegister(false);
       }
 
-      setInterval(syncPortalState, 8000);
+      // Reduce Firebase download usage: refresh portal state once per minute instead of every 8 seconds.
+      setInterval(syncPortalState, 60000);
     });
 
     var loginConfirmationResult = null;
@@ -1441,18 +1442,6 @@
 
     function syncPortalState() {
       if (!activeUser) return;
-
-      if (activeUser.role !== 'admin') {
-        fetch(FIREBASE_URL + "/retailers/" + encodeURIComponent(activeUser.id) + "/wallet.json")
-          .then(function(res) { return res.json(); })
-          .then(function(bal) {
-            if (bal !== null && bal !== undefined) {
-              activeUser.wallet = Number(bal);
-              setSafeLocalData("raghu_active_user", activeUser);
-              document.getElementById('barWalletAmt').innerText = Number(bal).toFixed(2);
-            }
-          }).catch(function(){});
-      }
 
       if (activeUser.role !== 'admin') {
         // Always refresh retailer wallet from its actual Firebase account key.
