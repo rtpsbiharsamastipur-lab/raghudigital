@@ -432,18 +432,21 @@
         <button type="button" id="chooseRetailerLogin" onclick="showRetailerLoginMode()" style="border:2px solid #2563eb;background:#2563eb;color:#fff;border-radius:10px;padding:13px 8px;font-size:15px;font-weight:700;cursor:pointer;">🧑‍💼 Retailer Login</button>
         <button type="button" id="chooseAdminLogin" onclick="showAdminLoginMode()" style="border:2px solid #cbd5e1;background:#f8fafc;color:#334155;border-radius:10px;padding:13px 8px;font-size:15px;font-weight:700;cursor:pointer;">👑 Admin Login</button>
       </div>
-      <p class="subtitle" id="loginModeSubtitle">Retailer: User ID डालें, registered mobile पर OTP आएगा।</p>
+      <p class="subtitle" id="loginModeSubtitle">Retailer: User ID और password दर्ज करें।</p>
 
       <div class="input-group">
         <label>User ID</label>
         <input type="text" id="loginId" placeholder="Apni User ID darj karein" autocomplete="username" oninput="toggleAdminLoginFields()">
       </div>
+      <div class="input-group" id="retailerPasswordGroup">
+        <label>Retailer Password</label>
+        <input type="password" id="retailerLoginPass" placeholder="Apna password darj karein" autocomplete="current-password">
+      </div>
       <div class="input-group" id="adminPasswordGroup" style="display:none;">
         <label>Admin Password</label>
         <input type="password" id="adminLoginPass" placeholder="Admin password darj karein" autocomplete="current-password">
       </div>
-      <div id="loginRecaptcha" style="margin:12px 0;"></div>
-      <button type="button" class="btn-submit" id="btnSignIn" onclick="handleLoginAction()">📩 Retailer OTP भेजें</button>
+      <button type="button" class="btn-submit" id="btnSignIn" onclick="handleLoginAction()">🔐 Retailer Login करें</button>
 
       <div id="loginOtpBox" style="display:none;margin-top:18px;">
         <div class="input-group">
@@ -1131,9 +1134,11 @@
       id.value = '';
       id.placeholder = 'Apni Retailer User ID darj karein';
       document.getElementById('adminPasswordGroup').style.display = 'none';
+      document.getElementById('retailerPasswordGroup').style.display = 'block';
+      document.getElementById('retailerLoginPass').value = '';
       document.getElementById('loginOtpBox').style.display = 'none';
-      document.getElementById('btnSignIn').textContent = '📩 Retailer OTP भेजें';
-      document.getElementById('loginModeSubtitle').textContent = 'Retailer: User ID डालें, registered mobile पर OTP आएगा।';
+      document.getElementById('btnSignIn').textContent = '🔐 Retailer Login करें';
+      document.getElementById('loginModeSubtitle').textContent = 'Retailer: User ID और password दर्ज करें।';
       document.getElementById('chooseRetailerLogin').style.cssText = 'border:2px solid #2563eb;background:#2563eb;color:#fff;border-radius:10px;padding:13px 8px;font-size:15px;font-weight:700;cursor:pointer;';
       document.getElementById('chooseAdminLogin').style.cssText = 'border:2px solid #cbd5e1;background:#f8fafc;color:#334155;border-radius:10px;padding:13px 8px;font-size:15px;font-weight:700;cursor:pointer;';
       document.getElementById('adminLoginPass').value = '';
@@ -1145,6 +1150,7 @@
       id.value = 'admin';
       id.placeholder = 'Admin ID';
       document.getElementById('adminPasswordGroup').style.display = 'block';
+      document.getElementById('retailerPasswordGroup').style.display = 'none';
       document.getElementById('loginOtpBox').style.display = 'none';
       document.getElementById('btnSignIn').textContent = 'Admin Login करें';
       document.getElementById('loginModeSubtitle').textContent = 'Admin: अपनी Admin ID और password दर्ज करें।';
@@ -1158,7 +1164,7 @@
       var group = document.getElementById('adminPasswordGroup');
       var btn = document.getElementById('btnSignIn');
       if (group) group.style.display = isAdmin ? 'block' : 'none';
-      if (btn && !btn.disabled) btn.textContent = isAdmin ? 'Admin Login करें' : '📩 Retailer OTP भेजें';
+      if (btn && !btn.disabled) btn.textContent = isAdmin ? 'Admin Login करें' : '🔐 Retailer Login करें';
       if (!isAdmin) {
         var pass = document.getElementById('adminLoginPass');
         if (pass) pass.value = '';
@@ -1168,11 +1174,10 @@
     function handleLoginAction() {
       var enteredId = (document.getElementById('loginId').value || '').trim();
       if (!enteredId) { alert('Apni User ID darj karein.'); return; }
-      var btn = document.getElementById('btnSignIn');
 
-      // Keep the original Admin login flow unchanged: admin ID + password.
       if (enteredId.toLowerCase() === 'admin') {
         var adminPass = document.getElementById('adminLoginPass').value || '';
+        if (!adminPass) { alert('Admin password darj karein.'); return; }
         if (adminPass !== 'admin123') { alert('Galat Admin Password!'); return; }
         activeUser = { role: 'admin', id: 'admin', name: 'Master Admin (Raghu Baba)', mobile: '8207827581', wallet: 99999 };
         setSafeLocalData('raghu_active_user', activeUser);
@@ -1181,55 +1186,57 @@
         return;
       }
 
+      var retailerPass = document.getElementById('retailerLoginPass').value || '';
+      if (!retailerPass) { alert('Retailer password darj karein.'); return; }
+      var btn = document.getElementById('btnSignIn');
       btn.disabled = true;
       btn.textContent = 'Account check ho raha hai...';
 
-      // Retailer login uses SMS OTP only; admin remains password-based.
-      var accountPromise;
-      {
-        // Existing portal records are keyed by mobile number. Also accept a
-        // userId/username field if one exists in a retailer record.
-        accountPromise = fetch(FIREBASE_URL + '/retailers.json')
-          .then(function(res) { if (!res.ok) throw new Error('Retailer list load nahi hui.'); return res.json(); })
-          .then(function(all) {
-            all = all || {};
-            var found = null;
-            Object.keys(all).some(function(key) {
-              var item = all[key] || {};
-              if (key === enteredId || String(item.userId || '') === enteredId ||
-                  String(item.userID || '') === enteredId || String(item.username || '') === enteredId ||
-                  String(item.id || '') === enteredId) {
-                found = { accountKey: key, mobile: String(item.mobile || key).replace(/\D/g, ''), data: item };
-                return true;
-              }
-              return false;
-            });
-            if (!found) throw new Error('Is User ID ka account nahi mila. Admin se User ID verify karwayein.');
-            if (!/^[6-9]\d{9}$/.test(found.mobile)) throw new Error('Is account mein sahi registered mobile number set nahi hai. Admin se sampark karein.');
-            return found;
+      fetch(FIREBASE_URL + '/retailers.json')
+        .then(function(res) {
+          if (!res.ok) throw new Error('Retailer account load nahi hua (HTTP ' + res.status + '). Firebase permission check karein.');
+          return res.json();
+        })
+        .then(function(all) {
+          all = all || {};
+          var found = null;
+          Object.keys(all).some(function(key) {
+            var item = all[key] || {};
+            if (key === enteredId || String(item.userId || '') === enteredId ||
+                String(item.userID || '') === enteredId || String(item.username || '') === enteredId ||
+                String(item.id || '') === enteredId) {
+              found = { accountKey: key, mobile: String(item.mobile || key).replace(/\\D/g, ''), data: item };
+              return true;
+            }
+            return false;
           });
-      }
-
-      accountPromise.then(function(account) {
-        loginTargetAccount = account;
-        btn.textContent = 'reCAPTCHA load ho raha hai...';
-        return getLoginRecaptcha().render().then(function() {
-          return phoneAuth.signInWithPhoneNumber('+91' + account.mobile, loginRecaptchaVerifier);
+          if (!found) throw new Error('Is User ID ka account nahi mila. Admin se User ID verify karwayein.');
+          if (String(found.data.pass || '') !== retailerPass) throw new Error('Galat Retailer User ID ya Password.');
+          var account = found;
+          var allRetailers = getSafeLocalData('all_portal_retailers') || {};
+          allRetailers[account.accountKey] = account.data;
+          setSafeLocalData('all_portal_retailers', allRetailers);
+          setSafeLocalData('user_' + account.accountKey, account.data);
+          activeUser = {
+            role: 'retailer',
+            id: account.accountKey,
+            name: account.data.name || account.accountKey,
+            mobile: account.mobile,
+            wallet: Number(account.data.wallet || 0)
+          };
+          setSafeLocalData('raghu_active_user', activeUser);
+          document.getElementById('loginId').value = '';
+          document.getElementById('retailerLoginPass').value = '';
+          openDashboardPanel();
+          showRetailerWarningModal();
+        })
+        .catch(function(err) {
+          alert(err.message || 'Login nahi ho saka. Dobara try karein.');
+        })
+        .finally(function() {
+          btn.disabled = false;
+          btn.textContent = '🔐 Retailer Login करें';
         });
-      }).then(function(confirmation) {
-        loginConfirmationResult = confirmation;
-        document.getElementById('loginOtpBox').style.display = 'block';
-        document.getElementById('loginOtp').value = '';
-        document.getElementById('loginOtp').focus();
-        btn.textContent = 'OTP दोबारा भेजें';
-        alert('Registered mobile number par SMS OTP bhej diya gaya hai. SMS check karein.');
-      }).catch(function(err) {
-        loginConfirmationResult = null;
-        loginTargetAccount = null;
-        resetLoginRecaptcha();
-        alert(err.message || 'OTP bhejne mein dikkat hui. Kuch der baad dobara try karein.');
-        btn.textContent = '📩 OTP भेजें';
-      }).finally(function() { btn.disabled = false; });
     }
 
     function verifyLoginOtp() {
