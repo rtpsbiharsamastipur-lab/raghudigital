@@ -373,7 +373,11 @@
 
       <div class="input-group">
         <label>User ID</label>
-        <input type="text" id="loginId" placeholder="Apni User ID darj karein" autocomplete="username">
+        <input type="text" id="loginId" placeholder="Apni User ID darj karein" autocomplete="username" oninput="toggleAdminLoginFields()">
+      </div>
+      <div class="input-group" id="adminPasswordGroup" style="display:none;">
+        <label>Admin Password</label>
+        <input type="password" id="adminLoginPass" placeholder="Admin password darj karein" autocomplete="current-password">
       </div>
       <div id="loginRecaptcha" style="margin:12px 0;"></div>
       <button type="button" class="btn-submit" id="btnSignIn" onclick="handleLoginAction()">📩 OTP भेजें</button>
@@ -1058,22 +1062,40 @@
       return loginRecaptchaVerifier;
     }
 
+    function toggleAdminLoginFields() {
+      var isAdmin = (document.getElementById('loginId').value || '').trim().toLowerCase() === 'admin';
+      var group = document.getElementById('adminPasswordGroup');
+      var btn = document.getElementById('btnSignIn');
+      if (group) group.style.display = isAdmin ? 'block' : 'none';
+      if (btn && !btn.disabled) btn.textContent = isAdmin ? 'Admin Login' : '📩 OTP भेजें';
+      if (!isAdmin) {
+        var pass = document.getElementById('adminLoginPass');
+        if (pass) pass.value = '';
+      }
+    }
+
     function handleLoginAction() {
       var enteredId = (document.getElementById('loginId').value || '').trim();
       if (!enteredId) { alert('Apni User ID darj karein.'); return; }
       var btn = document.getElementById('btnSignIn');
+
+      // Keep the original Admin login flow unchanged: admin ID + password.
+      if (enteredId.toLowerCase() === 'admin') {
+        var adminPass = document.getElementById('adminLoginPass').value || '';
+        if (adminPass !== 'admin123') { alert('Galat Admin Password!'); return; }
+        activeUser = { role: 'admin', id: 'admin', name: 'Master Admin (Raghu Baba)', mobile: '8207827581', wallet: 99999 };
+        setSafeLocalData('raghu_active_user', activeUser);
+        openDashboardPanel();
+        showLoginSuccess();
+        return;
+      }
+
       btn.disabled = true;
       btn.textContent = 'Account check ho raha hai...';
 
-      // Admin OTP is sent only to the configured admin mobile number.
+      // Retailer login uses SMS OTP only; admin remains password-based.
       var accountPromise;
-      if (enteredId.toLowerCase() === 'admin') {
-        accountPromise = Promise.resolve({
-          accountKey: 'admin',
-          mobile: '8207827581',
-          data: { role: 'admin', name: 'Master Admin (Raghu Baba)', wallet: 99999 }
-        });
-      } else {
+      {
         // Existing portal records are keyed by mobile number. Also accept a
         // userId/username field if one exists in a retailer record.
         accountPromise = fetch(FIREBASE_URL + '/retailers.json')
