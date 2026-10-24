@@ -368,8 +368,12 @@
 
     <!-- 1. LOGIN SCREEN -->
     <div class="card-box" id="loginBox">
-      <h2>🔐 Retailer Login</h2>
-      <p class="subtitle">Apni User ID dalein, registered mobile par OTP aayega</p>
+      <h2>🔐 Login चुनें</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0 20px;">
+        <button type="button" id="chooseRetailerLogin" onclick="showRetailerLoginMode()" style="border:2px solid #2563eb;background:#2563eb;color:#fff;border-radius:10px;padding:13px 8px;font-size:15px;font-weight:700;cursor:pointer;">🧑‍💼 Retailer Login</button>
+        <button type="button" id="chooseAdminLogin" onclick="showAdminLoginMode()" style="border:2px solid #cbd5e1;background:#f8fafc;color:#334155;border-radius:10px;padding:13px 8px;font-size:15px;font-weight:700;cursor:pointer;">👑 Admin Login</button>
+      </div>
+      <p class="subtitle" id="loginModeSubtitle">Retailer: User ID डालें, registered mobile पर OTP आएगा।</p>
 
       <div class="input-group">
         <label>User ID</label>
@@ -381,7 +385,6 @@
       </div>
       <div id="loginRecaptcha" style="margin:12px 0;"></div>
       <button type="button" class="btn-submit" id="btnSignIn" onclick="handleLoginAction()">📩 Retailer OTP भेजें</button>
-      <button type="button" class="btn-submit" id="btnAdminLoginMode" onclick="showAdminLoginMode()" style="margin-top:10px;background:#334155;">👑 Admin Login</button>
 
       <div id="loginOtpBox" style="display:none;margin-top:18px;">
         <div class="input-group">
@@ -1064,12 +1067,30 @@
       return loginRecaptchaVerifier;
     }
 
+    function showRetailerLoginMode() {
+      var id = document.getElementById('loginId');
+      id.value = '';
+      id.placeholder = 'Apni Retailer User ID darj karein';
+      document.getElementById('adminPasswordGroup').style.display = 'none';
+      document.getElementById('loginOtpBox').style.display = 'none';
+      document.getElementById('btnSignIn').textContent = '📩 Retailer OTP भेजें';
+      document.getElementById('loginModeSubtitle').textContent = 'Retailer: User ID डालें, registered mobile पर OTP आएगा।';
+      document.getElementById('chooseRetailerLogin').style.cssText = 'border:2px solid #2563eb;background:#2563eb;color:#fff;border-radius:10px;padding:13px 8px;font-size:15px;font-weight:700;cursor:pointer;';
+      document.getElementById('chooseAdminLogin').style.cssText = 'border:2px solid #cbd5e1;background:#f8fafc;color:#334155;border-radius:10px;padding:13px 8px;font-size:15px;font-weight:700;cursor:pointer;';
+      document.getElementById('adminLoginPass').value = '';
+      id.focus();
+    }
+
     function showAdminLoginMode() {
       var id = document.getElementById('loginId');
       id.value = 'admin';
+      id.placeholder = 'Admin ID';
       document.getElementById('adminPasswordGroup').style.display = 'block';
       document.getElementById('loginOtpBox').style.display = 'none';
       document.getElementById('btnSignIn').textContent = 'Admin Login करें';
+      document.getElementById('loginModeSubtitle').textContent = 'Admin: अपनी Admin ID और password दर्ज करें।';
+      document.getElementById('chooseAdminLogin').style.cssText = 'border:2px solid #7c3aed;background:#7c3aed;color:#fff;border-radius:10px;padding:13px 8px;font-size:15px;font-weight:700;cursor:pointer;';
+      document.getElementById('chooseRetailerLogin').style.cssText = 'border:2px solid #cbd5e1;background:#f8fafc;color:#334155;border-radius:10px;padding:13px 8px;font-size:15px;font-weight:700;cursor:pointer;';
       document.getElementById('adminLoginPass').focus();
     }
 
