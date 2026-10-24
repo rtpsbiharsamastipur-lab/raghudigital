@@ -1162,12 +1162,17 @@
     function toggleAdminLoginFields() {
       var isAdmin = (document.getElementById('loginId').value || '').trim().toLowerCase() === 'admin';
       var group = document.getElementById('adminPasswordGroup');
+      var retailerGroup = document.getElementById('retailerPasswordGroup');
       var btn = document.getElementById('btnSignIn');
       if (group) group.style.display = isAdmin ? 'block' : 'none';
+      if (retailerGroup) retailerGroup.style.display = isAdmin ? 'none' : 'block';
       if (btn && !btn.disabled) btn.textContent = isAdmin ? 'Admin Login करें' : '🔐 Retailer Login करें';
-      if (!isAdmin) {
-        var pass = document.getElementById('adminLoginPass');
-        if (pass) pass.value = '';
+      if (isAdmin) {
+        var retailerPass = document.getElementById('retailerLoginPass');
+        if (retailerPass) retailerPass.value = '';
+      } else {
+        var adminPass = document.getElementById('adminLoginPass');
+        if (adminPass) adminPass.value = '';
       }
     }
 
@@ -1178,7 +1183,7 @@
       if (enteredId.toLowerCase() === 'admin') {
         var adminPass = document.getElementById('adminLoginPass').value || '';
         if (!adminPass) { alert('Admin password darj karein.'); return; }
-        if (adminPass !== 'admin123') { alert('Galat Admin Password!'); return; }
+        if (adminPass !== 'admin123') { alert('Admin password galat hai. Agar aapne password badla tha, wahi sahi password darj karein.'); return; }
         activeUser = { role: 'admin', id: 'admin', name: 'Master Admin (Raghu Baba)', mobile: '8207827581', wallet: 99999 };
         setSafeLocalData('raghu_active_user', activeUser);
         openDashboardPanel();
