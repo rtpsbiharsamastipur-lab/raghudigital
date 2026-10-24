@@ -380,7 +380,8 @@
         <input type="password" id="adminLoginPass" placeholder="Admin password darj karein" autocomplete="current-password">
       </div>
       <div id="loginRecaptcha" style="margin:12px 0;"></div>
-      <button type="button" class="btn-submit" id="btnSignIn" onclick="handleLoginAction()">📩 OTP भेजें</button>
+      <button type="button" class="btn-submit" id="btnSignIn" onclick="handleLoginAction()">📩 Retailer OTP भेजें</button>
+      <button type="button" class="btn-submit" id="btnAdminLoginMode" onclick="showAdminLoginMode()" style="margin-top:10px;background:#334155;">👑 Admin Login</button>
 
       <div id="loginOtpBox" style="display:none;margin-top:18px;">
         <div class="input-group">
@@ -1062,12 +1063,21 @@
       return loginRecaptchaVerifier;
     }
 
+    function showAdminLoginMode() {
+      var id = document.getElementById('loginId');
+      id.value = 'admin';
+      document.getElementById('adminPasswordGroup').style.display = 'block';
+      document.getElementById('loginOtpBox').style.display = 'none';
+      document.getElementById('btnSignIn').textContent = 'Admin Login करें';
+      document.getElementById('adminLoginPass').focus();
+    }
+
     function toggleAdminLoginFields() {
       var isAdmin = (document.getElementById('loginId').value || '').trim().toLowerCase() === 'admin';
       var group = document.getElementById('adminPasswordGroup');
       var btn = document.getElementById('btnSignIn');
       if (group) group.style.display = isAdmin ? 'block' : 'none';
-      if (btn && !btn.disabled) btn.textContent = isAdmin ? 'Admin Login' : '📩 OTP भेजें';
+      if (btn && !btn.disabled) btn.textContent = isAdmin ? 'Admin Login करें' : '📩 Retailer OTP भेजें';
       if (!isAdmin) {
         var pass = document.getElementById('adminLoginPass');
         if (pass) pass.value = '';
