@@ -1086,13 +1086,13 @@
               if (key === enteredId || String(item.userId || '') === enteredId ||
                   String(item.userID || '') === enteredId || String(item.username || '') === enteredId ||
                   String(item.id || '') === enteredId) {
-                found = { accountKey: key, mobile: String(item.mobile || key).replace(/\\D/g, ''), data: item };
+                found = { accountKey: key, mobile: String(item.mobile || key).replace(/\D/g, ''), data: item };
                 return true;
               }
               return false;
             });
             if (!found) throw new Error('Is User ID ka account nahi mila. Admin se User ID verify karwayein.');
-            if (!/^[6-9]\\d{9}$/.test(found.mobile)) throw new Error('Is account mein sahi registered mobile number set nahi hai. Admin se sampark karein.');
+            if (!/^[6-9]\d{9}$/.test(found.mobile)) throw new Error('Is account mein sahi registered mobile number set nahi hai. Admin se sampark karein.');
             return found;
           });
       }
@@ -1125,7 +1125,7 @@
         alert('Pehle User ID dalkar OTP mangwayein.');
         return;
       }
-      if (!/^\\d{6}$/.test(otp)) { alert('6 digit SMS OTP darj karein.'); return; }
+      if (!/^\d{6}$/.test(otp)) { alert('6 digit SMS OTP darj karein.'); return; }
 
       var btn = document.getElementById('btnVerifyLoginOtp');
       btn.disabled = true;
