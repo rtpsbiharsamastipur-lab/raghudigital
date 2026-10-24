@@ -1192,26 +1192,38 @@
       btn.disabled = true;
       btn.textContent = 'Account check ho raha hai...';
 
+      function findRetailer(all) {
+        all = all || {};
+        var found = null;
+        Object.keys(all).some(function(key) {
+          var item = all[key] || {};
+          if (key === enteredId || String(item.userId || '').trim() === enteredId ||
+              String(item.userID || '').trim() === enteredId || String(item.username || '').trim() === enteredId ||
+              String(item.id || '').trim() === enteredId) {
+            found = { accountKey: key, mobile: String(item.mobile || key).replace(/\D/g, ''), data: item };
+            return true;
+          }
+          return false;
+        });
+        return found;
+      }
+
       fetch(FIREBASE_URL + '/retailers.json')
         .then(function(res) {
-          if (!res.ok) throw new Error('Retailer account load nahi hua (HTTP ' + res.status + '). Firebase permission check karein.');
+          if (!res.ok) throw new Error('Firebase se retailer account nahi padha ja saka (HTTP ' + res.status + ').');
           return res.json();
         })
         .then(function(all) {
-          all = all || {};
-          var found = null;
-          Object.keys(all).some(function(key) {
-            var item = all[key] || {};
-            if (key === enteredId || String(item.userId || '') === enteredId ||
-                String(item.userID || '') === enteredId || String(item.username || '') === enteredId ||
-                String(item.id || '') === enteredId) {
-              found = { accountKey: key, mobile: String(item.mobile || key).replace(/\\D/g, ''), data: item };
-              return true;
-            }
-            return false;
-          });
-          if (!found) throw new Error('Is User ID ka account nahi mila. Admin se User ID verify karwayein.');
-          if (String(found.data.pass || '') !== retailerPass) throw new Error('Galat Retailer User ID ya Password.');
+          var found = findRetailer(all);
+          // Use this browser's cached retailer record only if Firebase returned no matching account.
+          if (!found) {
+            var cached = getSafeLocalData('all_portal_retailers') || {};
+            found = findRetailer(cached);
+          }
+          if (!found) throw new Error('User ID nahi mila. Agar account pehle se hai, Admin se account record verify karwayein.');
+          var savedPass = found.data.pass != null ? String(found.data.pass) :
+                          (found.data.password != null ? String(found.data.password) : '');
+          if (savedPass !== retailerPass) throw new Error('Password galat hai. Registration ke waqt banaya gaya password darj karein.');
           var account = found;
           var allRetailers = getSafeLocalData('all_portal_retailers') || {};
           allRetailers[account.accountKey] = account.data;
