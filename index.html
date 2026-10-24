@@ -1904,55 +1904,55 @@
       renderDailyLedger();
     }
 
-    function renderDailyLedger() {
+    async function renderDailyLedger() {
       var selectedDate = document.getElementById('ledgerFilterDate').value;
-      var dateObj = new Date(selectedDate);
+      var dateObj = selectedDate ? new Date(selectedDate + 'T00:00:00') : new Date();
       var formattedDate = dateObj.toLocaleDateString('en-GB');
-
       var tbody = document.getElementById('ledgerTransfersTableBody');
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #64748b;">Khata calculate ho raha hai...</td></tr>';
-
-      fetch(FIREBASE_URL + "/admin_transfers.json")
-        .then(function(res){ return res.json(); })
-        .then(function(transfers) {
-          tbody.innerHTML = '';
-          var totalAmt = 0;
-          var count = 0;
-
-          for (var k in transfers || {}) {
-            var t = transfers[k];
-            if (!t.date || t.date === formattedDate) {
-              totalAmt += Number(t.amount || 0);
-              count++;
-              var tr = document.createElement('tr');
-              tr.innerHTML = 
-                '<td>' + (t.fullTime || t.date) + '</td>' +
-                '<td><strong>' + t.retailer + '</strong></td>' +
-                '<td>' + t.mobile + '</td>' +
-                '<td><strong style="color:#0e7490;">₹' + Number(t.amount).toFixed(2) + '</strong></td>' +
-                '<td>₹' + Number(t.newWallet || 0).toFixed(2) + '</td>';
-              tbody.appendChild(tr);
-            }
-          }
-
-          if (count === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #ef4444;">Is tareekh me koi transfer record nahi mila.</td></tr>';
-          }
-          document.getElementById('ledgerTotalTransfer').innerText = totalAmt.toFixed(2);
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#64748b;">Khata calculate ho raha hai...</td></tr>';
+      try {
+        var response = await fetch(FIREBASE_URL + "/admin_transfers.json");
+        if (!response.ok) throw new Error('Firebase HTTP ' + response.status);
+        var transfers = await response.json() || {};
+        tbody.innerHTML = '';
+        var totalAmt = 0, count = 0;
+        Object.keys(transfers).reverse().forEach(function(k) {
+          var t = transfers[k] || {};
+          var transferDate = t.date || '';
+          if (transferDate && transferDate !== formattedDate) return;
+          var amount = Number(t.amount || 0);
+          if (!Number.isFinite(amount)) amount = 0;
+          totalAmt += amount; count++;
+          var tr = document.createElement('tr');
+          tr.innerHTML =
+            '<td>' + (t.fullTime || transferDate || '—') + '</td>' +
+            '<td><strong>' + (t.retailer || t.name || '—') + '</strong></td>' +
+            '<td>' + (t.mobile || t.retailerKey || '—') + '</td>' +
+            '<td><strong style="color:#0e7490;">₹' + amount.toFixed(2) + '</strong></td>' +
+            '<td>₹' + Number(t.newWallet || 0).toFixed(2) + '</td>';
+          tbody.appendChild(tr);
         });
+        if (!count) tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#64748b;">Is tareekh me koi transfer record nahi mila.</td></tr>';
+        document.getElementById('ledgerTotalTransfer').innerText = totalAmt.toFixed(2);
+      } catch (err) {
+        console.error('Ledger transfer load error:', err);
+        tbody.innerHTML = '<tr><td colspan="5" style="color:#dc2626;">Transfer records load nahi hue: ' + (err.message || err) + '</td></tr>';
+      }
 
-      fetch(FIREBASE_URL + "/service_orders.json")
-        .then(function(res){ return res.json(); })
-        .then(function(orders) {
-          var orderTotal = 0;
-          for (var o in orders || {}) {
-            var ord = orders[o];
-            if (ord.date && ord.date.includes(formattedDate)) {
-              orderTotal += Number(ord.charge || 0);
-            }
-          }
-          document.getElementById('ledgerTotalOrders').innerText = orderTotal.toFixed(2);
+      try {
+        var ordersRes = await fetch(FIREBASE_URL + "/service_orders.json");
+        if (!ordersRes.ok) throw new Error('Firebase HTTP ' + ordersRes.status);
+        var orders = await ordersRes.json() || {};
+        var orderTotal = 0;
+        Object.keys(orders).forEach(function(k) {
+          var ord = orders[k] || {};
+          if (ord.date && ord.date.includes(formattedDate)) orderTotal += Number(ord.charge || 0);
         });
+        document.getElementById('ledgerTotalOrders').innerText = orderTotal.toFixed(2);
+      } catch (err) {
+        console.error('Ledger orders load error:', err);
+        document.getElementById('ledgerTotalOrders').innerText = 'Error';
+      }
     }
 
     function openAdminRechargePanel() {
