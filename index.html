@@ -1813,49 +1813,63 @@
       document.getElementById('adminTransferAmt').focus();
     }
 
-    function executeAdminTransfer() {
+    async function executeAdminTransfer() {
       var mob = String(document.getElementById('adminTransferMobile').value || '').trim();
-      var amt = parseFloat(document.getElementById('adminTransferAmt').value);
+      var amt = Number(document.getElementById('adminTransferAmt').value);
 
-      if (!mob || !amt || amt <= 0) {
-        alert('Kripya valid Mobile ID aur Amount dalein!');
+      if (!mob || !Number.isFinite(amt) || amt <= 0) {
+        alert('Kripya valid Retailer Mobile ID aur Amount dalein!');
         return;
       }
 
-      fetch(FIREBASE_URL + "/retailers/" + encodeURIComponent(mob) + ".json")
-        .then(function(res){ return res.json(); })
-        .then(function(retailerData) {
-          if (!retailerData) {
-            alert('Retailer nahi mila! Mobile number check karein.');
-            return;
-          }
+      try {
+        var getRes = await fetch(FIREBASE_URL + "/retailers/" + encodeURIComponent(mob) + ".json");
+        if (!getRes.ok) throw new Error('Firebase se retailer data nahi mila (HTTP ' + getRes.status + ').');
+        var retailerData = await getRes.json();
+        if (!retailerData) {
+          alert('Retailer nahi mila! Retailer list me dikh raha exact Mobile ID use karein.');
+          return;
+        }
 
-          var oldBal = Number(retailerData.wallet || 0);
-          var updatedBal = oldBal + amt;
-
-          fetch(FIREBASE_URL + "/retailers/" + encodeURIComponent(mob) + "/wallet.json", {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(updatedBal)
-          });
-
-          fetch(FIREBASE_URL + "/admin_transfers.json", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              retailer: retailerData.name || mob,
-              mobile: mob,
-              amount: amt,
-              newWallet: updatedBal,
-              date: new Date().toLocaleDateString('en-GB'),
-              fullTime: new Date().toLocaleString()
-            })
-          });
-
-          alert('Balance safal transfer! Naya Balance: ₹' + updatedBal.toFixed(2));
-          document.getElementById('adminTransferAmt').value = '';
-          fetchRetailersList();
+        var oldBal = Number(retailerData.wallet || 0);
+        if (!Number.isFinite(oldBal) || oldBal < 0) oldBal = 0;
+        var updatedBal = oldBal + amt;
+        var walletRes = await fetch(FIREBASE_URL + "/retailers/" + encodeURIComponent(mob) + "/wallet.json", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updatedBal)
         });
+        if (!walletRes.ok) {
+          var walletErr = await walletRes.text();
+          throw new Error('Wallet update fail hua (HTTP ' + walletRes.status + '). Firebase Rules/permission check karein. ' + walletErr);
+        }
+        var savedBal = await walletRes.json();
+        if (Number(savedBal) !== updatedBal) throw new Error('Firebase ne naya wallet balance confirm nahi kiya.');
+
+        var logRes = await fetch(FIREBASE_URL + "/admin_transfers.json", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            retailer: retailerData.name || mob,
+            mobile: mob,
+            amount: amt,
+            previousWallet: oldBal,
+            newWallet: updatedBal,
+            date: new Date().toLocaleDateString('en-GB'),
+            fullTime: new Date().toLocaleString()
+          })
+        });
+        if (!logRes.ok) {
+          alert('Wallet ₹' + updatedBal.toFixed(2) + ' update ho gaya, lekin transaction history save nahi hui (HTTP ' + logRes.status + ').');
+        } else {
+          alert('✅ Retailer wallet me ₹' + amt.toFixed(2) + ' add ho gaya. Naya balance: ₹' + updatedBal.toFixed(2));
+        }
+        document.getElementById('adminTransferAmt').value = '';
+        fetchRetailersList();
+      } catch (err) {
+        console.error('Admin wallet transfer error:', err);
+        alert('❌ Wallet add nahi hua: ' + (err && err.message ? err.message : 'Network/Firebase error'));
+      }
     }
 
     function openAdminLedgerPanel() {
@@ -1958,26 +1972,35 @@
         });
     }
 
-    function approveRecharge(reqId, mob, amt) {
+    async function approveRecharge(reqId, mob, amt) {
       if (!confirm('Kya aap ₹' + amt + ' dukandar (' + mob + ') ke wallet me credit karna chahte hain?')) return;
-
-      fetch(FIREBASE_URL + "/retailers/" + encodeURIComponent(mob) + "/wallet.json")
-        .then(function(res){ return res.json(); })
-        .then(function(bal) {
-          var updated = Number(bal || 0) + amt;
-          fetch(FIREBASE_URL + "/retailers/" + encodeURIComponent(mob) + "/wallet.json", {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(updated)
-          });
-          fetch(FIREBASE_URL + "/recharge_requests/" + encodeURIComponent(reqId) + ".json", {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ status: "Approved" })
-          });
-          alert('Recharge safaltapoorvak approve ho gaya!');
-          fetchAdminRecharges();
+      try {
+        var walletUrl = FIREBASE_URL + "/retailers/" + encodeURIComponent(mob) + "/wallet.json";
+        var getRes = await fetch(walletUrl);
+        if (!getRes.ok) throw new Error('Wallet read fail (HTTP ' + getRes.status + ').');
+        var bal = await getRes.json();
+        var updated = Number(bal || 0) + Number(amt);
+        if (!Number.isFinite(updated) || Number(amt) <= 0) throw new Error('Recharge amount invalid hai.');
+        var putRes = await fetch(walletUrl, {
+          method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(updated)
         });
+        if (!putRes.ok) throw new Error('Wallet credit fail (HTTP ' + putRes.status + '). Firebase Rules/permission check karein.');
+        var saved = await putRes.json();
+        if (Number(saved) !== updated) throw new Error('Wallet balance save confirm nahi hua.');
+        var reqRes = await fetch(FIREBASE_URL + "/recharge_requests/" + encodeURIComponent(reqId) + ".json", {
+          method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "Approved" })
+        });
+        if (!reqRes.ok) {
+          alert('Wallet me amount credit ho gaya, lekin request status update nahi hua. Dobara approve na karein, warna double credit ho sakta hai.');
+        } else {
+          alert('✅ Recharge approve ho gaya. Naya wallet balance: ₹' + updated.toFixed(2));
+        }
+        fetchAdminRecharges();
+        fetchRetailersList();
+      } catch (err) {
+        console.error('Recharge approval error:', err);
+        alert('❌ Recharge wallet me add nahi hua: ' + (err && err.message ? err.message : 'Network/Firebase error'));
+      }
     }
 
     function openOrderForm(serviceId) {
