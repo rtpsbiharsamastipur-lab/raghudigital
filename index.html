@@ -1225,10 +1225,19 @@
             var cached = getSafeLocalData('all_portal_retailers') || {};
             found = findRetailer(cached);
           }
-          if (!found) throw new Error('User ID nahi mila. Agar account pehle se hai, Admin se account record verify karwayein.');
+          // Older portal versions may have saved the retailer only in user_<ID>.
+          if (!found) {
+            var legacy = getSafeLocalData('user_' + enteredId);
+            if (legacy && typeof legacy === 'object') {
+              found = { accountKey: String(legacy.mobile || enteredId), mobile: String(legacy.mobile || enteredId).replace(/\D/g, ''), data: legacy };
+            }
+          }
+          if (!found) throw new Error('Retailer account nahi mila. User ID aam taur par registration wala 10-digit mobile number hota hai.');
           var savedPass = found.data.pass != null ? String(found.data.pass) :
-                          (found.data.password != null ? String(found.data.password) : '');
-          if (savedPass !== retailerPass) throw new Error('Password galat hai. Registration ke waqt banaya gaya password darj karein.');
+                          (found.data.password != null ? String(found.data.password) :
+                          (found.data.loginPassword != null ? String(found.data.loginPassword) : ''));
+          if (!savedPass) throw new Error('Is retailer record mein password saved nahi hai. Is purane account ke liye password reset/set karna hoga.');
+          if (savedPass !== retailerPass) throw new Error('Retailer password galat hai. Wahi password use karein jo registration ke waqt banaya tha.');
           var account = found;
           var allRetailers = getSafeLocalData('all_portal_retailers') || {};
           allRetailers[account.accountKey] = account.data;
