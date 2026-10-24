@@ -1760,18 +1760,55 @@
             }
 
             var detailsFormatted = [];
-            if (o.formData) {
-              for (var f in o.formData) {
-                var val = o.formData[f];
-                if (typeof val === 'string' && val.startsWith('data:')) {
-                  detailsFormatted.push('<div><strong>' + f + ':</strong> <a href="' + val + '" target="_blank" download="Doc_' + f + '" style="color:#2563eb; font-weight:bold; background:#e0f2fe; padding:2px 8px; border-radius:4px; text-decoration:none;">👁️ View / Download</a></div>');
-                } else {
-                  detailsFormatted.push('<div><strong>' + f + ':</strong> ' + val + '</div>');
-                }
-              }
+            var fd = o.formData || {};
+            function safeOrderText(value) {
+              return String(value == null ? '' : value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
             }
+            function findField(names) {
+              var wanted = names.map(function(n) { return n.toLowerCase().replace(/[^a-z0-9]/g, ''); });
+              var key = Object.keys(fd).find(function(k) { return wanted.indexOf(k.toLowerCase().replace(/[^a-z0-9]/g, '')) >= 0; });
+              return key ? fd[key] : '';
+            }
+            var displayFields = [
+              { label: 'Name', value: findField(['NAME','FULL_NAME','APPLICANT_NAME']) },
+              { label: 'Father Name', value: findField(['FATHER_NAME','FATHERNAME']) },
+              { label: 'Mother Name', value: findField(['MOTHER_NAME','MOTHERNAME']) }
+            ];
+            displayFields.forEach(function(item, idx) {
+              if (item.value && typeof item.value === 'string' && !item.value.startsWith('data:')) {
+                detailsFormatted.push('<div style="padding:3px 0;border-bottom:1px solid #e2e8f0;"><strong>' + (idx + 1) + '. ' + item.label + ':</strong> ' + safeOrderText(item.value) + '</div>');
+              }
+            });
+            var addressNames = ['WARD_NO','VILLAGE','POST_OFFICE','PANCHAYAT','BLOCK','DISTRICT','STATE','PIN_CODE','ADDRESS','FULL_ADDRESS'];
+            var addressParts = [];
+            addressNames.forEach(function(name) {
+              var val = findField([name]);
+              if (val && typeof val === 'string' && !val.startsWith('data:') && addressParts.indexOf(safeOrderText(val)) < 0) addressParts.push(safeOrderText(val));
+            });
+            if (addressParts.length) detailsFormatted.push('<div style="padding:4px 0;border-bottom:1px solid #e2e8f0;"><strong>4. Address:</strong> ' + addressParts.join(', ') + '</div>');
+            var aadhaarValue = findField(['AADHAAR_NO','AADHAAR_NUMBER','AADHAR_NO','AADHAR_NUMBER','IDENTITY_NO']);
+            if (aadhaarValue && typeof aadhaarValue === 'string' && !aadhaarValue.startsWith('data:')) {
+              detailsFormatted.push('<div style="padding:4px 0;border-bottom:1px solid #e2e8f0;"><strong>5. Aadhaar No:</strong> ' + safeOrderText(aadhaarValue) + '</div>');
+            }
+            var uploadRows = [];
+            Object.keys(fd).forEach(function(f) {
+              var val = fd[f];
+              if (typeof val === 'string' && val.startsWith('data:')) {
+                uploadRows.push('<div style="margin:4px 0;"><strong>' + safeOrderText(f) + ':</strong> <a href="' + val + '" target="_blank" rel="noopener" download="Doc_' + safeOrderText(f) + '" style="color:#2563eb;font-weight:bold;background:#e0f2fe;padding:3px 8px;border-radius:4px;text-decoration:none;">👁️ View / Download</a></div>');
+              }
+            });
+            if (uploadRows.length) detailsFormatted.push('<div style="padding:5px 0;"><strong>6. Upload Data:</strong>' + uploadRows.join('') + '</div>');
+            var priority = ['NAME','FULL_NAME','APPLICANT_NAME','FATHER_NAME','FATHERNAME','MOTHER_NAME','MOTHERNAME'];
+            Object.keys(fd).forEach(function(f) {
+              var val = fd[f];
+              var normalized = f.toUpperCase().replace(/[^A-Z0-9]/g, '');
+              var known = priority.concat(addressNames).concat(['AADHAAR_NO','AADHAAR_NUMBER','AADHAR_NO','AADHAR_NUMBER','IDENTITY_NO']).some(function(n) { return n.replace(/[^A-Z0-9]/g, '') === normalized; });
+              if (!known && !(typeof val === 'string' && val.startsWith('data:'))) {
+                detailsFormatted.push('<div style="padding:3px 0;"><strong>' + safeOrderText(f.replace(/_/g, ' ')) + ':</strong> ' + safeOrderText(val) + '</div>');
+              }
+            });
             if (o.adminServiceNumber) {
-              detailsFormatted.push('<div><strong>Admin Entered Service Number:</strong> ' + String(o.adminServiceNumber).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</div>');
+              detailsFormatted.push('<div style="padding:3px 0;"><strong>Admin Entered Service Number:</strong> ' + safeOrderText(o.adminServiceNumber) + '</div>');
             }
 
             var resultDeliveryHtml = o.deliveryResult ? 
