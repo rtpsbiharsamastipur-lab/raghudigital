@@ -1454,6 +1454,20 @@
           }).catch(function(){});
       }
 
+      if (activeUser.role !== 'admin') {
+        // Always refresh retailer wallet from its actual Firebase account key.
+        fetch(FIREBASE_URL + "/retailers/" + encodeURIComponent(activeUser.id) + "/wallet.json")
+          .then(function(res) { if (!res.ok) throw new Error('Wallet HTTP ' + res.status); return res.json(); })
+          .then(function(bal) {
+            if (bal !== null && bal !== undefined && Number.isFinite(Number(bal))) {
+              activeUser.wallet = Number(bal);
+              setSafeLocalData("raghu_active_user", activeUser);
+              var walletEl = document.getElementById('barWalletAmt');
+              if (walletEl) walletEl.innerText = Number(bal).toFixed(2);
+            }
+          }).catch(function(err) { console.error('Retailer wallet refresh error:', err); });
+      }
+
       if (activeUser.role === 'admin') {
         fetch(FIREBASE_URL + "/service_orders.json")
           .then(function(res) { return res.json(); })
@@ -1739,24 +1753,30 @@
       });
     }
 
-    function fetchRetailersList() {
+    async function fetchRetailersList() {
       var tbody = document.getElementById('retailersTableBody');
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #64748b;">Retailers load ho rahe hain...</td></tr>';
-
-      fetch(FIREBASE_URL + "/retailers.json")
-        .then(function(res) { return res.json(); })
-        .then(function(dict) {
+      if (!tbody) return;
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#64748b;">Retailers load ho rahe hain...</td></tr>';
+      try {
+          var response = await fetch(FIREBASE_URL + "/retailers.json");
+          if (!response.ok) throw new Error('Firebase HTTP ' + response.status);
+          var dict = await response.json();
           tbody.innerHTML = '';
           var keys = Object.keys(dict || {});
-          document.getElementById('totalRetailersCount').innerText = keys.length;
+          var countEl = document.getElementById('totalRetailersCount');
+          if (countEl) countEl.innerText = keys.length;
 
           if (keys.length === 0) {
             tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #ef4444;">Abhi koi retailer registered nahi hai.</td></tr>';
             return;
           }
 
+          if (keys.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#ef4444;">Abhi koi retailer registered nahi hai.</td></tr>';
+            return;
+          }
           keys.forEach(function(key) {
-            var ret = dict[key];
+            var ret = dict[key] || {};
             var tr = document.createElement('tr');
             tr.innerHTML = 
               '<td><strong>' + (ret.name || 'N/A') + '</strong></td>' +
@@ -1771,7 +1791,10 @@
               '</td>';
             tbody.appendChild(tr);
           });
-        }).catch(function(){});
+        } catch (err) {
+          console.error('Retailer list error:', err);
+          tbody.innerHTML = '<tr><td colspan="6" style="color:#dc2626;">Retailer list load nahi hui: ' + String(err.message || err) + '</td></tr>';
+        }
     }
 
     function updateRetailerEmail(mob) {
@@ -1975,7 +1998,12 @@
     async function approveRecharge(reqId, mob, amt) {
       if (!confirm('Kya aap ₹' + amt + ' dukandar (' + mob + ') ke wallet me credit karna chahte hain?')) return;
       try {
-        var walletUrl = FIREBASE_URL + "/retailers/" + encodeURIComponent(mob) + "/wallet.json";
+        // Prefer the original retailer database key; older requests fall back to mobile.
+        var requestRes = await fetch(FIREBASE_URL + "/recharge_requests/" + encodeURIComponent(reqId) + ".json");
+        if (!requestRes.ok) throw new Error('Recharge request load nahi hui (HTTP ' + requestRes.status + ').');
+        var requestData = await requestRes.json();
+        var retailerKey = requestData && requestData.retailerKey ? requestData.retailerKey : mob;
+        var walletUrl = FIREBASE_URL + "/retailers/" + encodeURIComponent(retailerKey) + "/wallet.json";
         var getRes = await fetch(walletUrl);
         if (!getRes.ok) throw new Error('Wallet read fail (HTTP ' + getRes.status + ').');
         var bal = await getRes.json();
@@ -2486,6 +2514,7 @@
       var payload = {
         reqId: reqId,
         mobile: activeUser.mobile || activeUser.id,
+        retailerKey: activeUser.id,
         name: activeUser.name,
         amount: amt,
         utr: utr,
