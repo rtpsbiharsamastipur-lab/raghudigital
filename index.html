@@ -1777,7 +1777,18 @@
           var found = Object.keys(data || {}).filter(function(key) {
             var o = data[key] || {};
             var searchable = [key, o.orderId, o.retailerName, o.retailerPhone, o.serviceName, o.status];
-            Object.keys(o.formData || {}).forEach(function(f) { searchable.push(f, o.formData[f]); });
+            function collectSearchValues(value) {
+              if (value == null) return;
+              if (typeof value === 'string' || typeof value === 'number') {
+                searchable.push(String(value));
+              } else if (Array.isArray(value)) {
+                value.forEach(collectSearchValues);
+              } else if (typeof value === 'object') {
+                Object.keys(value).forEach(function(k) { searchable.push(k); collectSearchValues(value[k]); });
+              }
+            }
+            collectSearchValues(o.formData || {});
+            collectSearchValues(o);
             return searchable.some(function(v) { return typeof v === 'string' && v.toLowerCase().indexOf(query) >= 0; });
           }).reverse();
           if (!found.length) {
