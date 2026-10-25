@@ -685,7 +685,10 @@
             <h3 style="color:#047857;font-size:19px;">✅ Successful / Completed Orders</h3>
             <p style="font-size:13px;color:#64748b;">Pending orders se alag, yahan completed/success orders ka record rahega.</p>
           </div>
-          <button type="button" class="btn-exit" style="background:#475569;" onclick="fetchAdminCompletedOrders()">🔄 Refresh</button>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <button type="button" class="btn-exit" style="background:#059669;" onclick="fetchAdminCompletedOrders()">🔄 Refresh</button>
+            <button type="button" class="btn-exit" style="background:#dc2626;" onclick="closeAdminCompletedOrders()">✖ Close</button>
+          </div>
         </div>
         <div class="admin-table-wrap">
           <table class="admin-table">
@@ -1751,6 +1754,11 @@
       b.style.display = 'block';
       b.scrollIntoView({ behavior: 'smooth' });
       fetchAdminOrdersList();
+    }
+
+    function closeAdminCompletedOrders() {
+      var box = document.getElementById('adminCompletedOrdersBox');
+      if (box) box.style.display = 'none';
     }
 
     function toggleAdminCompletedOrders() {
