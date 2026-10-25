@@ -1002,6 +1002,7 @@
           { name: "NAME", label: "Full Name", type: "text", required: true },
           { name: "FATHER_NAME", label: "Father Name", type: "text", required: true },
           { name: "MOTHER_NAME", label: "Mother Name", type: "text", required: true },
+          { name: "GENDER", label: "Gender (Male / Female)", type: "select", required: true, options: ["Select Gender", "Male", "Female"] },
           { name: "DOB", label: "Date of Birth (DOB)", type: "date", required: true },
           { name: "MOBILE_NO", label: "Mobile No", type: "number", required: true },
           { name: "IDENTITY_NO", label: "Aadhaar No", type: "text", required: true },
@@ -2469,38 +2470,40 @@
       function esc(v) { return String(v == null ? '' : v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
       function val(k, fallback) { return fd[k] ? esc(fd[k]) : (fallback || ''); }
       var address = ['WARD_NO','VILLAGE','POST_OFFICE','PANCHAYAT','BLOCK','DISTRICT','STATE','PIN_CODE'].map(function(k){return fd[k] ? esc(fd[k]) : '';}).filter(Boolean).join(', ');
+      var proofDocName = fd.OTHER_DOC || 'Document uploaded by retailer';
+      var retailerDisplayName = order.retailerName || (activeUser && activeUser.name) || 'Retailer';
       var rows = [
-        ['Received / Service Charge', '₹' + Number(order.charge || 0).toFixed(2) + ' (Portal service charge; not government fee)'],
-        ['Application No./Coupon No.', order.orderId || ''],
+        ['Received Rs.', '₹' + Number(order.charge || 0).toFixed(2) + ' — portal service charge (not government tax/fee)'],
+        ['PAN 93', 'Manual Receipt'],
+        ['Applicant Name', val('NAME')],
+        ['Application No.', order.orderId || ''],
         ['Gender', val('GENDER')],
         ['Date of Birth', val('DOB') || val('DATE_OF_BIRTH')],
         ['Parent Name', val('FATHER_NAME')],
-        ['Aadhaar Number', val('IDENTITY_NO') ? 'Provided on application form' : 'Not provided'],
-        ['Name as per Aadhaar', val('NAME')],
-        ["Applicant's Contact details (Mobile/Landline/email)", [fd.MOBILE_NO,fd.EMAIL].filter(Boolean).map(esc).join(' / ')],
-        ['Communication Address', address],
-        ['Residence State', val('STATE')],
-        ['Proof of Identity', val('OTHER_DOC')],
-        ['Proof of Address', val('OTHER_DOC')],
-        ['Proof of DOB', val('DOB_DOC') || val('OTHER_DOC')],
+        ['Aadhaar No.', val('IDENTITY_NO') ? 'Provided on application form' : 'Not provided'],
+        ['Mobile No.', val('MOBILE_NO')],
+        ['Address', address],
+        ['Proof of Identity', 'AADHAAR Card issued by UIDAI (In copy)'],
+        ['Proof of Address', 'AADHAAR Card issued by UIDAI (In copy)'],
+        ['Proof of DOB', proofDocName],
+        ['Payment Ref No.', order.orderId || ''],
         ['Date of Receipt', order.date || ''],
-        ['Mode of PAN Card', 'Physical PAN / e-PAN preference to be confirmed during official application'],
-        ['Payment Ref No', 'Portal Order ID: ' + (order.orderId || '')],
-        ['Payment Date', order.date || ''],
-        ['PAN Service Center Name', 'RAGHU BABA ONLINE SERVICE'],
-        ['Centre Contact Details', esc(order.retailerName || '') + (order.retailerPhone ? ' / ' + esc(order.retailerPhone) : '')]
+        ['PAN Service Centre Code', '333731160015'],
+        ['PAN Service Centre Name', 'Raghunath Kumar'],
+        ['Retailer', retailerDisplayName],
+        ['Retailer Contact', order.retailerPhone || (activeUser && activeUser.mobile) || '']
       ];
       var modal = document.createElement('div');
       modal.id = 'panManualSlipModal';
       modal.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(15,23,42,.72);display:flex;align-items:center;justify-content:center;padding:12px;overflow:auto;';
       modal.innerHTML = '<div style="background:#fff;width:min(1040px,100%);max-height:95vh;overflow:auto;border-radius:8px;padding:14px;box-shadow:0 20px 60px #0005;">' +
         '<div id="panManualSlipPrint" style="position:relative;border:1px solid #9ca3af;padding:18px 22px;color:#111;font-family:Arial,sans-serif;background:#fff;">' +
-        '<div style="text-align:center;font-size:18px;font-weight:700;margin-bottom:2px;">PAN Application — Manual Customer Copy</div>' +
-        '<div style="text-align:center;font-size:13px;font-weight:700;margin-bottom:12px;">NOT AN OFFICIAL PAN ACKNOWLEDGEMENT RECEIPT</div>' +
+        '<div style="text-align:center;font-size:18px;font-weight:700;margin-bottom:2px;">PAN 93 — MANUAL RECEIPT</div>' +
+        '<div style="text-align:center;font-size:13px;font-weight:700;margin-bottom:12px;">MANUAL CUSTOMER RECEIPT — NOT AN OFFICIAL UTIITSL RECEIPT</div>' +
         '<div style="position:absolute;right:18px;top:58px;border:2px solid #cbd5e1;padding:10px 14px;color:#64748b;font-weight:bold;transform:rotate(8deg);">MANUAL COPY</div>' +
         '<table style="width:100%;border-collapse:collapse;font-size:13.5px;line-height:1.25;">' +
         rows.map(function(row){return '<tr><td style="width:32%;padding:3px 5px;font-weight:600;vertical-align:top;">'+esc(row[0])+'</td><td style="width:3%;padding:3px 0;vertical-align:top;">:</td><td style="padding:3px 5px;vertical-align:top;font-weight:600;">'+esc(row[1] || '—')+'</td></tr>';}).join('') +
-        '</table><div style="border-top:1px solid #9ca3af;margin-top:10px;padding-top:7px;font-size:11px;">This is a manually generated customer copy from the service portal. It is not issued by the Income Tax Department or Protean/UTIITSL and does not confirm that a PAN application has been submitted, accepted, or allotted. Use the official acknowledgement issued by the authorised PAN service provider as proof of application.</div>' +
+        '</table><div style="border-top:1px solid #9ca3af;margin-top:10px;padding-top:7px;font-size:11px;">This is a manually generated customer copy from the service portal. It is not issued by the Income Tax Department or Protean/UTIITSL and does not confirm that a PAN application has been submitted, accepted, or allotted. This receipt is for customer reference only. It does not prove submission to UTIITSL or confirm that a PAN application has been accepted. Use the official acknowledgement from the authorised PAN service provider as proof of submission.</div>' +
         '<div style="display:flex;justify-content:space-between;gap:20px;margin-top:24px;font-size:12px;"><span>Customer Signature: __________________</span><span>Retailer Signature/Stamp: __________________</span></div></div>' +
         '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;"><button type="button" id="panManualSlipPrintBtn" style="background:#2563eb;color:#fff;border:0;border-radius:6px;padding:10px 16px;font-weight:bold;">🖨️ Print / Save PDF</button><button type="button" id="panManualSlipCloseBtn" style="background:#64748b;color:#fff;border:0;border-radius:6px;padding:10px 16px;">Close</button></div></div>';
       document.body.appendChild(modal);
