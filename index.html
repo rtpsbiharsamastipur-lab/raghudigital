@@ -998,6 +998,7 @@
         name: "PAN CARD NEW APPLY",
         charge: 150,
         note: "Note: Pan Card apply karne me kam se kam 2 documents lagana zaroori hai.",
+        noticeHindi: "आवेदन करने के 02 घंटे के अंदर ओरिजिनल स्लिप अपलोड कर दी जाएगी। Service List पर जाकर स्लिप डाउनलोड कर लें।",
         fields: [
           { name: "NAME", label: "Full Name", type: "text", required: true },
           { name: "FATHER_NAME", label: "Father Name", type: "text", required: true },
@@ -2390,6 +2391,15 @@
       } else {
         noteEl.style.display = 'none';
       }
+      var oldPanNotice = document.getElementById('panApplyHindiNotice');
+      if (oldPanNotice) oldPanNotice.remove();
+      if (currentService.id === 'pan_new') {
+        var panNotice = document.createElement('div');
+        panNotice.id = 'panApplyHindiNotice';
+        panNotice.className = 'pan-apply-hindi-notice';
+        panNotice.innerHTML = '<span class="pan-notice-title">📢 PAN CARD NEW APPLY</span>⚠️ ' + currentService.noticeHindi;
+        noteEl.parentNode.insertBefore(panNotice, noteEl.nextSibling);
+      }
 
       var container = document.getElementById('formInputsContainer');
       container.innerHTML = '';
@@ -2463,6 +2473,13 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    .pan-apply-hindi-notice {
+      margin: 12px 0 18px; padding: 13px 16px; border: 2px solid #f59e0b;
+      border-radius: 10px; background: linear-gradient(100deg,#fff7ad 0%,#ffedd5 48%,#fce7f3 100%);
+      color: #9a3412; font-weight: 900; font-size: 17px; line-height: 1.65;
+      text-align: center; box-shadow: 0 4px 12px rgba(234,88,12,.14);
+    }
+    .pan-apply-hindi-notice .pan-notice-title { display:block;color:#7e22ce;font-size:19px;font-weight:900;margin-bottom:3px; }
     function showPanManualSlip(order) {
       var old = document.getElementById('panManualSlipModal');
       if (old) old.remove();
