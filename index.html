@@ -2463,6 +2463,19 @@
             inp.pattern = '[0-9]{28}';
             inp.title = 'Enter the complete 28-digit EID';
           }
+          if (currentService.id === 'pan_new' && f.name === 'IDENTITY_NO') {
+            inp.type = 'text';
+            inp.inputMode = 'numeric';
+            inp.autocomplete = 'off';
+            inp.maxLength = 14;
+            inp.placeholder = 'XXXX XXXX XXXX';
+            inp.pattern = '[0-9]{4} [0-9]{4} [0-9]{4}';
+            inp.title = '12 ankon ka Aadhaar number darj karein';
+            inp.addEventListener('input', function() {
+              var digits = this.value.replace(/\\D/g, '').slice(0, 12);
+              this.value = digits.replace(/(\\d{4})(?=\\d)/g, '$1 ').trim();
+            });
+          }
           group.appendChild(inp);
         }
         container.appendChild(group);
