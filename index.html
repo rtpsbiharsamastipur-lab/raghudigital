@@ -1737,9 +1737,13 @@
         .then(function(res) { return res.json(); })
         .then(function(data) {
           tbody.innerHTML = '';
-          var keys = Object.keys(data || {});
+          var allOrderKeys = Object.keys(data || {});
+          var keys = allOrderKeys.filter(function(key) {
+            var status = String((data[key] || {}).status || 'Pending').toLowerCase();
+            return status === 'pending';
+          });
           if (keys.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #ef4444;">Abhi tak koi order prapt nahi hua hai.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #059669; padding:20px;">✅ Koi Pending Order nahi hai. Sabhi orders complete ya process mein hain.</td></tr>';
             return;
           }
 
