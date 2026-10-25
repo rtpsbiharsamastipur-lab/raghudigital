@@ -671,6 +671,23 @@
         </div>
       </div>
 
+      <!-- COMPLETED / SUCCESS ORDERS ARCHIVE -->
+      <div class="module-card" id="adminCompletedOrdersBox" style="border-top-color:#059669;display:none;margin-top:18px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;flex-wrap:wrap;gap:10px;">
+          <div>
+            <h3 style="color:#047857;font-size:19px;">✅ Successful / Completed Orders</h3>
+            <p style="font-size:13px;color:#64748b;">Pending orders se alag, yahan completed/success orders ka record rahega.</p>
+          </div>
+          <button type="button" class="btn-exit" style="background:#475569;" onclick="fetchAdminCompletedOrders()">🔄 Refresh</button>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead><tr><th>Order ID &amp; Time</th><th>Retailer Details</th><th>Service Name</th><th>Charge</th><th>Status</th><th>Slip / Note</th></tr></thead>
+            <tbody id="adminCompletedOrdersTableBody"><tr><td colspan="6" style="text-align:center;color:#64748b;">Completed orders load ho rahe hain...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
       <!-- ADMIN EXCLUSIVE: RECHARGE APPROVAL DESK -->
       <div class="module-card" id="adminRechargeBox" style="border-top-color: #7c3aed; display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
@@ -1727,6 +1744,38 @@
       b.style.display = 'block';
       b.scrollIntoView({ behavior: 'smooth' });
       fetchAdminOrdersList();
+    }
+
+    function fetchAdminCompletedOrders() {
+      var tbody = document.getElementById('adminCompletedOrdersTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#64748b;">Completed orders load ho rahe hain...</td></tr>';
+      fetch(FIREBASE_URL + "/service_orders.json")
+        .then(function(res) { if (!res.ok) throw new Error('HTTP ' + res.status); return res.json(); })
+        .then(function(data) {
+          var rows = Object.keys(data || {}).filter(function(key) {
+            var status = String((data[key] || {}).status || '').toLowerCase();
+            return ['completed','success','successful','succeeded'].indexOf(status) >= 0;
+          }).reverse();
+          tbody.innerHTML = '';
+          if (!rows.length) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#059669;padding:20px;">Abhi koi Successful / Completed order nahi hai.</td></tr>';
+            return;
+          }
+          rows.forEach(function(key) {
+            var o = data[key] || {};
+            var result = o.deliveryResult ? (String(o.deliveryResult).indexOf('data:') === 0 || String(o.deliveryResult).indexOf('http') === 0
+              ? '<a href="' + o.deliveryResult + '" target="_blank" rel="noopener" style="color:#059669;font-weight:bold;">📄 Open Slip</a>'
+              : String(o.deliveryResult).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')) : '—';
+            var tr = document.createElement('tr');
+            tr.innerHTML = '<td><strong>' + String(o.orderId || key).replace(/</g,'&lt;') + '</strong><br><small>' + String(o.date || '').replace(/</g,'&lt;') + '</small></td>' +
+              '<td><strong>' + String(o.retailerName || 'N/A').replace(/</g,'&lt;') + '</strong><br><small>' + String(o.retailerPhone || '').replace(/</g,'&lt;') + '</small></td>' +
+              '<td>' + String(o.serviceName || '').replace(/</g,'&lt;') + '</td><td>₹' + Number(o.charge || 0).toFixed(2) + '</td>' +
+              '<td><span class="st-completed">Completed (✅)</span></td><td>' + result + '</td>';
+            tbody.appendChild(tr);
+          });
+        })
+        .catch(function() { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#dc2626;">Completed orders load nahi ho sake. Refresh karke dobara try karein.</td></tr>'; });
     }
 
     function fetchAdminOrdersList() {
