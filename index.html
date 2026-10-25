@@ -2454,26 +2454,49 @@
       if (old) old.remove();
       var fd = order.formData || {};
       function esc(v) { return String(v == null ? '' : v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+      function val(k, fallback) { return fd[k] ? esc(fd[k]) : (fallback || ''); }
       var address = ['WARD_NO','VILLAGE','POST_OFFICE','PANCHAYAT','BLOCK','DISTRICT','STATE','PIN_CODE'].map(function(k){return fd[k] ? esc(fd[k]) : '';}).filter(Boolean).join(', ');
+      var rows = [
+        ['Received / Service Charge', '₹' + Number(order.charge || 0).toFixed(2) + ' (Portal service charge; not government fee)'],
+        ['Application No./Coupon No.', order.orderId || ''],
+        ['Gender', val('GENDER')],
+        ['Date of Birth', val('DOB') || val('DATE_OF_BIRTH')],
+        ['Parent Name', val('FATHER_NAME')],
+        ['Aadhaar Number', val('IDENTITY_NO') ? 'Provided on application form' : 'Not provided'],
+        ['Name as per Aadhaar', val('NAME')],
+        ["Applicant's Contact details (Mobile/Landline/email)", [fd.MOBILE_NO,fd.EMAIL].filter(Boolean).map(esc).join(' / ')],
+        ['Communication Address', address],
+        ['Residence State', val('STATE')],
+        ['Proof of Identity', val('OTHER_DOC')],
+        ['Proof of Address', val('OTHER_DOC')],
+        ['Proof of DOB', val('DOB_DOC') || val('OTHER_DOC')],
+        ['Date of Receipt', order.date || ''],
+        ['Mode of PAN Card', 'Physical PAN / e-PAN preference to be confirmed during official application'],
+        ['Payment Ref No', 'Portal Order ID: ' + (order.orderId || '')],
+        ['Payment Date', order.date || ''],
+        ['PAN Service Center Name', 'RAGHU BABA ONLINE SERVICE'],
+        ['Centre Contact Details', esc(order.retailerName || '') + (order.retailerPhone ? ' / ' + esc(order.retailerPhone) : '')]
+      ];
       var modal = document.createElement('div');
       modal.id = 'panManualSlipModal';
       modal.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(15,23,42,.72);display:flex;align-items:center;justify-content:center;padding:12px;overflow:auto;';
-      modal.innerHTML = '<div style="background:#fff;width:min(800px,100%);max-height:95vh;overflow:auto;border-radius:12px;padding:20px;box-shadow:0 20px 60px #0005;">' +
-        '<div id="panManualSlipPrint" style="border:2px solid #334155;padding:22px;color:#111827;font-family:Arial,sans-serif;">' +
-        '<div style="text-align:center;border-bottom:2px solid #2563eb;padding-bottom:12px;"><h2 style="margin:0;color:#1d4ed8;">PAN CARD APPLICATION</h2><h3 style="margin:6px 0;">MANUAL CUSTOMER ACKNOWLEDGEMENT</h3><p style="margin:0;color:#b91c1c;font-weight:bold;">Customer Copy — Not an Official PAN/Acknowledgement Receipt</p></div>' +
-        '<div style="display:flex;justify-content:space-between;gap:12px;margin:16px 0;"><div><b>Portal Order ID:</b> '+esc(order.orderId)+'<br><b>Application Date:</b> '+esc(order.date)+'</div><div><b>Service:</b> PAN CARD NEW APPLY<br><b>Status:</b> Submitted to Service Desk</div></div>' +
-        '<table style="width:100%;border-collapse:collapse;font-size:14px;">' +
-        [['Applicant Name',fd.NAME],['Father Name',fd.FATHER_NAME],['Mother Name',fd.MOTHER_NAME],['Mobile No.',fd.MOBILE_NO],['Aadhaar No.',fd.IDENTITY_NO],['Address',address],['Other Document',fd.OTHER_DOC],['Retailer Name',order.retailerName],['Retailer Contact',order.retailerPhone],['Service Charge','₹'+Number(order.charge||0).toFixed(2)]].map(function(row){return '<tr><th style="text-align:left;border:1px solid #cbd5e1;padding:8px;width:32%;background:#eff6ff;">'+esc(row[0])+'</th><td style="border:1px solid #cbd5e1;padding:8px;">'+esc(row[1]||'—')+'</td></tr>';}).join('')+
-        '</table><p style="font-size:12px;margin-top:16px;">यह पोर्टल द्वारा बनाई गई मैनुअल ग्राहक रसीद है। यह सरकारी PAN acknowledgement, PAN application number या PAN allotment का प्रमाण नहीं है। आधिकारिक आवेदन/acknowledgement मिलने पर वही मान्य होगा।</p>' +
-        '<div style="display:flex;justify-content:space-between;margin-top:28px;"><span>Customer Signature: ______________</span><span>Retailer Stamp/Signature: ______________</span></div></div>' +
-        '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;"><button type="button" id="panManualSlipPrintBtn" style="background:#2563eb;color:#fff;border:0;border-radius:8px;padding:11px 18px;font-weight:bold;">🖨️ Print / Save PDF</button><button type="button" id="panManualSlipCloseBtn" style="background:#64748b;color:#fff;border:0;border-radius:8px;padding:11px 18px;">Close</button></div></div>';
+      modal.innerHTML = '<div style="background:#fff;width:min(1040px,100%);max-height:95vh;overflow:auto;border-radius:8px;padding:14px;box-shadow:0 20px 60px #0005;">' +
+        '<div id="panManualSlipPrint" style="position:relative;border:1px solid #9ca3af;padding:18px 22px;color:#111;font-family:Arial,sans-serif;background:#fff;">' +
+        '<div style="text-align:center;font-size:18px;font-weight:700;margin-bottom:2px;">PAN Application — Manual Customer Copy</div>' +
+        '<div style="text-align:center;font-size:13px;font-weight:700;margin-bottom:12px;">NOT AN OFFICIAL PAN ACKNOWLEDGEMENT RECEIPT</div>' +
+        '<div style="position:absolute;right:18px;top:58px;border:2px solid #cbd5e1;padding:10px 14px;color:#64748b;font-weight:bold;transform:rotate(8deg);">MANUAL COPY</div>' +
+        '<table style="width:100%;border-collapse:collapse;font-size:13.5px;line-height:1.25;">' +
+        rows.map(function(row){return '<tr><td style="width:32%;padding:3px 5px;font-weight:600;vertical-align:top;">'+esc(row[0])+'</td><td style="width:3%;padding:3px 0;vertical-align:top;">:</td><td style="padding:3px 5px;vertical-align:top;font-weight:600;">'+esc(row[1] || '—')+'</td></tr>';}).join('') +
+        '</table><div style="border-top:1px solid #9ca3af;margin-top:10px;padding-top:7px;font-size:11px;">This is a manually generated customer copy from the service portal. It is not issued by the Income Tax Department or Protean/UTIITSL and does not confirm that a PAN application has been submitted, accepted, or allotted. Use the official acknowledgement issued by the authorised PAN service provider as proof of application.</div>' +
+        '<div style="display:flex;justify-content:space-between;gap:20px;margin-top:24px;font-size:12px;"><span>Customer Signature: __________________</span><span>Retailer Signature/Stamp: __________________</span></div></div>' +
+        '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;"><button type="button" id="panManualSlipPrintBtn" style="background:#2563eb;color:#fff;border:0;border-radius:6px;padding:10px 16px;font-weight:bold;">🖨️ Print / Save PDF</button><button type="button" id="panManualSlipCloseBtn" style="background:#64748b;color:#fff;border:0;border-radius:6px;padding:10px 16px;">Close</button></div></div>';
       document.body.appendChild(modal);
       document.getElementById('panManualSlipCloseBtn').onclick = function(){modal.remove();};
       document.getElementById('panManualSlipPrintBtn').onclick = function(){
         var content = document.getElementById('panManualSlipPrint').innerHTML;
         var win = window.open('', '_blank');
         if (!win) { alert('Print window block ho gaya. Browser mein pop-ups allow karein.'); return; }
-        win.document.write('<!doctype html><html><head><title>Manual PAN Customer Slip</title><meta charset="utf-8"><style>body{font-family:Arial,sans-serif;padding:20px}table{width:100%;border-collapse:collapse}tr{break-inside:avoid}@media print{body{padding:0}}</style></head><body>'+content+'</body></html>');
+        win.document.write('<!doctype html><html><head><title>Manual PAN Customer Copy</title><meta charset="utf-8"><style>body{font-family:Arial,sans-serif;padding:20px}table{width:100%;border-collapse:collapse}tr{break-inside:avoid}@page{size:A4 landscape;margin:10mm}@media print{body{padding:0}}</style></head><body>'+content+'</body></html>');
         win.document.close(); win.focus(); win.print();
       };
     }
