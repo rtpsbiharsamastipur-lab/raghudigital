@@ -998,7 +998,7 @@
         name: "PAN CARD NEW APPLY",
         charge: 150,
         note: "Note: Pan Card apply karne me kam se kam 2 documents lagana zaroori hai.",
-        noticeHindi: "आवेदन करने के 02 घंटे के अंदर ओरिजिनल स्लिप अपलोड कर दी जाएगी। Service List पर जाकर स्लिप डाउनलोड कर लें।",
+        noticeHindi: "नोट: आवेदन करने के 02 घंटे के अंदर ओरिजिनल स्लिप अपलोड कर दी जाएगी। Service List पर जाकर स्लिप डाउनलोड कर लें।",
         fields: [
           { name: "NAME", label: "Full Name", type: "text", required: true },
           { name: "FATHER_NAME", label: "Father Name", type: "text", required: true },
@@ -2397,7 +2397,8 @@
         var panNotice = document.createElement('div');
         panNotice.id = 'panApplyHindiNotice';
         panNotice.className = 'pan-apply-hindi-notice';
-        panNotice.innerHTML = '<span class="pan-notice-title">📢 PAN CARD NEW APPLY</span>⚠️ ' + currentService.noticeHindi;
+        panNotice.innerHTML = '<span class="pan-notice-title">📢 PAN CARD NEW APPLY</span><span style="display:block;color:#b91c1c;font-size:17px;font-weight:900;">' + currentService.noticeHindi + '</span>';
+        panNotice.style.display = 'block';
         noteEl.parentNode.insertBefore(panNotice, noteEl.nextSibling);
       }
 
