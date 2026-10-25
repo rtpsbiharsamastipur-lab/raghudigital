@@ -2769,11 +2769,24 @@
           else if (col.key === 'customer') value = customerHtml;
           else if (col.key === 'result') value = resultHtml;
           else if (col.key === 'date') value = safe(order.date || '—');
-          else if (col.key === 'status') value = '<span style="color:' + statusColor + ';font-weight:800;">' + safe(status) + '</span>';
+          else if (col.key === 'status') {
+            value = '<span style="color:' + statusColor + ';font-weight:800;">' + safe(status) + '</span>';
+            if (serviceId === 'pan_new') {
+              var slipOrderId = safe(order.orderId || '');
+              value += '<div style="margin-top:8px;"><button type="button" onclick="printPanManualSlipFromList(\'' + slipOrderId + '\')" style="background:linear-gradient(90deg,#2563eb,#7c3aed);color:#fff;border:0;border-radius:5px;padding:7px 9px;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap;">🖨️ Manual Print Receipt</button></div>';
+            }
+          }
           return '<td style="background:#fff;padding:13px 10px;text-align:center;vertical-align:top;">' + value + '</td>';
         }).join('');
         tbody.appendChild(tr);
       });
+    }
+
+    function printPanManualSlipFromList(orderId) {
+      var rows = window.currentServiceListRows || [];
+      var order = rows.find(function(item) { return String(item.orderId || '') === String(orderId); });
+      if (!order) { alert('Order data nahi mila. Service list refresh karein.'); return; }
+      showPanManualSlip(order);
     }
 
     function filterServiceListRows() {
