@@ -612,7 +612,8 @@
             <p style="font-size: 13px; color: #64748b;">Orders clear karein, final receipt/slip upload karein ya refund bhejein.</p>
           </div>
           <div style="display: flex; gap: 8px;">
-            <button class="c-btn btn-open" style="max-width: 110px;" onclick="fetchAdminOrdersList()">🔄 Refresh</button>
+            <button class="c-btn btn-open" style="max-width: 110px;" onclick="fetchAdminOrdersList()">🔄 Pending Refresh</button>
+            <button type="button" class="c-btn" style="background:#059669;color:#fff;border:0;" onclick="toggleAdminCompletedOrders()">✅ Success Orders</button>
             <button type="button" class="btn-exit" style="background: #475569;" onclick="closeAllModules()">Close</button>
           </div>
         </div>
@@ -1744,6 +1745,17 @@
       b.style.display = 'block';
       b.scrollIntoView({ behavior: 'smooth' });
       fetchAdminOrdersList();
+    }
+
+    function toggleAdminCompletedOrders() {
+      var box = document.getElementById('adminCompletedOrdersBox');
+      if (!box) return;
+      var opening = box.style.display === 'none' || !box.style.display;
+      box.style.display = opening ? 'block' : 'none';
+      if (opening) {
+        fetchAdminCompletedOrders();
+        box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
 
     function fetchAdminCompletedOrders() {
