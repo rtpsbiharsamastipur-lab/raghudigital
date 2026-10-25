@@ -2538,8 +2538,9 @@
     async function submitOrderAction() {
       if (!currentService) return;
 
+      var isEditingExistingOrder = !!window.editingOrderKey;
       var charge = currentService.charge;
-      if (Number(activeUser.wallet || 0) < charge) {
+      if (!isEditingExistingOrder && Number(activeUser.wallet || 0) < charge) {
         alert('Wallet balance kam hai! Is service ke liye ₹' + charge + ' chahiye. Pehle recharge karein.');
         openRechargeModule();
         return;
@@ -2582,6 +2583,34 @@
         } else {
           formDataMap[el.name] = el.value;
         }
+      }
+
+      if (isEditingExistingOrder && window.editingOriginalFormData) {
+        Object.keys(window.editingOriginalFormData).forEach(function(key) {
+          if (formDataMap[key] === undefined) formDataMap[key] = window.editingOriginalFormData[key];
+        });
+      }
+
+      if (isEditingExistingOrder) {
+        try {
+          var patchResponse = await fetch(FIREBASE_URL + "/service_orders/" + encodeURIComponent(window.editingOrderKey) + ".json", {
+            method: "PATCH", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ formData: formDataMap, updatedAt: new Date().toLocaleString() })
+          });
+          if (!patchResponse.ok) throw new Error("Update failed");
+          alert("✅ Application details update ho gaye. Wallet se dobara charge nahi kata.");
+          window.editingOrderKey = null;
+          window.editingOriginalFormData = null;
+          var updateBtn = document.getElementById('btnSubmitOrder');
+          if (updateBtn) updateBtn.textContent = 'Submit Order';
+          closeAllModules();
+          openServiceResults(currentService.id);
+        } catch (editError) {
+          alert("Application update nahi hua. Firebase write permission check karein.");
+        }
+        btn.innerText = "Submit Order";
+        btn.disabled = false;
+        return;
       }
 
       var orderId = "RB" + Math.floor(100000 + Math.random() * 900000);
@@ -2697,6 +2726,7 @@
             if (sameRetailer && sameService) matches.push(order);
           });
           matches.sort(function(a,b) { return parseOrderDateForList(b.date) - parseOrderDateForList(a.date); });
+          window.currentServiceListRows = matches;
           var safe = function(value) { return String(value == null ? '' : value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); };
           var serviceListColumns = getServiceListColumns(serviceId, matches);
           var tableHeaders = serviceListColumns.map(function(col) {
@@ -2750,6 +2780,38 @@
         { key: 'uploads', label: 'UPLOADED FILES' }, { key: 'result', label: 'RESULT' },
         { key: 'date', label: 'DATE' }, { key: 'status', label: 'STATUS' }
       ];
+    }
+
+    window.editingOrderKey = null;
+    window.editingOriginalFormData = null;
+
+    function editServiceApplication(orderId) {
+      var rows = window.currentServiceListRows || [];
+      var order = rows.find(function(item) { return String(item.orderId || '') === String(orderId); });
+      if (!order) { alert('Order data nahi mila. Service List refresh karke dobara try karein.'); return; }
+      if (['completed','success'].indexOf(String(order.status || '').toLowerCase()) >= 0) {
+        alert('Completed order ko edit nahi kiya ja sakta.'); return;
+      }
+      var service = SERVICES_CONFIG.find(function(item) { return item.id === (order.serviceId || window.currentServiceListServiceId); });
+      if (!service) { alert('Service configuration nahi mili.'); return; }
+      window.editingOrderKey = String(order.orderId || orderId);
+      window.editingOriginalFormData = JSON.parse(JSON.stringify(order.formData || {}));
+      openOrderForm(service.id);
+      var form = document.getElementById('dynamicServiceForm');
+      Object.keys(window.editingOriginalFormData).forEach(function(key) {
+        var el = form.querySelector('[name="' + key.replace(/"/g, '\\"') + '"]');
+        if (!el || el.type === 'file') return;
+        if (el.tagName === 'SELECT') {
+          Array.from(el.options).forEach(function(opt) { if (opt.value === String(window.editingOriginalFormData[key])) opt.selected = true; });
+        } else {
+          el.value = window.editingOriginalFormData[key];
+        }
+      });
+      var title = document.getElementById('formTitleText');
+      if (title) title.textContent = '✏️ Edit Application — ' + service.name + ' (' + order.orderId + ')';
+      var submit = document.getElementById('btnSubmitOrder');
+      if (submit) submit.textContent = 'Update Application';
+      alert('Application details edit karein. File upload badalna ho to nayi file select karein; purani file bina badle safe rahegi.');
     }
 
     function renderServiceListRows(rows) {
@@ -2808,6 +2870,10 @@
             if (serviceId === 'pan_new') {
               var slipOrderId = safe(order.orderId || '');
               value += '<div style="margin-top:8px;"><button type="button" onclick="printPanManualSlipFromList(\'' + slipOrderId + '\')" style="background:linear-gradient(90deg,#2563eb,#7c3aed);color:#fff;border:0;border-radius:5px;padding:7px 9px;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap;">🖨️ Manual Print Receipt</button></div>';
+            }
+            if (status.toLowerCase() !== 'completed' && status.toLowerCase() !== 'success') {
+              var editOrderId = safe(order.orderId || '');
+              value += '<div style="margin-top:7px;"><button type="button" onclick="editServiceApplication(\'' + editOrderId + '\')" style="background:#0f766e;color:#fff;border:0;border-radius:5px;padding:7px 10px;font-size:11px;font-weight:800;cursor:pointer;">✏️ Edit Application</button></div>';
             }
           }
           return '<td style="background:#fff;padding:13px 10px;text-align:center;vertical-align:top;">' + value + '</td>';
