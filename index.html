@@ -2449,6 +2449,35 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    function showPanManualSlip(order) {
+      var old = document.getElementById('panManualSlipModal');
+      if (old) old.remove();
+      var fd = order.formData || {};
+      function esc(v) { return String(v == null ? '' : v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+      var address = ['WARD_NO','VILLAGE','POST_OFFICE','PANCHAYAT','BLOCK','DISTRICT','STATE','PIN_CODE'].map(function(k){return fd[k] ? esc(fd[k]) : '';}).filter(Boolean).join(', ');
+      var modal = document.createElement('div');
+      modal.id = 'panManualSlipModal';
+      modal.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(15,23,42,.72);display:flex;align-items:center;justify-content:center;padding:12px;overflow:auto;';
+      modal.innerHTML = '<div style="background:#fff;width:min(800px,100%);max-height:95vh;overflow:auto;border-radius:12px;padding:20px;box-shadow:0 20px 60px #0005;">' +
+        '<div id="panManualSlipPrint" style="border:2px solid #334155;padding:22px;color:#111827;font-family:Arial,sans-serif;">' +
+        '<div style="text-align:center;border-bottom:2px solid #2563eb;padding-bottom:12px;"><h2 style="margin:0;color:#1d4ed8;">PAN CARD APPLICATION</h2><h3 style="margin:6px 0;">MANUAL CUSTOMER ACKNOWLEDGEMENT</h3><p style="margin:0;color:#b91c1c;font-weight:bold;">Customer Copy — Not an Official PAN/Acknowledgement Receipt</p></div>' +
+        '<div style="display:flex;justify-content:space-between;gap:12px;margin:16px 0;"><div><b>Portal Order ID:</b> '+esc(order.orderId)+'<br><b>Application Date:</b> '+esc(order.date)+'</div><div><b>Service:</b> PAN CARD NEW APPLY<br><b>Status:</b> Submitted to Service Desk</div></div>' +
+        '<table style="width:100%;border-collapse:collapse;font-size:14px;">' +
+        [['Applicant Name',fd.NAME],['Father Name',fd.FATHER_NAME],['Mother Name',fd.MOTHER_NAME],['Mobile No.',fd.MOBILE_NO],['Aadhaar No.',fd.IDENTITY_NO],['Address',address],['Other Document',fd.OTHER_DOC],['Retailer Name',order.retailerName],['Retailer Contact',order.retailerPhone],['Service Charge','₹'+Number(order.charge||0).toFixed(2)]].map(function(row){return '<tr><th style="text-align:left;border:1px solid #cbd5e1;padding:8px;width:32%;background:#eff6ff;">'+esc(row[0])+'</th><td style="border:1px solid #cbd5e1;padding:8px;">'+esc(row[1]||'—')+'</td></tr>';}).join('')+
+        '</table><p style="font-size:12px;margin-top:16px;">यह पोर्टल द्वारा बनाई गई मैनुअल ग्राहक रसीद है। यह सरकारी PAN acknowledgement, PAN application number या PAN allotment का प्रमाण नहीं है। आधिकारिक आवेदन/acknowledgement मिलने पर वही मान्य होगा।</p>' +
+        '<div style="display:flex;justify-content:space-between;margin-top:28px;"><span>Customer Signature: ______________</span><span>Retailer Stamp/Signature: ______________</span></div></div>' +
+        '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;"><button type="button" id="panManualSlipPrintBtn" style="background:#2563eb;color:#fff;border:0;border-radius:8px;padding:11px 18px;font-weight:bold;">🖨️ Print / Save PDF</button><button type="button" id="panManualSlipCloseBtn" style="background:#64748b;color:#fff;border:0;border-radius:8px;padding:11px 18px;">Close</button></div></div>';
+      document.body.appendChild(modal);
+      document.getElementById('panManualSlipCloseBtn').onclick = function(){modal.remove();};
+      document.getElementById('panManualSlipPrintBtn').onclick = function(){
+        var content = document.getElementById('panManualSlipPrint').innerHTML;
+        var win = window.open('', '_blank');
+        if (!win) { alert('Print window block ho gaya. Browser mein pop-ups allow karein.'); return; }
+        win.document.write('<!doctype html><html><head><title>Manual PAN Customer Slip</title><meta charset="utf-8"><style>body{font-family:Arial,sans-serif;padding:20px}table{width:100%;border-collapse:collapse}tr{break-inside:avoid}@media print{body{padding:0}}</style></head><body>'+content+'</body></html>');
+        win.document.close(); win.focus(); win.print();
+      };
+    }
+
     async function submitOrderAction() {
       if (!currentService) return;
 
@@ -2531,6 +2560,9 @@
         document.getElementById('barWalletAmt').innerText = Number(newWalletBalance).toFixed(2);
 
         alert('✅ Order Safaltapoorvak Lag Gaya Hai!\nOrder ID: ' + orderId + '\nAapke wallet se ₹' + charge + ' kat chuke hain.');
+        if (currentService.id === 'pan_new') {
+          showPanManualSlip(orderPayload);
+        }
       } catch(e) {
         alert('Order submit karne me samasya aayi.');
       }
