@@ -2504,7 +2504,7 @@
       var proofDocName = fd.OTHER_DOC || 'Document uploaded by retailer';
       var retailerDisplayName = order.retailerName || (activeUser && activeUser.name) || 'Retailer';
       var rows = [
-        ['Received Rs.', '₹' + Number(order.charge || 0).toFixed(2) + ' — portal service charge (not government tax/fee)'],
+        ['Received Rs.', '₹107.00 — Government Fee'],
         ['PAN 93', 'Manual Receipt'],
         ['Applicant Name', val('NAME')],
         ['Application No.', order.orderId || ''],
