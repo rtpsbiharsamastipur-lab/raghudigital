@@ -618,6 +618,12 @@
           </div>
         </div>
 
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:12px;background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;margin-bottom:14px;">
+          <input id="adminAllOrdersSearch" type="text" placeholder="Sabhi orders mein naam / mobile / Order ID khojein" style="flex:1;min-width:220px;padding:10px;border:1px solid #fdba74;border-radius:8px;">
+          <button type="button" class="c-btn btn-open" onclick="searchAllAdminOrders()">🔎 Search All Orders</button>
+        </div>
+        <div id="adminAllOrdersSearchResults" style="display:none;margin-bottom:16px;"></div>
+
         <!-- Order Action Clearance Box with Slip File Upload -->
         <div id="orderClearanceActionBox" style="display: none; background: #eff6ff; padding: 18px; border-radius: 8px; border: 1.5px solid #bfdbfe; margin-bottom: 20px;">
           <h4 style="font-size: 15px; margin-bottom: 6px; color: #1e3a8a;">⚙️ Process Order: <span id="clearanceOrderIdText" style="color: #ef4444; font-weight: bold;"></span></h4>
@@ -1756,6 +1762,57 @@
         fetchAdminCompletedOrders();
         box.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
+    }
+
+    function searchAllAdminOrders() {
+      var input = document.getElementById('adminAllOrdersSearch');
+      var box = document.getElementById('adminAllOrdersSearchResults');
+      var query = String(input && input.value || '').trim().toLowerCase();
+      if (!query) { alert('Naam, mobile ya Order ID likhein.'); return; }
+      box.style.display = 'block';
+      box.innerHTML = '<p style="padding:10px;">Sabhi orders search ho rahe hain...</p>';
+      fetch(FIREBASE_URL + '/service_orders.json')
+        .then(function(res) { if (!res.ok) throw new Error('HTTP ' + res.status); return res.json(); })
+        .then(function(data) {
+          var found = Object.keys(data || {}).filter(function(key) {
+            var o = data[key] || {};
+            var searchable = [key, o.orderId, o.retailerName, o.retailerPhone, o.serviceName, o.status];
+            Object.keys(o.formData || {}).forEach(function(f) { searchable.push(f, o.formData[f]); });
+            return searchable.some(function(v) { return typeof v === 'string' && v.toLowerCase().indexOf(query) >= 0; });
+          }).reverse();
+          if (!found.length) {
+            box.innerHTML = '<p style="padding:12px;color:#b91c1c;">Is naam/ID se koi order nahi mila. Spelling ya mobile number se dobara search karein.</p>';
+            return;
+          }
+          var html = '<div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Order ID / Date</th><th>Retailer</th><th>Service</th><th>Status</th><th>Action</th></tr></thead><tbody>';
+          found.forEach(function(key) {
+            var o = data[key] || {};
+            var status = String(o.status || 'Pending');
+            var escapedKey = String(key).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,'&#39;');
+            html += '<tr><td>' + String(o.orderId || key).replace(/</g,'&lt;') + '<br><small>' + String(o.date || '').replace(/</g,'&lt;') + '</small></td>' +
+              '<td>' + String(o.retailerName || 'N/A').replace(/</g,'&lt;') + '<br>' + String(o.retailerPhone || '').replace(/</g,'&lt;') + '</td>' +
+              '<td>' + String(o.serviceName || '').replace(/</g,'&lt;') + '</td><td><strong>' + status.replace(/</g,'&lt;') + '</strong></td><td>' +
+              (status.toLowerCase() === 'pending' ? '<span style="color:#059669;">Already Pending</span>' :
+              '<button type="button" class="btn-action-small" onclick="restoreAdminOrderToPending(\'' + escapedKey + '\')">↩ Make Pending</button>') + '</td></tr>';
+          });
+          box.innerHTML = html + '</tbody></table></div>';
+        })
+        .catch(function() { box.innerHTML = '<p style="padding:12px;color:#b91c1c;">Orders search nahi ho sake. Firebase access check karein.</p>'; });
+    }
+
+    function restoreAdminOrderToPending(orderKey) {
+      if (!confirm('Is order ka status Pending karna hai? Wallet balance nahi badlega.')) return;
+      fetch(FIREBASE_URL + '/service_orders/' + encodeURIComponent(orderKey) + '.json', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'Pending' })
+      }).then(function(res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        alert('Order status Pending kar diya gaya.');
+        searchAllAdminOrders();
+        fetchAdminOrdersList();
+        fetchAdminCompletedOrders();
+      }).catch(function() { alert('Status update nahi hua. Firebase write permission check karein.'); });
     }
 
     function fetchAdminCompletedOrders() {
