@@ -2473,13 +2473,6 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    .pan-apply-hindi-notice {
-      margin: 12px 0 18px; padding: 13px 16px; border: 2px solid #f59e0b;
-      border-radius: 10px; background: linear-gradient(100deg,#fff7ad 0%,#ffedd5 48%,#fce7f3 100%);
-      color: #9a3412; font-weight: 900; font-size: 17px; line-height: 1.65;
-      text-align: center; box-shadow: 0 4px 12px rgba(234,88,12,.14);
-    }
-    .pan-apply-hindi-notice .pan-notice-title { display:block;color:#7e22ce;font-size:19px;font-weight:900;margin-bottom:3px; }
     function showPanManualSlip(order) {
       var old = document.getElementById('panManualSlipModal');
       if (old) old.remove();
@@ -2529,7 +2522,14 @@
         var content = document.getElementById('panManualSlipPrint').innerHTML;
         var win = window.open('', '_blank');
         if (!win) { alert('Print window block ho gaya. Browser mein pop-ups allow karein.'); return; }
-        win.document.write('<!doctype html><html><head><title>Manual PAN Customer Copy</title><meta charset="utf-8"><style>body{font-family:Arial,sans-serif;padding:20px}table{width:100%;border-collapse:collapse}tr{break-inside:avoid}@page{size:A4 landscape;margin:10mm}@media print{body{padding:0}}</style></head><body>'+content+'</body></html>');
+        win.document.write('<!doctype html><html><head><title>Manual PAN Customer Copy</title><meta charset="utf-8"><style>body{font-family:Arial,sans-serif;padding:20px}table{width:100%;border-collapse:collapse}tr{break-inside:avoid}@page{size:A4 landscape;margin:10mm}@media print{body{padding:0}}    .pan-apply-hindi-notice {
+      margin: 12px 0 18px; padding: 13px 16px; border: 2px solid #f59e0b;
+      border-radius: 10px; background: linear-gradient(100deg,#fff7ad 0%,#ffedd5 48%,#fce7f3 100%);
+      color: #9a3412; font-weight: 900; font-size: 17px; line-height: 1.65;
+      text-align: center; box-shadow: 0 4px 12px rgba(234,88,12,.14);
+    }
+    .pan-apply-hindi-notice .pan-notice-title { display:block;color:#7e22ce;font-size:19px;font-weight:900;margin-bottom:3px; }
+</style></head><body>'+content+'</body></html>');
         win.document.close(); win.focus(); win.print();
       };
     }
