@@ -1002,6 +1002,7 @@
           { name: "NAME", label: "Full Name", type: "text", required: true },
           { name: "FATHER_NAME", label: "Father Name", type: "text", required: true },
           { name: "MOTHER_NAME", label: "Mother Name", type: "text", required: true },
+          { name: "DOB", label: "Date of Birth (DOB)", type: "date", required: true },
           { name: "MOBILE_NO", label: "Mobile No", type: "number", required: true },
           { name: "IDENTITY_NO", label: "Aadhaar No", type: "text", required: true },
           { name: "WARD_NO", label: "Ward-", type: "text", required: true },
@@ -1013,8 +1014,8 @@
           { name: "STATE", label: "State-", type: "text", required: true },
           { name: "PIN_CODE", label: "Pincode", type: "number", required: true },
           { name: "DOC_UPLOAD", label: "Aadhaar Card Upload (PDF under 200 KB)", type: "file", required: true, accept: ".pdf,application/pdf", maxSize: 204800 },
-          { name: "PHOTO_DOC", label: "Photo Upload", type: "file", required: true },
-          { name: "SIG_DOC", label: "Signature Upload", type: "file", required: true },
+          { name: "PHOTO_DOC", label: "Photo Upload (JPG/JPEG)", type: "file", required: true, accept: ".jpg,.jpeg,image/jpeg" },
+          { name: "SIG_DOC", label: "Signature Upload (JPG/JPEG)", type: "file", required: true, accept: ".jpg,.jpeg,image/jpeg" },
           { name: "OTHER_DOC", label: "Other Document Type", type: "select", required: true, options: ["Select one document", "Voter ID", "10th Marksheet", "ABHA ID"] },
           { name: "OTHER_DOC_FILE", label: "Upload Selected Document (PDF under 200 KB)", type: "file", required: true, accept: ".pdf,application/pdf", maxSize: 204800 }
         ]
