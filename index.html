@@ -1844,9 +1844,19 @@
           }
           rows.forEach(function(key) {
             var o = data[key] || {};
-            var result = o.deliveryResult ? (String(o.deliveryResult).indexOf('data:') === 0 || String(o.deliveryResult).indexOf('http') === 0
-              ? '<a href="' + o.deliveryResult + '" target="_blank" rel="noopener" style="color:#059669;font-weight:bold;">📄 Open Slip</a>'
-              : String(o.deliveryResult).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')) : '—';
+            function safeSlipText(value) {
+              return String(value == null ? '' : value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+            }
+            var slipValue = o.deliveryResult || o.slipUrl || o.slip || o.deliveryFile || o.resultFile || o.fileUrl || '';
+            var result = '—';
+            if (typeof slipValue === 'string' && slipValue.trim()) {
+              var slipText = slipValue.trim();
+              if (/^(data:|https?:\/\/)/i.test(slipText)) {
+                result = '<a href="' + slipText.replace(/"/g,'%22') + '" target="_blank" rel="noopener" style="display:inline-block;color:#fff;font-weight:bold;background:#059669;padding:6px 10px;border-radius:6px;text-decoration:none;">📄 View / Download Slip</a>';
+              } else {
+                result = '<div style="white-space:pre-wrap;max-width:260px;overflow-wrap:anywhere;">' + safeSlipText(slipText) + '</div>';
+              }
+            }
             var tr = document.createElement('tr');
             tr.innerHTML = '<td><strong>' + String(o.orderId || key).replace(/</g,'&lt;') + '</strong><br><small>' + String(o.date || '').replace(/</g,'&lt;') + '</small></td>' +
               '<td><strong>' + String(o.retailerName || 'N/A').replace(/</g,'&lt;') + '</strong><br><small>' + String(o.retailerPhone || '').replace(/</g,'&lt;') + '</small></td>' +
