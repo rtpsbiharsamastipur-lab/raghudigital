@@ -720,8 +720,8 @@
         </div>
         <div class="admin-table-wrap">
           <table class="admin-table">
-            <thead><tr><th>Order ID &amp; Date</th><th>Retailer</th><th>Service</th><th>Customer Details</th><th>Refund Amount</th><th>Status / Note</th></tr></thead>
-            <tbody id="adminRefundOrdersTableBody"><tr><td colspan="6" style="text-align:center;color:#64748b;">Refund list load ho rahi hai...</td></tr></tbody>
+            <thead><tr><th>Order ID &amp; Date</th><th>Retailer</th><th>Service</th><th>Customer Details</th><th>Refund Amount</th><th>Status / Note</th><th>Action</th></tr></thead>
+            <tbody id="adminRefundOrdersTableBody"><tr><td colspan="7" style="text-align:center;color:#64748b;">Refund list load ho rahi hai...</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -1895,7 +1895,7 @@
           }).reverse();
           tbody.innerHTML = '';
           if (!rows.length) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#b91c1c;padding:20px;">Abhi koi refunded order nahi mila.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#b91c1c;padding:20px;">Abhi koi refunded order nahi mila.</td></tr>';
             return;
           }
           rows.forEach(function(key) {
@@ -1912,13 +1912,38 @@
               '<td>' + retailer + '</td><td>' + esc(o.serviceName || o.service || '—') + '</td>' +
               '<td>' + (customer || '—') + '</td>' +
               '<td><strong style="color:#b91c1c;">₹' + Number(o.charge || o.amount || 0).toFixed(2) + '</strong></td>' +
-              '<td><span class="st-refunded">REFUNDED</span><br><small>' + note + '</small></td>';
+              '<td><span class="st-refunded">REFUNDED</span><br><small>' + note + '</small></td>' +
+              '<td><button type="button" onclick="moveRefundToSuccess(\'' + esc(o.orderId || key) + '\')" style="background:#059669;color:#fff;border:0;border-radius:5px;padding:7px 9px;font-weight:800;cursor:pointer;white-space:nowrap;">➡️ Move to Success</button></td>';
             tbody.appendChild(tr);
           });
         })
         .catch(function() {
-          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#b91c1c;padding:20px;">Refund list load nahi ho payi. Database connection / Rules check karein.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#b91c1c;padding:20px;">Refund list load nahi ho payi. Database connection / Rules check karein.</td></tr>';
         });
+    }
+
+    async function moveRefundToSuccess(orderId) {
+      if (!confirm('Is order ko Refund List se Success List mein shift karein? Status Completed hoga. Retailer wallet ka refund reverse nahi hoga.')) return;
+      try {
+        var res = await fetch(FIREBASE_URL + '/service_orders.json');
+        if (!res.ok) throw new Error('Orders load nahi hue.');
+        var all = await res.json() || {};
+        var key = Object.keys(all).find(function(k) { return String((all[k] || {}).orderId || k) === String(orderId); });
+        if (!key) throw new Error('Order nahi mila.');
+        var order = all[key] || {};
+        var status = String(order.status || '').toLowerCase();
+        if (status !== 'refunded' && status !== 'rejected_refund') throw new Error('Order ab Refund status mein nahi hai.');
+        var update = await fetch(FIREBASE_URL + '/service_orders/' + encodeURIComponent(key) + '.json', {
+          method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'Completed', previousStatus: order.status, movedToSuccessAt: new Date().toLocaleString(), deliveryResult: order.deliveryResult || 'Moved from Refund List by Admin' })
+        });
+        if (!update.ok) throw new Error('Status update nahi hua.');
+        alert('Order Success List mein shift ho gaya. Dhyan dein: retailer wallet refund alag se reverse nahi hua.');
+        fetchAdminRefundOrders();
+        fetchAdminCompletedOrders();
+      } catch (err) {
+        alert('Transfer nahi hua: ' + (err.message || 'Database error'));
+      }
     }
 
     function fetchAdminCompletedOrders() {
