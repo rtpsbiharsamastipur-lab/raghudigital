@@ -2236,7 +2236,8 @@
               '<td>' +
                 '<button class="btn-action-small" onclick="updateRetailerEmail(\'' + key + '\')">✉️ Email</button>' +
               '<button class="btn-action-small" onclick="prepareTransfer(\'' + key + '\')">➕ Transfer</button>' +
-                '<button class="btn-delete-small" onclick="deleteRetailerAccount(\'' + key + '\', \'' + (ret.name || key) + '\')">🗑️ Delete</button>' +
+                '<button class="btn-action-small" style="background:#b45309;" onclick="deductRetailerWallet(\'' + key + '\', \'' + String(ret.name || key).replace(/'/g, '') + '\')">➖ Deduct</button>' +
+                '<button class="btn-delete-small" onclick="deleteRetailerAccount(\'' + key + '\', \'' + String(ret.name || key).replace(/'/g, '') + '\')">🗑️ Delete</button>' +
               '</td>';
             tbody.appendChild(tr);
           });
@@ -2244,6 +2245,31 @@
           console.error('Retailer list error:', err);
           tbody.innerHTML = '<tr><td colspan="6" style="color:#dc2626;">Retailer list load nahi hui: ' + String(err.message || err) + '</td></tr>';
         }
+    }
+
+    async function deductRetailerWallet(mob, name) {
+      var raw = prompt('Retailer: ' + name + '\\nCurrent balance dekh kar kitna amount deduct karna hai? (₹)');
+      if (raw === null) return;
+      var amount = Number(raw);
+      if (!Number.isFinite(amount) || amount <= 0) { alert('Valid amount darj karein.'); return; }
+      try {
+        var url = FIREBASE_URL + '/retailers/' + encodeURIComponent(mob) + '.json';
+        var res = await fetch(url);
+        if (!res.ok) throw new Error('Retailer record load nahi hua.');
+        var ret = await res.json();
+        if (!ret) throw new Error('Retailer account nahi mila.');
+        var balance = Number(ret.wallet || 0);
+        if (amount > balance) throw new Error('Wallet balance ₹' + balance.toFixed(2) + ' hai. Isse zyada deduct nahi kar sakte.');
+        var updated = Number((balance - amount).toFixed(2));
+        if (!confirm(name + ' ke wallet se ₹' + amount.toFixed(2) + ' deduct karein?\\nBalance: ₹' + balance.toFixed(2) + ' → ₹' + updated.toFixed(2))) return;
+        ret.wallet = updated;
+        var save = await fetch(url, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(ret) });
+        if (!save.ok) throw new Error('Wallet update save nahi hua.');
+        alert('Wallet update ho gaya. Naya balance: ₹' + updated.toFixed(2));
+        fetchRetailersList();
+      } catch (err) {
+        alert('Wallet deduct nahi hua: ' + (err.message || 'Database error'));
+      }
     }
 
     function updateRetailerEmail(mob) {
