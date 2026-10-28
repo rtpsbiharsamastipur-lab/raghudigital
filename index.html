@@ -2378,12 +2378,12 @@
         if (String(current.status || '').toLowerCase() !== 'pending') {
           throw new Error('Ye request Pending nahi hai (current status: ' + (current.status || 'undefined') + '). Dobara credit nahi kiya gaya.');
         }
-        var normalizedUtr = String(current.utr || '').replace(/\\s+/g, '').toLowerCase();
+        var normalizedUtr = String(current.utr || '').replace(/\s+/g, '').toLowerCase();
         if (!normalizedUtr) throw new Error('UTR khaali hai. Is request ko approve nahi kiya ja sakta.');
         var duplicate = Object.keys(allRequests).some(function(key) {
           if (key === reqId) return false;
           var other = allRequests[key] || {};
-          return String(other.utr || '').replace(/\\s+/g, '').toLowerCase() === normalizedUtr;
+          return String(other.utr || '').replace(/\s+/g, '').toLowerCase() === normalizedUtr;
         });
         if (duplicate) throw new Error('Yahi UTR kisi doosri recharge request mein bhi hai. Double credit rokne ke liye approve nahi kiya gaya. Pehle duplicate record verify karein.');
         var retailerKey = current.retailerKey || mob;
@@ -3045,7 +3045,7 @@
 
     async function submitRechargeDetails() {
       var amt = parseFloat(document.getElementById('inputRechAmt').value);
-      var utr = (document.getElementById('inputRechUtr').value || '').replace(/\\s+/g, '').trim();
+      var utr = (document.getElementById('inputRechUtr').value || '').replace(/\s+/g, '').trim();
       if (!amt || amt < 1 || !utr) {
         alert('Kripya valid Amount aur UTR darj karein!');
         return;
@@ -3056,7 +3056,7 @@
         var existing = await existingRes.json() || {};
         var duplicate = Object.keys(existing).some(function(key) {
           var item = existing[key] || {};
-          return String(item.utr || '').replace(/\\s+/g, '').toLowerCase() === utr.toLowerCase();
+          return String(item.utr || '').replace(/\s+/g, '').toLowerCase() === utr.toLowerCase();
         });
         if (duplicate) {
           alert('❌ Ye UTR pehle se use ho chuka hai ya request mein hai. Ek UTR se dobara recharge request nahi bhej sakte.');
