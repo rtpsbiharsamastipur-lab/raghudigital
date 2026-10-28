@@ -2327,8 +2327,10 @@
           keys.reverse().forEach(function(key) {
             var r = data[key];
             var tr = document.createElement('tr');
-            var actionBtn = r.status === 'Approved' ? '<span style="color:#16a34a; font-weight:bold;">Approved</span>' : 
-              '<button class="btn-action-small" onclick="approveRecharge(\'' + key + '\', \'' + r.mobile + '\', ' + r.amount + ')">✅ Approve &amp; Credit</button>';
+            var actionBtn = r.status === 'Approved' ? '<span style="color:#16a34a;font-weight:bold;">Approved</span>' :
+              (r.status === 'Rejected' ? '<span style="color:#dc2626;font-weight:bold;">Rejected</span>' :
+              '<button class="btn-action-small" onclick="approveRecharge(this.dataset.reqId, this.dataset.mobile, Number(this.dataset.amount))" data-req-id="' + key + '" data-mobile="' + r.mobile + '" data-amount="' + r.amount + '">✅ Approve &amp; Credit</button> ' +
+              '<button class="btn-action-small" style="background:#dc2626;color:#fff;" onclick="rejectRecharge(this.dataset.reqId)" data-req-id="' + key + '">❌ Reject Request</button>');
 
             tr.innerHTML = 
               '<td>' + key + '<br><small>' + (r.date || '') + '</small></td>' +
@@ -2340,6 +2342,29 @@
             tbody.appendChild(tr);
           });
         });
+    }
+
+    async function rejectRecharge(reqId) {
+      if (!confirm('Kya aap is recharge request ko Reject karna chahte hain? Wallet mein koi paisa credit nahi hoga.')) return;
+      try {
+        var res = await fetch(FIREBASE_URL + "/recharge_requests.json");
+        if (!res.ok) throw new Error('Recharge requests load nahi ho saki.');
+        var all = await res.json() || {};
+        var current = all[reqId];
+        if (!current) throw new Error('Request nahi mili.');
+        if (String(current.status || '').toLowerCase() !== 'pending') {
+          throw new Error('Sirf Pending request reject ho sakti hai. Current status: ' + (current.status || 'unknown'));
+        }
+        var save = await fetch(FIREBASE_URL + "/recharge_requests/" + encodeURIComponent(reqId) + ".json", {
+          method: "PATCH", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: "Rejected", rejectedAt: new Date().toLocaleString() })
+        });
+        if (!save.ok) throw new Error('Reject status save nahi hua.');
+        alert('Request Reject kar di gayi. Wallet mein credit nahi hua.');
+        fetchAdminRecharges();
+      } catch (err) {
+        alert('Reject nahi hua: ' + (err.message || 'Network/Firebase error'));
+      }
     }
 
     async function approveRecharge(reqId, mob, amt) {
