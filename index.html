@@ -621,6 +621,7 @@
           <div style="display: flex; gap: 8px;">
             <button class="c-btn btn-open" style="max-width: 110px;" onclick="fetchAdminOrdersList()">🔄 Pending Refresh</button>
             <button type="button" class="c-btn" style="background:#059669;color:#fff;border:0;" onclick="toggleAdminCompletedOrders()">✅ Success Orders</button>
+            <button type="button" class="c-btn" style="background:#dc2626;color:#fff;border:0;" onclick="toggleAdminRefundOrders()">💸 Refund List</button>
             <button type="button" class="btn-exit" style="background: #475569;" onclick="closeAllModules()">Close</button>
           </div>
         </div>
@@ -701,6 +702,26 @@
           <table class="admin-table">
             <thead><tr><th>Order ID &amp; Time</th><th>Retailer Details</th><th>Service Name</th><th>Charge</th><th>Status</th><th>Slip / Note</th></tr></thead>
             <tbody id="adminCompletedOrdersTableBody"><tr><td colspan="6" style="text-align:center;color:#64748b;">Completed orders load ho rahe hain...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- REFUNDED ORDERS ARCHIVE -->
+      <div class="module-card" id="adminRefundOrdersBox" style="border-top-color:#dc2626;display:none;margin-top:18px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;flex-wrap:wrap;gap:10px;">
+          <div>
+            <h3 style="color:#b91c1c;font-size:19px;">💸 Refund List</h3>
+            <p style="font-size:13px;color:#64748b;">Refund kiye gaye orders ka alag record. Yahan se confirm karein ki order refund hua tha.</p>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <button type="button" class="btn-exit" style="background:#dc2626;" onclick="fetchAdminRefundOrders()">🔄 Refresh</button>
+            <button type="button" class="btn-exit" style="background:#475569;" onclick="closeAdminRefundOrders()">✖ Close</button>
+          </div>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead><tr><th>Order ID &amp; Date</th><th>Retailer</th><th>Service</th><th>Customer Details</th><th>Refund Amount</th><th>Status / Note</th></tr></thead>
+            <tbody id="adminRefundOrdersTableBody"><tr><td colspan="6" style="text-align:center;color:#64748b;">Refund list load ho rahi hai...</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -1842,6 +1863,62 @@
         fetchAdminOrdersList();
         fetchAdminCompletedOrders();
       }).catch(function() { alert('Status update nahi hua. Firebase write permission check karein.'); });
+    }
+
+    function closeAdminRefundOrders() {
+      var box = document.getElementById('adminRefundOrdersBox');
+      if (box) box.style.display = 'none';
+    }
+
+    function toggleAdminRefundOrders() {
+      var box = document.getElementById('adminRefundOrdersBox');
+      if (!box) return;
+      var opening = box.style.display === 'none' || !box.style.display;
+      box.style.display = opening ? 'block' : 'none';
+      if (opening) {
+        fetchAdminRefundOrders();
+        box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    function fetchAdminRefundOrders() {
+      var tbody = document.getElementById('adminRefundOrdersTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#64748b;">Refund list load ho rahi hai...</td></tr>';
+      fetch(FIREBASE_URL + '/service_orders.json')
+        .then(function(res) { if (!res.ok) throw new Error('HTTP ' + res.status); return res.json(); })
+        .then(function(data) {
+          var rows = Object.keys(data || {}).filter(function(key) {
+            var o = data[key] || {};
+            var status = String(o.status || '').toLowerCase();
+            return status === 'refunded' || status === 'rejected_refund';
+          }).reverse();
+          tbody.innerHTML = '';
+          if (!rows.length) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#b91c1c;padding:20px;">Abhi koi refunded order nahi mila.</td></tr>';
+            return;
+          }
+          rows.forEach(function(key) {
+            var o = data[key] || {};
+            var fd = o.formData || {};
+            function esc(v) {
+              return String(v == null ? '' : v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+            }
+            var customer = [fd.NAME || fd.FULL_NAME || fd.APPLICANT_NAME || fd.CUSTOMER_NAME, fd.FATHER_NAME || fd.FATHERNAME].filter(Boolean).map(esc).join('<br>');
+            var retailer = [o.retailerName || '—', o.retailerPhone || o.retailerId || '—'].map(esc).join('<br>');
+            var note = esc(o.deliveryResult || o.refundReason || 'Refund status recorded');
+            var tr = document.createElement('tr');
+            tr.innerHTML = '<td>' + esc(o.orderId || key) + '<br><small>' + esc(o.date || o.createdAt || '') + '</small></td>' +
+              '<td>' + retailer + '</td><td>' + esc(o.serviceName || o.service || '—') + '</td>' +
+              '<td>' + (customer || '—') + '</td>' +
+              '<td><strong style="color:#b91c1c;">₹' + Number(o.charge || o.amount || 0).toFixed(2) + '</strong></td>' +
+              '<td><span class="st-refunded">REFUNDED</span><br><small>' + note + '</small></td>';
+            tbody.appendChild(tr);
+          });
+        })
+        .catch(function() {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#b91c1c;padding:20px;">Refund list load nahi ho payi. Database connection / Rules check karein.</td></tr>';
+        });
     }
 
     function fetchAdminCompletedOrders() {
