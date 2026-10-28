@@ -1013,6 +1013,19 @@
         ]
       },
       {
+        id: "ll_exam",
+        name: "LEARNING EXAM",
+        charge: 150,
+        note: "LL EXAM REQUEST — आवेदन नंबर, जन्मतिथि और राज्य सही भरें। Password केवल अधिकृत प्रक्रिया के लिए दर्ज करें।",
+        fields: [
+          { name: "APP_NO", label: "Application Number", type: "text", required: true },
+          { name: "DOB", label: "Date of Birth", type: "date", required: true },
+          { name: "EXAM_PASSWORD", label: "Password", type: "password", required: true },
+          { name: "EXAM_PIN", label: "Exam Pin (Optional)", type: "text", required: false },
+          { name: "STATE", label: "Select State", type: "select", required: true, options: ["Select State", "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal", "Delhi", "Jammu and Kashmir", "Ladakh", "Puducherry"] }
+        ]
+      },
+      {
         id: "voter_link",
         name: "VOTER LINK MOBILE NO",
         charge: 40,
