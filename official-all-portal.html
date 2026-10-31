@@ -156,4 +156,49 @@ body{margin:0;padding:20px;font-family:Arial,'Noto Sans',sans-serif;background:l
  }));
  applyFilters();
 })();
+</script><script>
+(function(){
+  var input=document.getElementById('portalSearch');
+  var clear=document.getElementById('clearSearch');
+  var grid=document.querySelector('.grid');
+  if(!input||!grid)return;
+  var cards=Array.prototype.slice.call(grid.querySelectorAll('a[href]'));
+  var chips=Array.prototype.slice.call(document.querySelectorAll('.filter-chip'));
+  var active='All';
+  var empty=document.getElementById('emptyState');
+  if(!empty){
+    empty=document.createElement('div');
+    empty.id='emptyState';
+    empty.className='empty-state';
+    empty.textContent='No matching portals found. Try another keyword or category.';
+    grid.parentNode.insertBefore(empty,grid.nextSibling);
+  }
+  function normalize(v){
+    return String(v||'').toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/[^a-z0-9\\s]/g,' ').replace(/\\s+/g,' ').trim();
+  }
+  function filterPortals(){
+    var query=normalize(input.value);
+    var count=0;
+    cards.forEach(function(card){
+      var text=normalize((card.innerText||card.textContent||'')+' '+card.href+' '+(card.dataset.search||''));
+      var category=card.dataset.category||'Others';
+      var visible=(!query||text.indexOf(query)!==-1)&&(active==='All'||category===active);
+      card.style.display=visible?'flex':'none';
+      if(visible)count++;
+    });
+    empty.style.display=count?'none':'block';
+  }
+  input.oninput=filterPortals;
+  input.onkeyup=filterPortals;
+  input.onchange=filterPortals;
+  if(clear)clear.onclick=function(){input.value='';filterPortals();input.focus();};
+  chips.forEach(function(chip){
+    chip.onclick=function(){
+      active=chip.getAttribute('data-filter')||'All';
+      chips.forEach(function(c){c.classList.toggle('active',c===chip);});
+      filterPortals();
+    };
+  });
+  filterPortals();
+})();
 </script></body></html>
