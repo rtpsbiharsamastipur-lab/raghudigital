@@ -66,105 +66,78 @@ body{margin:0;padding:20px;font-family:Arial,'Noto Sans',sans-serif;background:l
 <a href="https://elabharthi.bihar.gov.in/DigitalSevaConnect/CSCLogin.aspx" target="_blank" rel="noopener noreferrer" style="display:block;padding:13px;border:1px solid #ddd6fe;border-radius:10px;background:#fff;color:#5b21b6;text-decoration:none;font-weight:800;">📜 जीवन प्रमाण-पत्र ↗<small style="display:block;margin-top:5px;color:#64748b;font-weight:500;">e-Labharthi CSC Login</small></a>
 <a href="https://www.bhulagan.bihar.gov.in/" target="_blank" rel="noopener noreferrer" style="display:block;padding:13px;border:1px solid #fde68a;border-radius:10px;background:#fff;color:#92400e;text-decoration:none;font-weight:800;">🏡 भू-लगान भुगतान / जमीन की रसीद ↗<small style="display:block;margin-top:5px;color:#64748b;font-weight:500;">बिहार राजस्व एवं भूमि सुधार विभाग</small></a>
 <a href="https://biharbhumi.bihar.gov.in/" target="_blank" rel="noopener noreferrer" style="display:block;padding:13px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;color:#334155;text-decoration:none;font-weight:800;">📍 बिहार भूमि पोर्टल ↗<small style="display:block;margin-top:5px;color:#64748b;font-weight:500;">भूमि एवं राजस्व संबंधी सेवाएँ</small></a></div></main><script>
-var portalActiveCategory = "All";
-function portalNormalize(value){
-  return String(value || "").toLowerCase().replace(/[^a-z0-9]+/g," ").replace(/\\s+/g," ").trim();
-}
-function filterPortalCards(){
-  var box=document.getElementById("portalSearch");
-  var grid=document.querySelector(".grid");
-  if(!box||!grid)return;
-  var query=portalNormalize(box.value);
-  var cards=grid.querySelectorAll("a[href]");
-  var shown=0;
+(function(){
+ var grid=document.querySelector(".grid"), input=document.getElementById("portalSearch"), clear=document.getElementById("clearSearch");
+ if(!grid||!input)return;
+ var cards=Array.prototype.slice.call(grid.querySelectorAll("a[href]"));
+ var info=[
+ ["NPCI Aadhaar Seeding / DBT","NPCI BASE Portal","Banking","NPCI Aadhaar bank DBT seeding","🏦","NPCI"],
+ ["Printscards Login","Printscards Login Portal","Others","printscards print cards","🖨️","PRINT"],
+ ["Yash Portal Login","Yash Portal Members Login","Others","yash portal","🌐","YASH"],
+ ["Electricity Bill Check / Pay","NBPDCL Official Portal","Utility","electricity bijli bill north bihar power","⚡","NBPDCL"],
+ ["Aadhaar Download / My Aadhaar","UIDAI Official Portal","Aadhaar","aadhaar aadhar uidai download","🪪","AADHAAR"],
+ ["Aadhaar Status Check","UIDAI Status Portal","Aadhaar","aadhaar aadhar uidai status","🪪","AADHAAR"],
+ ["Aadhaar Card Download","Download Aadhaar PDF","Aadhaar","aadhaar aadhar pdf","🪪","UIDAI"],
+ ["Photo Background Remover","Online Photo Editing Tool","Others","photo background remove","🖼️","PHOTO"],
+ ["Caste Certificate Apply","RTPS Bihar Portal","Others","caste jati certificate rtps","📜","RTPS"],
+ ["Income Certificate Apply","RTPS Bihar Portal","Others","income aay certificate rtps","📜","RTPS"],
+ ["Residence Certificate Apply","RTPS Bihar Portal","Others","residence niwas awasiy certificate rtps","🏠","RTPS"],
+ ["Voter ID Services / e-EPIC","Election Commission of India","Voter","voter matdata epic election","🗳️","ECI"],
+ ["PAN Card Download (Protean / NSDL)","PAN e-PAN Download Portal","PAN","pan nsdl protean","📄","NSDL"],
+ ["PAN Card Download (UTIITSL)","UTI e-PAN Download Portal","PAN","pan uti utiitsl","📄","UTI"],
+ ["CSC Digital Seva Login","CSC Connect Portal","Others","csc digital seva login","🖥️","CSC"],
+ ["CSC PAC Code Generate","UCL Payment / PAC Code","Banking","csc pac ucl code","💳","CSC"],
+ ["DigiPay Lite Login (CSC)","DigiPay Lite Portal","Banking","digipay csc","💳","CSC"],
+ ["DigiPay Login (CSC)","CSC DigiPay Portal","Banking","digipay csc login","💳","CSC"],
+ ["NSDL PAN Apply (CSC)","NSDL PAN Application","PAN","nsdl pan csc apply","📄","NSDL"],
+ ["PAN Address Update (Protean)","Protean PAN Update Portal","PAN","pan address update protean","📍","PROTEAN"],
+ ["UMANG Government Services","Central & State Online Services","Others","umang government","🇮🇳","UMANG"],
+ ["PM-KISAN Portal","Farmer Registration, e-KYC & Installments","Agriculture","pm kisan farmer","🌾","PM-KISAN"],
+ ["DigiLocker","Digital Documents & Certificates","Others","digilocker documents","📂","DigiLocker"],
+ ["Bihar Pension (SSPMIS)","Pension Status & Services","Others","bihar pension sspmis","👵","SSPMIS"],
+ ["Driving Licence Services (Sarathi)","LL, DL Apply & Licence Services","Driving Licence","driving licence license dl ll sarathi parivahan","🚘","SARATHI"],
+ ["Ayushman Card / PM-JAY","Ayushman Beneficiary Portal","Health","ayushman pmjay health card","🩺","PM-JAY"],
+ ["EPFO Member Portal","EPFO Unified Portal","Employment","epfo epf pf member","🏦","EPFO"],
+ ["APAAR ID Apply","Academic Bank of Credits / APAAR","Education","apaar abc id education","🎓","APAAR"],
+ ["ABHA Health ID Generate","ABDM Health ID Portal","Health","abha health id","🏥","ABHA"],
+ ["Bihar Ration Card Apply","Bihar Smart PDS Portal","Ration Card","bihar ration card pds","🍚","PDS"],
+ ["LNMU Official Website","Lalit Narayan Mithila University","Education","lnmu university","🎓","LNMU"],
+ ["Resume, Bill / Invoice & Tools","V2K Online Utility Tools","Others","resume invoice bill tools","🧾","TOOLS"],
+ ["Bank Passbook Creator","Create Bank Passbook / Bank ID","Banking","bank passbook","🏦","BANK"],
+ ["Jeevan Pramaan / e-Labharthi","e-Labharthi CSC Login","Others","jeevan pramaan elabharthi pension","📜","e-LABHARTHI"],
+ ["Bihar Land Revenue Payment","Bhu-Lagan / Land Receipt","Utility","bihar land bhulagan lagan","🏡","BHU-LAGAN"],
+ ["Bihar Bhumi Portal","Land & Revenue Services","Utility","bihar bhumi land","🏡","BIHAR BHUMI"]
+ ];
+ var palettes=[["#fce7f3","#fbcfe8","#9d174d"],["#f3e8ff","#e9d5ff","#6b21a8"],["#e0f2fe","#bae6fd","#075985"],["#ffedd5","#fed7aa","#c2410c"],["#dcfce7","#bbf7d0","#166534"],["#fef3c7","#fde68a","#92400e"],["#ede9fe","#ddd6fe","#5b21b6"],["#d1fae5","#a7f3d0","#065f46"]];
+ cards.forEach(function(card,i){
+  var d=info[i]||[card.textContent.trim(),"Official Website","Others","","🌐","PORTAL"], p=palettes[i%palettes.length];
+  card.setAttribute("data-category",d[2]); card.setAttribute("data-search",(d.join(" ")+" "+card.href).toLowerCase());
+  card.style.setProperty("display","flex","important"); card.style.setProperty("background","linear-gradient(135deg,"+p[0]+","+p[1]+")","important");
+  card.style.setProperty("border-color",p[1],"important"); card.style.setProperty("color",p[2],"important");
+  var mark=document.createElement("span");mark.className="portal-brandmark";
+  var ico=document.createElement("b");ico.textContent=d[4];var name=document.createElement("small");name.textContent=d[5];mark.append(ico,name);
+  var copy=document.createElement("span");copy.className="portal-copy";
+  var title=document.createElement("span");title.className="portal-title";title.textContent=d[0];
+  var desc=document.createElement("span");desc.className="portal-desc";desc.textContent=d[1];copy.append(title,desc);
+  var arrow=document.createElement("span");arrow.className="portal-arrow";arrow.textContent="→";
+  card.replaceChildren(mark,copy,arrow);
+ });
+ var chips=Array.prototype.slice.call(document.querySelectorAll(".filter-chip")), active="All";
+ var empty=document.getElementById("emptyState");
+ if(!empty){empty=document.createElement("div");empty.id="emptyState";empty.className="empty-state";empty.textContent="No matching portals found. Try another keyword.";grid.parentNode.insertBefore(empty,grid.nextSibling);}
+ function norm(v){return String(v||"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();}
+ function searchNow(){
+  var q=norm(input.value), count=0;
   cards.forEach(function(card){
-    var category=card.getAttribute("data-category")||"Others";
-    var searchText=portalNormalize((card.innerText||card.textContent||"")+" "+(card.getAttribute("data-search")||"")+" "+card.href);
-    var matchesText=!query || searchText.indexOf(query)!==-1;
-    var matchesCategory=portalActiveCategory==="All" || category===portalActiveCategory;
-    var visible=matchesText&&matchesCategory;
-    card.style.display=visible?"flex":"none";
-    if(visible)shown++;
+   var match=(!q||norm(card.getAttribute("data-search")+" "+card.textContent+" "+card.href).indexOf(q)>=0);
+   var cat=(active==="All"||card.getAttribute("data-category")===active), show=match&&cat;
+   card.style.setProperty("display",show?"flex":"none","important");if(show)count++;
   });
-  var empty=document.getElementById("emptyState");
-  if(!empty){
-    empty=document.createElement("div");
-    empty.id="emptyState";
-    empty.className="empty-state";
-    empty.textContent="No matching portals found. Try another keyword or category.";
-    grid.parentNode.insertBefore(empty,grid.nextSibling);
-  }
-  empty.style.display=shown===0?"block":"none";
-}
-document.addEventListener("DOMContentLoaded",function(){
-  var search=document.getElementById("portalSearch");
-  var clear=document.getElementById("clearSearch");
-  var cards=document.querySelectorAll(".grid a[href]");
-  var details=[
-    ["Banking","NPCI Aadhaar Seeding DBT bank"],
-    ["Others","Printscards print cards"],
-    ["Others","Yash Portal"],
-    ["Utility","Electricity Bijli NBPDCL bill"],
-    ["Aadhaar","Aadhaar Aadhar UIDAI download"],
-    ["Aadhaar","Aadhaar Aadhar UIDAI status"],
-    ["Aadhaar","Aadhaar Aadhar UIDAI PDF"],
-    ["Others","Photo background remover"],
-    ["Others","Caste Jati certificate RTPS"],
-    ["Others","Income Aay certificate RTPS"],
-    ["Others","Residence Niwas Awasiy certificate RTPS"],
-    ["Voter","Voter Matdata EPIC Election"],
-    ["PAN","PAN NSDL Protean download"],
-    ["PAN","PAN UTIITSL UTI download"],
-    ["Others","CSC Digital Seva login"],
-    ["Banking","CSC PAC UCL code"],
-    ["Banking","CSC DigiPay Lite"],
-    ["Banking","CSC DigiPay login"],
-    ["PAN","NSDL PAN CSC apply"],
-    ["PAN","PAN Protean address update"],
-    ["Others","UMANG Government services"],
-    ["Agriculture","PM Kisan Farmer"],
-    ["Others","DigiLocker documents"],
-    ["Others","Bihar Pension SSPMIS"],
-    ["Driving Licence","Driving License DL LL Sarathi Parivahan"],
-    ["Health","Ayushman PMJAY health card"],
-    ["Employment","EPFO EPF PF member"],
-    ["Education","APAAR ABC ID"],
-    ["Health","ABHA Health ID"],
-    ["Ration Card","Bihar Ration PDS"],
-    ["Education","LNMU University"],
-    ["Others","Resume Invoice Bill tools"],
-    ["Banking","Bank Passbook"],
-    ["Others","Jeevan Pramaan eLabharthi"],
-    ["Utility","Bihar Land BhuLagan"],
-    ["Utility","Bihar Bhumi Land"]
-  ];
-  Array.prototype.forEach.call(cards,function(card,index){
-    var extra=details[index]||["Others",""];
-    card.setAttribute("data-category",extra[0]);
-    card.setAttribute("data-search",extra[1]);
-  });
-  if(search){
-    search.setAttribute("oninput","filterPortalCards()");
-    search.addEventListener("input",filterPortalCards);
-    search.addEventListener("keyup",filterPortalCards);
-    search.addEventListener("search",filterPortalCards);
-  }
-  if(clear){
-    clear.onclick=function(){
-      search.value="";
-      filterPortalCards();
-      search.focus();
-    };
-  }
-  document.querySelectorAll(".filter-chip").forEach(function(button){
-    button.onclick=function(){
-      portalActiveCategory=button.getAttribute("data-filter")||"All";
-      document.querySelectorAll(".filter-chip").forEach(function(other){
-        other.classList.toggle("active",other===button);
-      });
-      filterPortalCards();
-    };
-  });
-  filterPortalCards();
-});
+  empty.style.display=count?"none":"block";
+ }
+ input.oninput=searchNow;input.onkeyup=searchNow;input.onsearch=searchNow;
+ if(clear)clear.onclick=function(){input.value="";searchNow();input.focus();};
+ chips.forEach(function(b){b.onclick=function(){active=b.getAttribute("data-filter")||"All";chips.forEach(function(c){c.classList.toggle("active",c===b);});searchNow();};});
+ searchNow();
+})();
 </script></body></html>
