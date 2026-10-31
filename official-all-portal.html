@@ -20,7 +20,7 @@ body{margin:0;padding:20px;font-family:Arial,'Noto Sans',sans-serif;background:l
 .grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
 .grid a{min-width:0;min-height:105px;padding:13px!important;border-radius:15px!important;text-decoration:none!important;display:flex!important;align-items:center;gap:12px;line-height:1.25;box-shadow:0 4px 12px rgba(15,23,42,.08)!important;border:1px solid transparent!important;transition:transform .18s,box-shadow .18s}
 .grid a:hover{transform:translateY(-3px);box-shadow:0 9px 20px rgba(15,23,42,.13)!important}
-.portal-logo{flex:0 0 70px;width:70px;height:70px;object-fit:contain;margin:0!important;padding:8px;background:#fff;border:1px solid rgba(148,163,184,.2);border-radius:16px;display:block}
+.portal-logo{flex:0 0 70px;width:70px;height:70px;object-fit:contain;margin:0!important;padding:8px;background:#fff;border:1px solid rgba(148,163,184,.2);border-radius:16px;display:block}.portal-brandmark{flex:0 0 70px;width:70px;height:70px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px;background:#fff;border:1px solid rgba(148,163,184,.25);border-radius:16px;color:#1d4ed8;font-size:12px;font-weight:1000;text-align:center;line-height:1.05;padding:5px;box-shadow:0 2px 8px rgba(15,23,42,.06)}.portal-brandmark b{font-size:24px;line-height:1}.portal-brandmark small{font-size:9px;letter-spacing:.2px}@media(max-width:850px){.portal-brandmark{flex-basis:54px;width:54px;height:54px}}@media(max-width:600px){.portal-brandmark{flex-basis:42px;width:42px;height:42px;font-size:9px;border-radius:10px}.portal-brandmark b{font-size:17px}.portal-brandmark small{font-size:7px}}
 .portal-copy{min-width:0;display:block}
 .portal-title{display:block;font-size:16px;font-weight:900;line-height:1.3;margin-bottom:5px}
 .portal-desc{display:block;font-size:12px;font-weight:600;line-height:1.35;color:#334155}
@@ -123,10 +123,38 @@ body{margin:0;padding:20px;font-family:Arial,'Noto Sans',sans-serif;background:l
    link.style.background='linear-gradient(135deg,'+palette[0]+','+palette[1]+')';
    link.style.borderColor=palette[1];
    link.style.color=palette[2];
-   const logo=document.createElement('img');
-   logo.className='portal-logo';logo.alt=domain+' logo';logo.loading='lazy';
-   logo.src='https://www.google.com/s2/favicons?domain='+encodeURIComponent(domain)+'&sz=128';
-   logo.onerror=function(){this.style.display='none';};
+   const brandInfo=(function(title,host){
+     const t=title.toLowerCase(),h=host.toLowerCase();
+     if(t.includes('csc')||h.includes('csc'))return ['CSC','🖥️','CSC'];
+     if(t.includes('aadhaar')||t.includes('abha'))return ['AADHAAR','🪪','UIDAI'];
+     if(t.includes('npci'))return ['NPCI','🏦','BASE'];
+     if(t.includes('pan')&&t.includes('uti'))return ['UTI','📄','PAN'];
+     if(t.includes('pan'))return ['NSDL','📄','PAN'];
+     if(t.includes('voter')||t.includes('matdata'))return ['ECI','🗳️','VOTER'];
+     if(t.includes('driving')||t.includes('licence'))return ['SARATHI','🚘','PARIVAHAN'];
+     if(t.includes('ration'))return ['PDS','🍚','BIHAR'];
+     if(t.includes('electricity'))return ['NBPDCL','⚡','BIHAR'];
+     if(t.includes('digipay'))return ['DIGIPAY','💳','CSC'];
+     if(t.includes('epfo'))return ['EPFO','🏦','INDIA'];
+     if(t.includes('pm-kisan')||t.includes('farmer'))return ['PM-KISAN','🌾','AGRI'];
+     if(t.includes('ayushman'))return ['PM-JAY','🩺','HEALTH'];
+     if(t.includes('health'))return ['ABHA','🏥','HEALTH'];
+     if(t.includes('apaar')||t.includes('lnmu'))return ['EDU','🎓','INDIA'];
+     if(t.includes('certificate')||t.includes('pramaan'))return ['RTPS','📜','BIHAR'];
+     if(t.includes('pension'))return ['SSPMIS','👵','BIHAR'];
+     if(t.includes('land')||t.includes('bhumi')||t.includes('lagan'))return ['BHOOMI','🏡','BIHAR'];
+     if(t.includes('printscards'))return ['PRINT','🖨️','CARDS'];
+     if(t.includes('yash'))return ['YASH','🌐','PORTAL'];
+     if(t.includes('digilocker'))return ['DigiLocker','📂','GOVT'];
+     if(t.includes('umang'))return ['UMANG','🇮🇳','GOVT'];
+     if(t.includes('bank'))return ['BANK','🏦','TOOLS'];
+     if(t.includes('photo'))return ['PHOTO','🖼️','TOOLS'];
+     return [host.split('.')[0].slice(0,10).toUpperCase()||'PORTAL','🌐','OFFICIAL'];
+   })(item[0],domain);
+   const logo=document.createElement('div');logo.className='portal-brandmark';logo.setAttribute('aria-label',brandInfo[0]+' logo');
+   const logoIcon=document.createElement('b');logoIcon.textContent=brandInfo[1];
+   const logoText=document.createElement('small');logoText.textContent=brandInfo[0];
+   logo.append(logoIcon,logoText);
    const copy=document.createElement('span');copy.className='portal-copy';
    const title=document.createElement('span');title.className='portal-title';title.textContent=item[0];
    const desc=document.createElement('span');desc.className='portal-desc';desc.textContent=item[1];
