@@ -2159,6 +2159,11 @@
       var linkOrReason = (document.getElementById('orderDeliverFileLink').value || '').trim();
       var adminServiceNumber = (document.getElementById('adminServiceNumber').value || '').trim();
       var slipFileInput = document.getElementById('slipUploadFile');
+      if (selectedAction === 'Completed' && activeOrderContext.verificationRequired && !activeOrderContext.finalSubmitted) {
+        alert('Pehle Data Verify List mein Admin aur Retailer dono se har field ✓ सही karwayein, phir Final Submitted karein.');
+        return;
+      }
+
       var charge = Number(activeOrderContext.charge || 0);
       var retailerMob = String(activeOrderContext.retailerPhone).trim();
 
