@@ -1633,7 +1633,8 @@
         document.getElementById('btnAdminRecharge').style.display = 'none';
         document.getElementById('btnAdminLedger').style.display = 'none';
         document.getElementById('btnMyOrders').style.display = 'inline-block';
-        document.getElementById('btnVerificationList').style.display = 'inline-block';
+        var verificationBtn = document.getElementById('btnVerificationList');
+        if (verificationBtn) verificationBtn.style.display = 'inline-block';
         document.getElementById('barWalletPill').style.display = 'inline-block';
         document.getElementById('retailerServicesSection').style.display = 'none';
         renderServicesGrid();
