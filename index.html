@@ -1609,8 +1609,10 @@
       document.getElementById('userBar').style.display = 'flex';
       document.getElementById('dashboardView').style.display = 'block';
 
-      document.getElementById('barUserName').innerText = activeUser.name;
-      document.getElementById('barUserPhone').innerText = activeUser.mobile || activeUser.id;
+      document.getElementById('barUserName').innerText = activeUser.name || '';
+      document.getElementById('barUserPhone').innerText = activeUser.mobile || activeUser.id || '';
+      var initialWalletEl = document.getElementById('barWalletAmt');
+      if (initialWalletEl) initialWalletEl.textContent = Number(activeUser.wallet || 0).toFixed(2);
 
       if (activeUser.role === 'admin') {
         document.body.classList.remove('retailer-dashboard');
@@ -1659,16 +1661,19 @@
       if (!activeUser) return;
 
       if (activeUser.role !== 'admin') {
-        // Always refresh retailer wallet from its actual Firebase account key.
-        fetch(FIREBASE_URL + "/retailers/" + encodeURIComponent(activeUser.id) + "/wallet.json")
-          .then(function(res) { if (!res.ok) throw new Error('Wallet HTTP ' + res.status); return res.json(); })
-          .then(function(bal) {
-            if (bal !== null && bal !== undefined && Number.isFinite(Number(bal))) {
+        // Refresh the full retailer record using the same account key as login.
+        var walletAccountId = String(activeUser.id || activeUser.mobile || '').trim();
+        fetch(FIREBASE_URL + '/retailers/' + encodeURIComponent(walletAccountId) + '.json')
+          .then(function(res) { if (!res.ok) throw new Error('Retailer account HTTP ' + res.status); return res.json(); })
+          .then(function(record) {
+            if (!record) throw new Error('Retailer account record nahi mila: ' + walletAccountId);
+            var bal = record.wallet;
+            if (bal !== null && bal !== undefined && bal !== '' && Number.isFinite(Number(bal))) {
               activeUser.wallet = Number(bal);
-              setSafeLocalData("raghu_active_user", activeUser);
+              setSafeLocalData('raghu_active_user', activeUser);
               var walletEl = document.getElementById('barWalletAmt');
-              if (walletEl) walletEl.innerText = Number(bal).toFixed(2);
-            }
+              if (walletEl) walletEl.textContent = Number(bal).toFixed(2);
+            } else { console.warn('Retailer wallet field missing in Firebase record:', walletAccountId); }
           }).catch(function(err) { console.error('Retailer wallet refresh error:', err); });
       }
 
