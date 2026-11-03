@@ -2272,6 +2272,7 @@
               '<td><strong style="color: #059669; font-size:14px;">₹' + Number(ret.wallet || 0).toFixed(2) + '</strong></td>' +
               '<td>' +
                 '<button class="btn-action-small" onclick="updateRetailerEmail(\'' + key + '\')">✉️ Email</button>' +
+              '<button class="btn-action-small" style="background:#7c3aed;" onclick="adminResetRetailerPassword(\\'' + key + '\\', \\' ' + String(ret.name || key).replace(/'/g, '') + '\\')">🔑 Reset Password</button>' +
               '<button class="btn-action-small" onclick="prepareTransfer(\'' + key + '\')">➕ Transfer</button>' +
                 '<button class="btn-action-small" style="background:#b45309;" onclick="deductRetailerWallet(\'' + key + '\', \'' + String(ret.name || key).replace(/'/g, '') + '\')">➖ Deduct</button>' +
                 '<button class="btn-delete-small" onclick="deleteRetailerAccount(\'' + key + '\', \'' + String(ret.name || key).replace(/'/g, '') + '\')">🗑️ Delete</button>' +
@@ -2282,6 +2283,33 @@
           console.error('Retailer list error:', err);
           tbody.innerHTML = '<tr><td colspan="6" style="color:#dc2626;">Retailer list load nahi hui: ' + String(err.message || err) + '</td></tr>';
         }
+    }
+
+    async function adminResetRetailerPassword(mob, name) {
+      if (!activeUser || activeUser.role !== 'admin') { alert('Sirf Admin password reset kar sakta hai.'); return; }
+      var newPass = prompt('Retailer: ' + name + '\\nNaya password darj karein (kam se kam 6 characters):');
+      if (newPass === null) return;
+      newPass = String(newPass).trim();
+      if (newPass.length < 6) { alert('Password kam se kam 6 characters ka hona chahiye.'); return; }
+      var confirmPass = prompt('Naya password dobara darj karke confirm karein:');
+      if (confirmPass === null) return;
+      if (newPass !== String(confirmPass).trim()) { alert('Dono password match nahi karte.'); return; }
+      if (!confirm(name + ' (' + mob + ') ka password reset karein? Wallet aur orders par koi asar nahi padega.')) return;
+      try {
+        var url = FIREBASE_URL + '/retailers/' + encodeURIComponent(mob) + '.json';
+        var getRes = await fetch(url);
+        if (!getRes.ok) throw new Error('Retailer record load nahi hua (HTTP ' + getRes.status + ').');
+        var record = await getRes.json();
+        if (!record) throw new Error('Retailer account nahi mila.');
+        var saveRes = await fetch(url, { method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify({pass:newPass}) });
+        if (!saveRes.ok) throw new Error('Password Firebase mein save nahi hua.');
+        record.pass = newPass;
+        var allRetailers = getSafeLocalData('all_portal_retailers') || {};
+        allRetailers[mob] = record;
+        setSafeLocalData('all_portal_retailers', allRetailers);
+        setSafeLocalData('user_' + mob, record);
+        alert('Password reset ho gaya. Retailer ab naye password se login kar sakta hai.');
+      } catch (err) { alert('Password reset nahi hua: ' + (err.message || 'Firebase error')); }
     }
 
     async function deductRetailerWallet(mob, name) {
