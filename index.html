@@ -572,6 +572,16 @@
   </div>
 
   <div id="dashboardView">
+      <div class="module-card" id="retailerAccountBox" style="display:none;border-top:5px solid #2563eb;max-width:650px;margin:20px auto;padding:24px;background:#fff;border-radius:16px;box-shadow:0 10px 28px rgba(15,23,42,.08);">
+        <h2 style="color:#1d4ed8;margin:0 0 8px;">👤 My Account</h2>
+        <p style="color:#64748b;margin:0 0 18px;">अपनी Retailer ID का पासवर्ड यहाँ से बदलें।</p>
+        <div style="background:#eff6ff;border-radius:10px;padding:12px;margin-bottom:18px;line-height:1.8;"><strong>Retailer:</strong> <span id="accountRetailerName">—</span><br><strong>User ID:</strong> <span id="accountRetailerId">—</span></div>
+        <h3 style="font-size:17px;color:#0f172a;margin:0 0 12px;">🔐 Change Password</h3>
+        <div class="input-group"><label>Current Password</label><input type="password" id="retailerCurrentPass" autocomplete="current-password" placeholder="अभी वाला पासवर्ड"></div>
+        <div class="input-group"><label>New Password</label><input type="password" id="retailerNewPass" autocomplete="new-password" placeholder="नया पासवर्ड (कम से कम 6 अक्षर)"></div>
+        <div class="input-group"><label>Confirm New Password</label><input type="password" id="retailerConfirmPass" autocomplete="new-password" placeholder="नया पासवर्ड दोबारा लिखें"></div>
+        <button type="button" class="btn-submit" id="btnChangeRetailerPass" onclick="changeRetailerPassword()" style="background:linear-gradient(90deg,#2563eb,#7c3aed);">🔒 Update Password</button>
+      </div>
 
       <!-- MASTER ADMIN HOME PAGE -->
       <div class="module-card" id="adminHomeBox" style="display:none;border-top-color:#0f766e;">
@@ -1458,7 +1468,7 @@
       var actionBox = document.getElementById('orderClearanceActionBox');
       if (actionBox) actionBox.style.display = 'none';
       document.body.classList.remove('orders-only');
-      var ids = ['adminHomeBox', 'retailerHomeBox', 'adminOrdersBox', 'adminRechargeBox', 'adminLedgerBox', 'retailerOrdersBox', 'adminRetailerBox', 'formOrderBox', 'formRechargeBox'];
+      var ids = ['retailerAccountBox', 'adminHomeBox', 'retailerHomeBox', 'adminOrdersBox', 'adminRechargeBox', 'adminLedgerBox', 'retailerOrdersBox', 'adminRetailerBox', 'formOrderBox', 'formRechargeBox'];
       ids.forEach(function(id) {
         var el = document.getElementById(id);
         if (el) el.style.display = 'none';
@@ -1751,8 +1761,39 @@
     }
 
     function showRetailerAccount() {
-      if (!activeUser || activeUser.role === 'admin') return;
-      alert('Retailer: ' + (activeUser.name || '') + '\nMobile / User ID: ' + (activeUser.mobile || activeUser.id || '') + '\nWallet balance top bar mein dekhein.');
+      if (!activeUser || activeUser.role !== 'retailer') return;
+      closeAllModules();
+      document.getElementById('accountRetailerName').textContent = activeUser.name || '—';
+      document.getElementById('accountRetailerId').textContent = activeUser.mobile || activeUser.id || '—';
+      ['retailerCurrentPass','retailerNewPass','retailerConfirmPass'].forEach(function(id) { var el=document.getElementById(id); if(el) el.value=''; });
+      var box=document.getElementById('retailerAccountBox');
+      if(box){box.style.display='block';box.scrollIntoView({behavior:'smooth',block:'start'});}
+    }
+
+    async function changeRetailerPassword() {
+      if (!activeUser || activeUser.role !== 'retailer') { alert('Pehle retailer login karein.'); return; }
+      var current=document.getElementById('retailerCurrentPass').value || '';
+      var next=document.getElementById('retailerNewPass').value || '';
+      var confirm=document.getElementById('retailerConfirmPass').value || '';
+      if(!current || !next || !confirm){alert('तीनों password field भरें।');return;}
+      if(next.length<6){alert('नया पासवर्ड कम से कम 6 अक्षर का होना चाहिए।');return;}
+      if(next!==confirm){alert('नया पासवर्ड और Confirm Password एक जैसे नहीं हैं।');return;}
+      if(current===next){alert('नया पासवर्ड पुराने पासवर्ड से अलग रखें।');return;}
+      var btn=document.getElementById('btnChangeRetailerPass');btn.disabled=true;btn.textContent='Updating...';
+      try {
+        var url=FIREBASE_URL+'/retailers/'+encodeURIComponent(activeUser.id)+'.json';
+        var response=await fetch(url);if(!response.ok)throw new Error('Retailer account load nahi ho saka.');
+        var record=await response.json();if(!record)throw new Error('Retailer account nahi mila.');
+        var saved=record.pass!=null?String(record.pass):(record.password!=null?String(record.password):(record.loginPassword!=null?String(record.loginPassword):''));
+        if(!saved || saved!==current)throw new Error('Current password galat hai.');
+        var update=await fetch(url,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({pass:next})});
+        if(!update.ok)throw new Error('Password update nahi ho saka. Dobara try karein.');
+        record.pass=next;var all=getSafeLocalData('all_portal_retailers')||{};all[activeUser.id]=record;
+        setSafeLocalData('all_portal_retailers',all);setSafeLocalData('user_'+activeUser.id,record);
+        ['retailerCurrentPass','retailerNewPass','retailerConfirmPass'].forEach(function(id){document.getElementById(id).value='';});
+        alert('✅ आपका Retailer Password सफलतापूर्वक बदल गया है। अगली बार नए पासवर्ड से Login करें।');
+      } catch(err){alert(err.message||'Password update mein dikkat aayi.');}
+      finally{btn.disabled=false;btn.textContent='🔒 Update Password';}
     }
 
     function openRetailerServicesPanel() {
