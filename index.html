@@ -3150,8 +3150,9 @@
         var myPhone = String(activeUser.mobile || activeUser.id || '').trim();
         var rows = Object.keys(all || {}).map(function(key) { return { key: key, order: all[key] || {} }; }).filter(function(item) {
           var o = item.order;
-          if (!o.verificationRequired || o.finalSubmitted) return false;
+          if (o.finalSubmitted) return false;
           if (['Refunded', 'Rejected_Refund', 'Completed'].indexOf(o.status) >= 0) return false;
+          if (['Pending', 'Processing'].indexOf(String(o.status || 'Pending')) < 0) return false;
           return isAdmin || String(o.retailerPhone || '').trim() === myPhone || String(o.retailerPhone || '').trim() === String(activeUser.id || '').trim();
         }).reverse();
         if (!rows.length) {
@@ -3213,7 +3214,7 @@
         if (!valid) throw new Error('Har field par Admin aur Retailer dono ka ✓ सही hona zaroori hai.');
         var patch = await fetch(FIREBASE_URL + '/service_orders/' + encodeURIComponent(orderKey) + '.json', {
           method: 'PATCH', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ finalSubmitted: true, finalSubmittedAt: new Date().toLocaleString(), finalSubmittedBy: activeUser.name || activeUser.id })
+          body: JSON.stringify({ verificationRequired: true, finalSubmitted: true, finalSubmittedAt: new Date().toLocaleString(), finalSubmittedBy: activeUser.name || activeUser.id })
         });
         if (!patch.ok) throw new Error('Final submit update nahi hua.');
         alert('Order Final Submitted mark ho gaya.');
