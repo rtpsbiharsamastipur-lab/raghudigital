@@ -2773,7 +2773,59 @@
         var content = document.getElementById('panManualSlipPrint').innerHTML;
         var win = window.open('', '_blank');
         if (!win) { alert('Print window block ho gaya. Browser mein pop-ups allow karein.'); return; }
-        win.document.write('<!doctype html><html><head><title>Manual PAN Customer Copy</title><meta charset="utf-8"><style>body{font-family:Arial,sans-serif;padding:20px}table{width:100%;border-collapse:collapse}tr{break-inside:avoid}@page{size:A4 landscape;margin:10mm}@media print{body{padding:0}}</style></head><body>'+content+'</body></html>');
+        win.document.write('<!doctype html><html><head><title>Manual PAN Customer Copy</title><meta charset="utf-8"><style>body{font-family:Arial,sans-serif;padding:20px}table{width:100%;border-collapse:collapse}tr{break-inside:avoid}@page{size:A4 landscape;margin:10mm}@media print{body{padding:0}}
+    /* Login screen refreshed: calm navy + teal professional theme */
+    body:has(#loginBox:not([style*="display: none"])),
+    body:has(#regBox:not([style*="display: none"])) {
+      background: linear-gradient(135deg,#e8f1f7 0%,#edf7f5 52%,#e2edf4 100%) !important;
+      background-attachment: fixed !important;
+    }
+    #loginBox, #regBox {
+      background: #ffffff !important;
+      border: 1px solid #d6e4ec !important;
+      border-top: 6px solid #0f766e !important;
+      border-radius: 16px !important;
+      box-shadow: 0 16px 38px rgba(15,42,58,.14) !important;
+      backdrop-filter: none !important;
+    }
+    #loginBox h2, #regBox h2 {
+      background: none !important;
+      color: #16324a !important;
+      -webkit-text-fill-color: #16324a !important;
+    }
+    #loginBox p.subtitle, #regBox p.subtitle { color:#647b89 !important; }
+    #loginBox .input-group label, #regBox .input-group label { color:#294657 !important; }
+    #loginBox .input-group input, #regBox .input-group input,
+    #loginBox .input-group select, #regBox .input-group select {
+      background:#f7fafc !important;
+      border:1.5px solid #cbdce5 !important;
+      box-shadow:none !important;
+    }
+    #loginBox .input-group input:focus, #regBox .input-group input:focus {
+      border-color:#0f8b83 !important;
+      box-shadow:0 0 0 3px rgba(15,139,131,.12) !important;
+    }
+    #loginBox #chooseRetailerLogin {
+      background:#0f766e !important;
+      color:#fff !important;
+      border:0 !important;
+      box-shadow:0 5px 12px rgba(15,118,110,.16) !important;
+    }
+    #loginBox #chooseAdminLogin {
+      background:#244b70 !important;
+      color:#fff !important;
+      border:0 !important;
+      box-shadow:0 5px 12px rgba(36,75,112,.16) !important;
+    }
+    #loginBox .btn-submit, #regBox .btn-submit {
+      background:#0f766e !important;
+      color:#fff !important;
+      box-shadow:0 5px 12px rgba(15,118,110,.16) !important;
+    }
+    #loginBox .switch-tab a, #regBox .switch-tab a,
+    #loginBox .forgot-password-link { color:#0f766e !important; }
+
+  </style></head><body>'+content+'</body></html>');
         win.document.close(); win.focus(); win.print();
       };
     }
