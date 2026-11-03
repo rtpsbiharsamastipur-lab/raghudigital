@@ -3123,6 +3123,97 @@
       renderServiceListRows(window.currentServiceListRows || []);
     }
 
+    function openVerificationList() {
+      if (!activeUser) return;
+      closeAllModules();
+      var box = document.getElementById('verificationListBox');
+      if (box) { box.style.display = 'block'; box.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+      fetchVerificationList();
+    }
+
+    function fetchVerificationList() {
+      var host = document.getElementById('verificationListContent');
+      if (!host || !activeUser) return;
+      host.innerHTML = '<p style="padding:12px;color:#64748b;">Verification orders load ho rahe hain...</p>';
+      fetch(FIREBASE_URL + '/service_orders.json').then(function(res) {
+        if (!res.ok) throw new Error('Orders load nahi hue');
+        return res.json();
+      }).then(function(all) {
+        var isAdmin = activeUser.role === 'admin';
+        var myPhone = String(activeUser.mobile || activeUser.id || '').trim();
+        var rows = Object.keys(all || {}).map(function(key) { return { key: key, order: all[key] || {} }; }).filter(function(item) {
+          var o = item.order;
+          if (!o.verificationRequired || o.finalSubmitted) return false;
+          if (['Refunded', 'Rejected_Refund', 'Completed'].indexOf(o.status) >= 0) return false;
+          return isAdmin || String(o.retailerPhone || '').trim() === myPhone || String(o.retailerPhone || '').trim() === String(activeUser.id || '').trim();
+        }).reverse();
+        if (!rows.length) {
+          host.innerHTML = '<div style="padding:22px;text-align:center;background:#f8fafc;border-radius:10px;color:#64748b;">Abhi koi customer data verification pending nahi hai.</div>';
+          return;
+        }
+        function esc(v) { return String(v == null ? '' : v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+        var html = '';
+        rows.forEach(function(item) {
+          var o = item.order, fd = o.formData || {}, verify = o.verification || {};
+          var keys = Object.keys(fd), allBoth = keys.length > 0, hasWrong = false;
+          var fieldsHtml = keys.map(function(key) {
+            var val = fd[key], fileValue = typeof val === 'string' && (val.indexOf('data:') === 0 || val.indexOf('https://') === 0 || val.indexOf('http://') === 0);
+            var display = fileValue ? '📎 File uploaded' : String(val == null ? '' : val);
+            if (display.length > 180) display = display.slice(0,180) + '…';
+            var state = verify[key] || {}, mine = state[isAdmin ? 'admin' : 'retailer'] || '';
+            if (state.admin !== 'correct' || state.retailer !== 'correct') allBoth = false;
+            if (state.admin === 'incorrect' || state.retailer === 'incorrect') hasWrong = true;
+            var buttons = '<button type="button" onclick="setVerificationField(\'' + esc(item.key) + '\',\'' + esc(key) + '\',\'correct\')" style="background:' + (mine === 'correct' ? '#059669' : '#dcfce7') + ';color:' + (mine === 'correct' ? '#fff' : '#166534') + ';border:0;border-radius:6px;padding:6px 9px;font-weight:800;">✓ सही</button> ' +
+              '<button type="button" onclick="setVerificationField(\'' + esc(item.key) + '\',\'' + esc(key) + '\',\'incorrect\')" style="background:' + (mine === 'incorrect' ? '#dc2626' : '#fee2e2') + ';color:' + (mine === 'incorrect' ? '#fff' : '#991b1b') + ';border:0;border-radius:6px;padding:6px 9px;font-weight:800;">✕ गलत</button>';
+            return '<div style="display:grid;grid-template-columns:minmax(120px,1fr) minmax(160px,2fr) auto;gap:9px;align-items:center;padding:9px;border-bottom:1px solid #e2e8f0;"><strong style="font-size:12px;color:#334155;">' + esc(key.replace(/_/g,' ')) + '</strong><span style="font-size:13px;word-break:break-word;">' + esc(display) + '</span><span style="display:flex;gap:5px;flex-wrap:wrap;">' + buttons + '</span></div>';
+          }).join('');
+          var finalBtn = isAdmin ? '<button type="button" ' + (allBoth && !hasWrong ? '' : 'disabled') + ' onclick="finalSubmitVerifiedOrder(\'' + esc(item.key) + '\')" style="margin-top:12px;background:' + (allBoth && !hasWrong ? '#059669' : '#94a3b8') + ';color:#fff;border:0;border-radius:8px;padding:10px 16px;font-weight:900;">🚀 Final Submitted</button>' : '<span style="font-size:12px;color:#64748b;">Admin aur Retailer dono ke har field par ✓ सही ke baad Admin Final Submitted karega.</span>';
+          html += '<div style="border:1px solid #c4b5fd;border-radius:12px;padding:14px;margin-bottom:14px;background:#fff;"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;"><div><strong style="color:#4c1d95;">' + esc(o.orderId || item.key) + ' — ' + esc(o.serviceName || 'Service') + '</strong><div style="font-size:12px;color:#64748b;margin-top:4px;">Retailer: ' + esc(o.retailerName || '') + ' (' + esc(o.retailerPhone || '') + ') | Charge: ₹' + esc(o.charge || 0) + '</div></div><span style="font-size:12px;font-weight:900;color:#b45309;">VERIFICATION PENDING</span></div><div style="margin-top:10px;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;">' + fieldsHtml + '</div><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">' + finalBtn + '<small style="color:#64748b;">Galat data ko retailer edit kare; edit ke baad dono dobara verify karein.</small></div></div>';
+        });
+        host.innerHTML = html;
+      }).catch(function(err) {
+        host.innerHTML = '<p style="padding:12px;color:#b91c1c;">Verification list load nahi hui: ' + String(err.message || err) + '</p>';
+      });
+    }
+
+    async function setVerificationField(orderKey, fieldKey, verdict) {
+      if (!activeUser || ['correct','incorrect'].indexOf(verdict) < 0) return;
+      try {
+        var role = activeUser.role === 'admin' ? 'admin' : 'retailer';
+        var update = {};
+        update[role] = verdict;
+        update[role + 'At'] = new Date().toLocaleString();
+        update[role + 'By'] = activeUser.name || activeUser.id;
+        var res = await fetch(FIREBASE_URL + '/service_orders/' + encodeURIComponent(orderKey) + '/verification/' + encodeURIComponent(fieldKey) + '.json', {
+          method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(update)
+        });
+        if (!res.ok) throw new Error('Save failed');
+        fetchVerificationList();
+      } catch (err) {
+        alert('Verification save nahi hua. Firebase Rules check karein.');
+      }
+    }
+
+    async function finalSubmitVerifiedOrder(orderKey) {
+      if (!activeUser || activeUser.role !== 'admin') { alert('Final Submitted sirf Admin kar sakta hai.'); return; }
+      if (!confirm('Kya Admin aur Retailer dono ne har field sahi verify kar liya hai?')) return;
+      try {
+        var res = await fetch(FIREBASE_URL + '/service_orders/' + encodeURIComponent(orderKey) + '.json');
+        if (!res.ok) throw new Error('Order load nahi hua.');
+        var order = await res.json(), fd = order && order.formData || {}, verify = order && order.verification || {};
+        var keys = Object.keys(fd);
+        var valid = keys.length > 0 && keys.every(function(key) { return verify[key] && verify[key].admin === 'correct' && verify[key].retailer === 'correct'; });
+        if (!valid) throw new Error('Har field par Admin aur Retailer dono ka ✓ सही hona zaroori hai.');
+        var patch = await fetch(FIREBASE_URL + '/service_orders/' + encodeURIComponent(orderKey) + '.json', {
+          method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ finalSubmitted: true, finalSubmittedAt: new Date().toLocaleString(), finalSubmittedBy: activeUser.name || activeUser.id })
+        });
+        if (!patch.ok) throw new Error('Final submit update nahi hua.');
+        alert('Order Final Submitted mark ho gaya.');
+        fetchVerificationList();
+      } catch (err) { alert(err.message || 'Final submit nahi hua.'); }
+    }
+
     function openRetailerOrdersPanel() {
       closeAllModules();
       document.body.classList.add('orders-only');
