@@ -890,6 +890,7 @@
               <tr>
                 <th>Order ID</th>
                 <th>Service</th>
+                <th>Customer / Candidate Name</th>
                 <th>Date &amp; Time</th>
                 <th>Charge</th>
                 <th>Status</th>
@@ -3163,7 +3164,7 @@
 
     function fetchRetailerMyOrders() {
       var tbody = document.getElementById('retailerOrdersTableBody');
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #64748b;">Aapke orders fetch ho rahe hain...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #64748b;">Aapke orders fetch ho rahe hain...</td></tr>';
 
       fetch(FIREBASE_URL + "/service_orders.json")
         .then(function(res) { return res.json(); })
@@ -3180,7 +3181,7 @@
           }
 
           if (myOrders.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #ef4444;">Aapne abhi tak koi order nahi lagaya hai.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #ef4444;">Aapne abhi tak koi order nahi lagaya hai.</td></tr>';
             return;
           }
 
@@ -3203,11 +3204,21 @@
               (o.deliveryResult.startsWith('data:') || o.deliveryResult.startsWith('http') ? '<a href="' + o.deliveryResult + '" target="_blank" download="Receipt_' + o.orderId + '" style="color: #059669; font-weight: bold; background: #dcfce7; padding: 6px 12px; border-radius: 4px; text-decoration: none; display:inline-block;">📥 Download / Print Slip</a>' : '<strong style="color:#0f172a;">' + o.deliveryResult + '</strong>') 
               : '<span style="color:#94a3b8;">Kaam chal raha hai...</span>';
 
+            var formData = o.formData && typeof o.formData === 'object' ? o.formData : {};
+            var customerName = formData.NAME || formData.FULL_NAME || formData.APPLICANT_NAME || formData.CUSTOMER_NAME || formData.NAME_AS_PER_AADHAAR || formData.name || formData.applicantName || formData.customerName || '';
+            var customerFather = formData.FATHER_NAME || formData.FATHERNAME || formData.FATHER || formData.fatherName || '';
+            var escapeOrderText = function(value) {
+              return String(value == null ? '' : value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+            };
+            var customerHtml = customerName
+              ? '<strong style="color:#0f172a;">' + escapeOrderText(customerName) + '</strong>' + (customerFather ? '<br><small style="color:#64748b;">Father: ' + escapeOrderText(customerFather) + '</small>' : '')
+              : '<span style="color:#94a3b8;font-size:12px;">Name not entered</span>';
             var tr = document.createElement('tr');
             tr.innerHTML = 
-              '<td><strong>' + o.orderId + '</strong></td>' +
-              '<td><strong style="color: #1e40af;">' + o.serviceName + '</strong></td>' +
-              '<td>' + (o.date || '') + '</td>' +
+              '<td><strong>' + escapeOrderText(o.orderId || '') + '</strong></td>' +
+              '<td><strong style="color: #1e40af;">' + escapeOrderText(o.serviceName || '') + '</strong></td>' +
+              '<td>' + customerHtml + '</td>' +
+              '<td>' + escapeOrderText(o.date || '') + '</td>' +
               '<td>₹' + o.charge + '</td>' +
               '<td><span class="' + stClass + '">' + stLabel + '</span></td>' +
               '<td>' + dlHtml + '</td>';
