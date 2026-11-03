@@ -2272,7 +2272,7 @@
               '<td><strong style="color: #059669; font-size:14px;">₹' + Number(ret.wallet || 0).toFixed(2) + '</strong></td>' +
               '<td>' +
                 '<button class="btn-action-small" onclick="updateRetailerEmail(\'' + key + '\')">✉️ Email</button>' +
-              '<button class="btn-action-small" style="background:#7c3aed;" onclick="adminResetRetailerPassword(\\'' + key + '\\', \\' ' + String(ret.name || key).replace(/'/g, '') + '\\')">🔑 Reset Password</button>' +
+                '<button class="btn-action-small" style="background:#7c3aed;" onclick="adminResetRetailerPassword(\'' + key + '\', \'' + String(ret.name || key).replace(/'/g, '') + '\')">🔑 Reset Password</button>' +
               '<button class="btn-action-small" onclick="prepareTransfer(\'' + key + '\')">➕ Transfer</button>' +
                 '<button class="btn-action-small" style="background:#b45309;" onclick="deductRetailerWallet(\'' + key + '\', \'' + String(ret.name || key).replace(/'/g, '') + '\')">➖ Deduct</button>' +
                 '<button class="btn-delete-small" onclick="deleteRetailerAccount(\'' + key + '\', \'' + String(ret.name || key).replace(/'/g, '') + '\')">🗑️ Delete</button>' +
