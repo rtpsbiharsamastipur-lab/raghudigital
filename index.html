@@ -463,6 +463,7 @@
       <button class="btn-bar-action btn-admin-ledger" id="btnAdminLedger" onclick="openAdminLedgerPanel()">📊 Din Bhar Ka Khata</button>
       <button class="btn-bar-action btn-admin-manage" id="btnAdminPanel" onclick="openAdminPanel()">👑 Retailers</button>
       <button class="btn-bar-action btn-my-orders" id="btnMyOrders" onclick="openRetailerOrdersPanel()">📑 Mere Orders</button>
+      <button class="btn-bar-action" id="btnVerificationList" onclick="openVerificationList()" style="background:#7c3aed;color:#fff;">🧾 Data Verify List</button>
       <div class="wallet-pill" id="barWalletPill" onclick="openRechargeModule()">💰 Wallet: ₹<span id="barWalletAmt">0.00</span> ➕</div>
       <button class="btn-bar-action btn-exit" onclick="doLogout()">Logout</button>
     </div>
@@ -474,6 +475,7 @@
     <button class="retailer-side-link" onclick="openOfficialAllPortal()">🌐 अधिकृत All Portal</button>
     <button class="retailer-side-link" onclick="openRetailerServicesPanel()">🧾 Digital Services</button>
     <button class="retailer-side-link" onclick="openRetailerOrdersPanel()">📑 My Orders</button>
+    <button class="retailer-side-link" onclick="openVerificationList()">🧾 Data Verify List</button>
     <button class="retailer-side-link" onclick="openRetailerRechargePanel()">💳 Wallet / Recharge</button>
     <button class="retailer-side-link" onclick="showRetailerAccount()">👤 My Account</button>
     <button class="retailer-side-link" onclick="doLogout()">↪ Logout</button>
@@ -864,6 +866,7 @@
         </div>
       </div>
 
+      <div class="module-card" id="verificationListBox" style="display:none;border-top-color:#7c3aed;"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:15px;"><div><h3 style="color:#5b21b6;font-size:19px;">🧾 Customer Data Verification List</h3><p style="font-size:13px;color:#64748b;">Retailer aur Admin har field ko check karenge. Sabhi field sahi hone par Admin Final Submitted karega.</p></div><div><button type="button" class="c-btn btn-open" onclick="fetchVerificationList()">🔄 Refresh</button> <button type="button" class="btn-exit" onclick="closeAllModules()">Close</button></div></div><div id="verificationListContent">Verification list load ho rahi hai...</div></div>
       <!-- RETAILER EXCLUSIVE: MY ORDERS & REFUND STATUS -->
       <div class="module-card" id="retailerOrdersBox" style="border-top-color: #0284c7; display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
@@ -1458,7 +1461,7 @@
       var actionBox = document.getElementById('orderClearanceActionBox');
       if (actionBox) actionBox.style.display = 'none';
       document.body.classList.remove('orders-only');
-      var ids = ['adminHomeBox', 'retailerHomeBox', 'adminOrdersBox', 'adminRechargeBox', 'adminLedgerBox', 'retailerOrdersBox', 'adminRetailerBox', 'formOrderBox', 'formRechargeBox'];
+      var ids = ['adminHomeBox', 'retailerHomeBox', 'adminOrdersBox', 'adminRechargeBox', 'adminLedgerBox', 'retailerOrdersBox', 'verificationListBox', 'adminRetailerBox', 'formOrderBox', 'formRechargeBox'];
       ids.forEach(function(id) {
         var el = document.getElementById(id);
         if (el) el.style.display = 'none';
@@ -1652,6 +1655,7 @@
         document.getElementById('btnAdminRecharge').style.display = 'inline-block';
         document.getElementById('btnAdminLedger').style.display = 'inline-block';
         document.getElementById('btnMyOrders').style.display = 'none';
+        document.getElementById('btnVerificationList').style.display = 'inline-block';
         document.getElementById('barWalletPill').style.display = 'none';
         document.getElementById('retailerServicesSection').style.display = 'none';
         openAdminHomePanel();
@@ -1664,6 +1668,7 @@
         document.getElementById('btnAdminRecharge').style.display = 'none';
         document.getElementById('btnAdminLedger').style.display = 'none';
         document.getElementById('btnMyOrders').style.display = 'inline-block';
+        document.getElementById('btnVerificationList').style.display = 'inline-block';
         document.getElementById('barWalletPill').style.display = 'inline-block';
         document.getElementById('retailerServicesSection').style.display = 'none';
         renderServicesGrid();
@@ -2802,7 +2807,7 @@
         try {
           var patchResponse = await fetch(FIREBASE_URL + "/service_orders/" + encodeURIComponent(window.editingOrderKey) + ".json", {
             method: "PATCH", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ formData: formDataMap, updatedAt: new Date().toLocaleString() })
+            body: JSON.stringify({ formData: formDataMap, verification: {}, finalSubmitted: false, verificationResetAt: new Date().toLocaleString(), updatedAt: new Date().toLocaleString() })
           });
           if (!patchResponse.ok) throw new Error("Update failed");
           alert("✅ Application details update ho gaye. Wallet se dobara charge nahi kata.");
@@ -2831,6 +2836,9 @@
         retailerPhone: activeUser.mobile || activeUser.id,
         charge: charge,
         formData: formDataMap,
+        verificationRequired: true,
+        verification: {},
+        finalSubmitted: false,
         status: "Pending",
         deliveryResult: "",
         date: new Date().toLocaleString()
