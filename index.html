@@ -1336,39 +1336,62 @@
     async function handleLoginAction() {
       var enteredId = (document.getElementById('loginId').value || '').trim();
       if (!enteredId) { alert('Apni User ID darj karein.'); return; }
-      if (enteredId.toLowerCase() === 'admin') {
+
+      var isAdmin = enteredId.toLowerCase() === 'admin';
+      if (isAdmin) {
         var adminPass = document.getElementById('adminLoginPass').value || '';
         if (!adminPass) { alert('Admin password darj karein.'); return; }
         if (adminPass !== 'admin123') { alert('Admin password galat hai.'); return; }
         activeUser = { role:'admin', id:'admin', name:'Master Admin (Raghu Baba)', mobile:'8207827581', wallet:99999 };
-        setSafeLocalData('raghu_active_user', activeUser); openDashboardPanel(); showLoginSuccess(); return;
+        setSafeLocalData('raghu_active_user', activeUser);
+        openDashboardPanel(); showLoginSuccess(); return;
       }
+
       var retailerPass = document.getElementById('retailerLoginPass').value || '';
       if (!retailerPass) { alert('Retailer password darj karein.'); return; }
       var btn = document.getElementById('btnSignIn');
-      btn.disabled = true; btn.textContent = 'Account check ho raha hai...';
+      if (btn) { btn.disabled = true; btn.textContent = 'Account check ho raha hai...'; }
+
+      async function loginFetch(url) {
+        var controller = new AbortController();
+        var timer = setTimeout(function(){ controller.abort(); }, 12000);
+        try {
+          return await fetch(url, { method:'GET', cache:'no-store', signal:controller.signal });
+        } catch(fetchError) {
+          if (fetchError && fetchError.name === 'AbortError') throw new Error('Firebase se jawab nahi aa raha hai (12 second timeout). Internet/Firebase connection check karein.');
+          throw new Error('Firebase connection nahi ho pa raha hai. Internet check karke dobara try karein.');
+        } finally { clearTimeout(timer); }
+      }
+
       try {
         var found = null;
-        var directRes = await fetch(FIREBASE_URL + '/retailers/' + encodeURIComponent(enteredId) + '.json');
-        if (!directRes.ok) throw new Error('Firebase se account verify nahi ho saka (HTTP ' + directRes.status + ').');
+        var directRes = await loginFetch(FIREBASE_URL + '/retailers/' + encodeURIComponent(enteredId) + '.json');
+        if (!directRes.ok) throw new Error('Firebase account check failed (HTTP ' + directRes.status + ').');
         var directData = await directRes.json();
-        if (directData && typeof directData === 'object') found = {accountKey:enteredId, mobile:String(directData.mobile || enteredId).replace(/\D/g,''), data:directData};
+        if (directData && typeof directData === 'object') {
+          found = {accountKey:enteredId, mobile:String(directData.mobile || enteredId).replace(/\\D/g,''), data:directData};
+        }
+
         if (!found) {
-          var allRes = await fetch(FIREBASE_URL + '/retailers.json');
+          var allRes = await loginFetch(FIREBASE_URL + '/retailers.json');
           if (!allRes.ok) throw new Error('Retailer list load nahi hui (HTTP ' + allRes.status + ').');
           var all = await allRes.json() || {};
           Object.keys(all).some(function(key) {
             var item = all[key] || {};
-            if (String(item.userId || '').trim() === enteredId || String(item.userID || '').trim() === enteredId || String(item.username || '').trim() === enteredId || String(item.id || '').trim() === enteredId) {
-              found = {accountKey:key, mobile:String(item.mobile || key).replace(/\D/g,''), data:item}; return true;
+            var ids = [item.userId, item.userID, item.username, item.id, item.mobile, key];
+            if (ids.some(function(value){ return String(value == null ? '' : value).trim() === enteredId; })) {
+              found = {accountKey:key, mobile:String(item.mobile || key).replace(/\\D/g,''), data:item};
+              return true;
             }
             return false;
           });
         }
-        if (!found) throw new Error('Retailer ID nahi mili. Apni registered User ID check karein.');
+
+        if (!found) throw new Error('Retailer ID nahi mili. Registered mobile/User ID check karein.');
         var savedPass = found.data.pass != null ? String(found.data.pass) : (found.data.password != null ? String(found.data.password) : (found.data.loginPassword != null ? String(found.data.loginPassword) : ''));
         if (!savedPass) throw new Error('Is Retailer ID ka password record nahi mila. Admin se password reset karwayein.');
         if (savedPass !== retailerPass) throw new Error('Retailer password galat hai.');
+
         var allRetailers = getSafeLocalData('all_portal_retailers') || {};
         allRetailers[found.accountKey] = found.data;
         setSafeLocalData('all_portal_retailers', allRetailers);
@@ -1377,10 +1400,16 @@
         setSafeLocalData('raghu_active_user', activeUser);
         document.getElementById('loginId').value = '';
         document.getElementById('retailerLoginPass').value = '';
-        openDashboardPanel(); showRetailerWarningModal();
-      } catch(err) { alert(err.message || 'Login nahi ho saka. Network check karke dobara try karein.'); }
-      finally { btn.disabled = false; btn.textContent = '🔐 Retailer Login करें'; }
+        openDashboardPanel();
+        showRetailerWarningModal();
+      } catch(err) {
+        console.error('Retailer login error:', err);
+        alert(err.message || 'Login nahi ho saka. Network check karke dobara try karein.');
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = '🔐 Retailer Login करें'; }
+      }
     }
+
     function verifyLoginOtp() {
       var otp = (document.getElementById('loginOtp').value || '').trim();
       if (!loginConfirmationResult || !loginTargetAccount) {
