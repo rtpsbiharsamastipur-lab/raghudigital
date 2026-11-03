@@ -2956,42 +2956,61 @@
       content.innerHTML = '<p style="padding:12px;color:#64748b;">Service list load ho rahi hai...</p>';
       box.style.display = 'block';
       box.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      var activePhone = String(activeUser.mobile || activeUser.id).trim();
-      fetch(FIREBASE_URL + '/service_orders.json')
-        .then(function(res) { if (!res.ok) throw new Error('Orders load failed'); return res.json(); })
-        .then(function(allOrders) {
-          var matches = [];
-          Object.keys(allOrders || {}).forEach(function(key) {
-            var order = allOrders[key] || {};
-            var phone = String(order.retailerPhone || '').trim();
-            var sameRetailer = phone === activePhone || phone === String(activeUser.id).trim();
-            var sameService = order.serviceId === serviceId || (!order.serviceId && order.serviceName === service.name);
-            if (sameRetailer && sameService) matches.push(order);
-          });
-          matches.sort(function(a,b) { return parseOrderDateForList(b.date) - parseOrderDateForList(a.date); });
-          window.currentServiceListRows = matches;
-          var safe = function(value) { return String(value == null ? '' : value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); };
-          var serviceListColumns = getServiceListColumns(serviceId, matches);
-          var tableHeaders = serviceListColumns.map(function(col) {
-            return '<th style="background:#10c6dc;color:#071827;padding:15px 10px;font-size:11px;text-align:center;">' + safe(col.label) + '</th>';
-          }).join('');
-          var html = '<div style="display:flex;gap:14px;align-items:end;flex-wrap:wrap;margin:4px 0 18px;padding:14px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;">' +
-            '<div style="flex:1;min-width:180px;"><label for="serviceListFromDate" style="display:block;font-size:12px;color:#475569;margin-bottom:6px;">FROM DATE</label><input id="serviceListFromDate" type="date" style="width:100%;padding:9px;border:1px solid #cbd5e1;border-radius:5px;"></div>' +
-            '<div style="flex:1;min-width:180px;"><label for="serviceListToDate" style="display:block;font-size:12px;color:#475569;margin-bottom:6px;">TO DATE</label><input id="serviceListToDate" type="date" style="width:100%;padding:9px;border:1px solid #cbd5e1;border-radius:5px;"></div>' +
-            '<button type="button" onclick="filterServiceListRows()" style="background:#078bff;color:#fff;border:0;padding:10px 18px;border-radius:5px;font-weight:800;cursor:pointer;">FILTER</button>' +
-            '<button type="button" onclick="resetServiceListFilter()" style="background:#7b8794;color:#fff;border:0;padding:10px 18px;border-radius:5px;font-weight:800;cursor:pointer;">RESET</button></div>' +
-            '<div style="overflow-x:auto;border-radius:7px;"><table style="width:100%;min-width:760px;border-collapse:separate;border-spacing:1px;background:#dbeafe;" id="serviceListTable"><thead><tr>' +
-            tableHeaders + '</tr></thead><tbody id="serviceListTableBody"></tbody></table></div>' +
-            '<p id="serviceListEmpty" style="display:none;padding:14px;text-align:center;color:#64748b;background:#fff;border-radius:8px;">Is date range mein koi record nahi mila.</p>';
-          content.innerHTML = html;
-          window.currentServiceListRows = matches;
-          window.currentServiceListServiceId = serviceId;
-          window.currentServiceListServiceName = service.name;
-          renderServiceListRows(matches);
-        })
-        .catch(function() { content.innerHTML = '<p style="padding:12px;color:#b91c1c;">Service list load nahi ho payi. Dobara try karein.</p>'; });
-    }
 
+      var activePhone = String(activeUser.mobile || activeUser.id).trim();
+      var activeId = String(activeUser.id || '').trim();
+      var safe = function(value) { return String(value == null ? '' : value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); };
+
+      function renderMatches(allOrders) {
+        var matches = [];
+        Object.keys(allOrders || {}).forEach(function(key) {
+          var order = allOrders[key] || {};
+          var phone = String(order.retailerPhone || '').trim();
+          var sameRetailer = phone === activePhone || phone === activeId;
+          var sameService = order.serviceId === serviceId || (!order.serviceId && order.serviceName === service.name);
+          if (sameRetailer && sameService) matches.push(order);
+        });
+        matches.sort(function(a,b) { return parseOrderDateForList(b.date) - parseOrderDateForList(a.date); });
+        window.currentServiceListRows = matches;
+        var serviceListColumns = getServiceListColumns(serviceId, matches);
+        var tableHeaders = serviceListColumns.map(function(col) {
+          return '<th style="background:#10c6dc;color:#071827;padding:15px 10px;font-size:11px;text-align:center;">' + safe(col.label) + '</th>';
+        }).join('');
+        var html = '<div style="display:flex;gap:14px;align-items:end;flex-wrap:wrap;margin:4px 0 18px;padding:14px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;">' +
+          '<div style="flex:1;min-width:180px;"><label for="serviceListFromDate" style="display:block;font-size:12px;color:#475569;margin-bottom:6px;">FROM DATE</label><input id="serviceListFromDate" type="date" style="width:100%;padding:9px;border:1px solid #cbd5e1;border-radius:5px;"></div>' +
+          '<div style="flex:1;min-width:180px;"><label for="serviceListToDate" style="display:block;font-size:12px;color:#475569;margin-bottom:6px;">TO DATE</label><input id="serviceListToDate" type="date" style="width:100%;padding:9px;border:1px solid #cbd5e1;border-radius:5px;"></div>' +
+          '<button type="button" onclick="filterServiceListRows()" style="background:#078bff;color:#fff;border:0;padding:10px 18px;border-radius:5px;font-weight:800;cursor:pointer;">FILTER</button>' +
+          '<button type="button" onclick="resetServiceListFilter()" style="background:#7b8794;color:#fff;border:0;padding:10px 18px;border-radius:5px;font-weight:800;cursor:pointer;">RESET</button></div>' +
+          '<div style="overflow-x:auto;border-radius:7px;"><table style="width:100%;min-width:760px;border-collapse:separate;border-spacing:1px;background:#dbeafe;" id="serviceListTable"><thead><tr>' +
+          tableHeaders + '</tr></thead><tbody id="serviceListTableBody"></tbody></table></div>' +
+          '<p id="serviceListEmpty" style="display:none;padding:14px;text-align:center;color:#64748b;background:#fff;border-radius:8px;">Is date range mein koi record nahi mila.</p>';
+        content.innerHTML = html;
+        window.currentServiceListServiceId = serviceId;
+        window.currentServiceListServiceName = service.name;
+        renderServiceListRows(matches);
+      }
+
+      // First request only this retailer's orders; if Firebase indexing/query is unavailable,
+      // fall back to the original complete order read so no existing records are lost.
+      var queryUrl = FIREBASE_URL + '/service_orders.json?orderBy=' +
+        encodeURIComponent('"retailerPhone"') + '&equalTo=' + encodeURIComponent(JSON.stringify(activePhone));
+      fetch(queryUrl)
+        .then(function(res) {
+          if (!res.ok) throw new Error('Filtered order query unavailable');
+          return res.json();
+        })
+        .then(function(orders) {
+          renderMatches(orders || {});
+        })
+        .catch(function() {
+          fetch(FIREBASE_URL + '/service_orders.json')
+            .then(function(res) { if (!res.ok) throw new Error('Orders load failed'); return res.json(); })
+            .then(renderMatches)
+            .catch(function() {
+              content.innerHTML = '<p style="padding:12px;color:#b91c1c;">Service list load nahi ho payi. Dobara try karein.</p>';
+            });
+        });
+    }
     function parseOrderDateForList(value) {
       if (!value) return 0;
       var text = String(value).trim();
