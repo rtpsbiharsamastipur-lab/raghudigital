@@ -3016,7 +3016,7 @@
       ];
       if (serviceId === 'pan_new') return [
         { key: 'serial', label: 'SN NO.' }, { key: 'nameFather', label: 'NAME & FATHER NAME' },
-        { key: 'uploads', label: 'UPLOADED PDF / DOCUMENTS' }, { key: 'date', label: 'DATE' }, { key: 'status', label: 'STATUS' }
+        { key: 'uploads', label: 'UPLOADED PDF / DOCUMENTS' }, { key: 'date', label: 'DATE' }, { key: 'result', label: 'FINAL SLIP / ADMIN MESSAGE' }, { key: 'status', label: 'STATUS' }
       ];
       return [
         { key: 'serial', label: 'SN NO.' }, { key: 'customer', label: 'CUSTOMER DETAILS' },
@@ -3089,7 +3089,7 @@
         var customerHtml = detailKeys.map(function(key) {
           return '<div style="margin:2px 0;"><strong>' + safe(key.replace(/_/g,' ')) + ':</strong> ' + safe(formData[key]) + '</div>';
         }).join('') || '<span style="color:#64748b;">—</span>';
-        var resultValue = order.adminServiceNumber || order.deliveryResult || '';
+        var resultValue = order.deliveryResult || order.adminServiceNumber || '';
         var resultHtml = resultValue ? (isFileLink(String(resultValue)) ?
           '<a href="' + safe(resultValue) + '" target="_blank" rel="noopener noreferrer" style="color:#047857;font-weight:800;">📥 View / Download Result</a>' :
           '<span style="font-weight:700;color:#0f172a;">' + safe(resultValue) + '</span>') : '<span style="color:#64748b;">—</span>';
@@ -3108,6 +3108,12 @@
           else if (col.key === 'customer') value = customerHtml;
           else if (col.key === 'result') value = resultHtml;
           else if (col.key === 'date') value = safe(order.date || '—');
+          else if (col.key === 'result') {
+            value = resultHtml;
+            if (order.adminServiceNumber && order.deliveryResult) {
+              value += '<div style="margin-top:6px;color:#334155;font-size:11px;"><strong>Service No:</strong> ' + safe(order.adminServiceNumber) + '</div>';
+            }
+          }
           else if (col.key === 'status') {
             value = '<span style="color:' + statusColor + ';font-weight:800;">' + safe(status) + '</span>';
             if (serviceId === 'pan_new') {
