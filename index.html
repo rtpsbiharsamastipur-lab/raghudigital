@@ -2831,7 +2831,6 @@
         var content = document.getElementById('panManualSlipPrint').innerHTML;
         var win = window.open('', '_blank');
         if (!win) { alert('Print window block ho gaya. Browser mein pop-ups allow karein.'); return; }
-        win.document.write('<!doctype html><html><head><title>Manual PAN Customer Copy</title><meta charset="utf-8"><style>body{font-family:Arial,sans-serif;padding:20px}table{width:100%;border-collapse:collapse}tr{break-inside:avoid}@page{size:A4 landscape;margin:10mm}@media print{body{padding:0}}
         win.document.write('<!doctype html><html><head><title>Manual PAN Customer Copy</title><meta charset="utf-8"><style>body{font-family:Arial,sans-serif;padding:20px}table{width:100%;border-collapse:collapse}tr{break-inside:avoid}@page{size:A4 landscape;margin:10mm}@media print{body{padding:0}}</style></head><body>'+content+'</body></html>');
         win.document.close(); win.focus(); win.print();
       };
