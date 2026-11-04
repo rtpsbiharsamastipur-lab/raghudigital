@@ -1287,6 +1287,7 @@
     }
 
     function showRetailerLoginMode() {
+      window.currentLoginMode = 'retailer';
       var id = document.getElementById('loginId');
       id.value = '';
       id.placeholder = 'Apni Retailer User ID darj karein';
@@ -1303,6 +1304,7 @@
     }
 
     function showAdminLoginMode() {
+      window.currentLoginMode = 'admin';
       var id = document.getElementById('loginId');
       id.value = '';
       id.placeholder = 'Apni Admin ID darj karein';
@@ -1336,11 +1338,14 @@
     async function handleLoginAction() {
       var enteredId = (document.getElementById('loginId').value || '').trim();
       if (!enteredId) { alert('Apni User ID darj karein.'); return; }
+      var isAdmin = window.currentLoginMode === 'admin' || enteredId.toLowerCase() === 'admin';
 
-      var isAdmin = enteredId.toLowerCase() === 'admin';
       if (isAdmin) {
         var adminPass = document.getElementById('adminLoginPass').value || '';
         if (!adminPass) { alert('Admin password darj karein.'); return; }
+        if (enteredId.toLowerCase() !== 'admin') {
+          alert('Admin login abhi sirf "admin" ID se supported hai.'); return;
+        }
         if (adminPass !== 'admin123') { alert('Admin password galat hai.'); return; }
         activeUser = { role:'admin', id:'admin', name:'Master Admin (Raghu Baba)', mobile:'8207827581', wallet:99999 };
         setSafeLocalData('raghu_active_user', activeUser);
@@ -1352,59 +1357,68 @@
       var btn = document.getElementById('btnSignIn');
       if (btn) { btn.disabled = true; btn.textContent = 'Account check ho raha hai...'; }
 
-      async function loginFetch(url) {
-        var controller = new AbortController();
-        var timer = setTimeout(function(){ controller.abort(); }, 12000);
-        try {
-          return await fetch(url, { method:'GET', cache:'no-store', signal:controller.signal });
-        } catch(fetchError) {
-          if (fetchError && fetchError.name === 'AbortError') throw new Error('Firebase se jawab nahi aa raha hai (12 second timeout). Internet/Firebase connection check karein.');
-          throw new Error('Firebase connection nahi ho pa raha hai. Internet check karke dobara try karein.');
-        } finally { clearTimeout(timer); }
+      function normalizeLoginId(value) {
+        var raw = String(value == null ? '' : value).trim().toLowerCase();
+        var digits = raw.replace(/\\D/g, '');
+        return { raw:raw, digits:digits };
+      }
+      function matchesRetailer(item, key, typed) {
+        item = item || {};
+        var wanted = normalizeLoginId(typed);
+        var candidates = [key, item.mobile, item.userId, item.userID, item.username, item.id, item.email, item.loginId, item.loginID];
+        return candidates.some(function(value) {
+          var got = normalizeLoginId(value);
+          return got.raw && (got.raw === wanted.raw || (wanted.digits.length >= 10 && got.digits === wanted.digits));
+        });
       }
 
       try {
+        var controller = new AbortController();
+        var timer = setTimeout(function(){ controller.abort(); }, 15000);
+        var response;
+        try {
+          response = await fetch(FIREBASE_URL + '/retailers.json', {cache:'no-store', signal:controller.signal});
+        } catch(netErr) {
+          if (netErr && netErr.name === 'AbortError') throw new Error('Firebase response nahi de raha (15 second). Internet ya Firebase Rules check karein.');
+          throw new Error('Firebase se connection nahi hua. Internet check karein.');
+        } finally { clearTimeout(timer); }
+
+        if (!response.ok) throw new Error('Retailer database read nahi hua (HTTP ' + response.status + '). Firebase Rules mein read permission check karein.');
+        var records = await response.json();
+        if (!records || typeof records !== 'object') throw new Error('Firebase mein retailer records nahi mile.');
+
         var found = null;
-        var directRes = await loginFetch(FIREBASE_URL + '/retailers/' + encodeURIComponent(enteredId) + '.json');
-        if (!directRes.ok) throw new Error('Firebase account check failed (HTTP ' + directRes.status + ').');
-        var directData = await directRes.json();
-        if (directData && typeof directData === 'object') {
-          found = {accountKey:enteredId, mobile:String(directData.mobile || enteredId).replace(/\\D/g,''), data:directData};
-        }
+        Object.keys(records).some(function(key) {
+          var item = records[key] || {};
+          if (matchesRetailer(item, key, enteredId)) {
+            found = {accountKey:key, data:item};
+            return true;
+          }
+          return false;
+        });
+        if (!found) throw new Error('Ye Retailer ID database mein nahi mili. Registered Mobile Number/User ID check karein.');
 
-        if (!found) {
-          var allRes = await loginFetch(FIREBASE_URL + '/retailers.json');
-          if (!allRes.ok) throw new Error('Retailer list load nahi hui (HTTP ' + allRes.status + ').');
-          var all = await allRes.json() || {};
-          Object.keys(all).some(function(key) {
-            var item = all[key] || {};
-            var ids = [item.userId, item.userID, item.username, item.id, item.mobile, key];
-            if (ids.some(function(value){ return String(value == null ? '' : value).trim() === enteredId; })) {
-              found = {accountKey:key, mobile:String(item.mobile || key).replace(/\\D/g,''), data:item};
-              return true;
-            }
-            return false;
-          });
-        }
+        var savedPass = found.data.pass != null ? String(found.data.pass) :
+          (found.data.password != null ? String(found.data.password) :
+          (found.data.loginPassword != null ? String(found.data.loginPassword) :
+          (found.data.login_password != null ? String(found.data.login_password) : '')));
+        if (!savedPass) throw new Error('Is account mein password field nahi mili. Admin se password reset karwayein.');
+        if (savedPass !== retailerPass) throw new Error('Password galat hai. Password case-sensitive hai.');
 
-        if (!found) throw new Error('Retailer ID nahi mili. Registered mobile/User ID check karein.');
-        var savedPass = found.data.pass != null ? String(found.data.pass) : (found.data.password != null ? String(found.data.password) : (found.data.loginPassword != null ? String(found.data.loginPassword) : ''));
-        if (!savedPass) throw new Error('Is Retailer ID ka password record nahi mila. Admin se password reset karwayein.');
-        if (savedPass !== retailerPass) throw new Error('Retailer password galat hai.');
-
+        var mobile = String(found.data.mobile || found.accountKey).replace(/\\D/g, '');
         var allRetailers = getSafeLocalData('all_portal_retailers') || {};
         allRetailers[found.accountKey] = found.data;
         setSafeLocalData('all_portal_retailers', allRetailers);
         setSafeLocalData('user_' + found.accountKey, found.data);
-        activeUser = {role:'retailer', id:found.accountKey, name:found.data.name || found.accountKey, mobile:found.mobile, wallet:Number(found.data.wallet || 0)};
+        activeUser = {role:'retailer', id:found.accountKey, name:found.data.name || found.accountKey, mobile:mobile, wallet:Number(found.data.wallet || 0)};
         setSafeLocalData('raghu_active_user', activeUser);
         document.getElementById('loginId').value = '';
         document.getElementById('retailerLoginPass').value = '';
         openDashboardPanel();
         showRetailerWarningModal();
       } catch(err) {
-        console.error('Retailer login error:', err);
-        alert(err.message || 'Login nahi ho saka. Network check karke dobara try karein.');
+        console.error('Login failed:', err);
+        alert(err && err.message ? err.message : 'Login nahi ho saka. Dobara try karein.');
       } finally {
         if (btn) { btn.disabled = false; btn.textContent = '🔐 Retailer Login करें'; }
       }
