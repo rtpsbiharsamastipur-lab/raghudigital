@@ -3424,6 +3424,12 @@
               ? '<strong style="color:#0f172a;">' + escapeOrderText(customerName) + '</strong>' + (customerFather ? '<br><small style="color:#64748b;">Father: ' + escapeOrderText(customerFather) + '</small>' : '')
               : '<span style="color:#94a3b8;font-size:12px;">Name not entered</span>';
             var tr = document.createElement('tr');
+            var cancelActionHtml = '';
+            if (String(o.status || 'Pending').toLowerCase() === 'pending' && !o.retailerCancelRefunded) {
+              cancelActionHtml = '<button type="button" onclick="cancelRetailerPendingOrder(\'' + escapeOrderText(o.orderId || '') + '\', this)" style="margin-top:6px;background:#dc2626;color:#fff;border:0;border-radius:5px;padding:6px 9px;font-size:11px;font-weight:800;cursor:pointer;">🗑️ Delete & Refund</button>';
+            } else if (o.status === 'Cancelled') {
+              cancelActionHtml = '<span style="display:inline-block;margin-top:5px;color:#b91c1c;font-size:11px;font-weight:800;">Cancelled • ₹' + Number(o.retailerRefundAmount || o.charge || 0) + ' Refunded</span>';
+            }
             tr.innerHTML = 
               '<td><strong>' + escapeOrderText(o.orderId || '') + '</strong></td>' +
               '<td><strong style="color: #1e40af;">' + escapeOrderText(o.serviceName || '') + '</strong></td>' +
@@ -3431,7 +3437,7 @@
               '<td>' + escapeOrderText(o.date || '') + '</td>' +
               '<td>₹' + o.charge + '</td>' +
               '<td><span class="' + stClass + '">' + stLabel + '</span></td>' +
-              '<td>' + dlHtml + '</td>';
+              '<td>' + dlHtml + cancelActionHtml + '</td>';
             tbody.appendChild(tr);
           });
         })
@@ -3439,6 +3445,87 @@
           console.error('Retailer orders load failed:', err);
           tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#dc2626;padding:16px;">Orders load nahi ho sake. Internet / Firebase connection check karke dobara kholein.</td></tr>';
         });
+    }
+
+    async function cancelRetailerPendingOrder(orderId, button) {
+      if (!activeUser || activeUser.role === 'admin') { alert('Retailer login zaroori hai.'); return; }
+      if (!orderId) { alert('Order ID nahi mila.'); return; }
+      var confirmed = confirm('Kya aap is Pending Order ko cancel karke ₹' + ' ka charge Wallet mein wapas lena chahte hain? Completed / Processing orders cancel nahi honge.');
+      if (!confirmed) return;
+      if (button) { button.disabled = true; button.textContent = 'Please wait...'; }
+      var orderUrl = FIREBASE_URL + '/service_orders/' + encodeURIComponent(orderId) + '.json';
+      var lockToken = 'retailer-cancel-' + Date.now() + '-' + Math.random().toString(36).slice(2);
+      var lockSet = false;
+      try {
+        var orderRes = await fetch(orderUrl);
+        if (!orderRes.ok) throw new Error('Order fetch failed');
+        var order = await orderRes.json();
+        if (!order) throw new Error('Order nahi mila.');
+        var ownPhone = String(activeUser.mobile || activeUser.id || '').trim();
+        var orderPhone = String(order.retailerPhone || '').trim();
+        if (orderPhone !== ownPhone && orderPhone !== String(activeUser.id || '').trim()) throw new Error('Yeh order aapke account ka nahi hai.');
+        if (String(order.status || 'Pending').toLowerCase() !== 'pending') throw new Error('Sirf Pending Order cancel ho sakta hai.');
+        if (order.retailerCancelRefunded || order.retailerCancelLock) throw new Error('Is order par cancellation/refund pehle se process ho raha hai.');
+        var amount = Number(order.charge || 0);
+        if (!Number.isFinite(amount) || amount < 0) throw new Error('Order charge sahi nahi hai.');
+
+        var lockRes = await fetch(orderUrl, {
+          method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'Cancel_Refund_Processing', retailerCancelLock: lockToken, retailerCancelRequestedAt: new Date().toLocaleString() })
+        });
+        if (!lockRes.ok) throw new Error('Order cancellation lock nahi laga.');
+        lockSet = true;
+
+        var verifyRes = await fetch(orderUrl);
+        if (!verifyRes.ok) throw new Error('Cancellation verify nahi hua.');
+        var lockedOrder = await verifyRes.json();
+        if (!lockedOrder || lockedOrder.retailerCancelLock !== lockToken) throw new Error('Order cancellation doosri request se update ho gaya. Dobara refresh karein.');
+
+        var retailerUrl = FIREBASE_URL + '/retailers/' + encodeURIComponent(activeUser.id) + '.json';
+        var retailerRes = await fetch(retailerUrl);
+        if (!retailerRes.ok) throw new Error('Retailer wallet record load nahi hua.');
+        var retailer = await retailerRes.json();
+        if (!retailer) throw new Error('Retailer account record nahi mila.');
+        var oldBalance = Number(retailer.wallet || 0);
+        if (!Number.isFinite(oldBalance)) throw new Error('Wallet balance invalid hai.');
+        var newBalance = oldBalance + amount;
+
+        var walletRes = await fetch(FIREBASE_URL + '/retailers/' + encodeURIComponent(activeUser.id) + '/wallet.json', {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newBalance)
+        });
+        if (!walletRes.ok) throw new Error('Wallet refund save nahi hua.');
+
+        var finishRes = await fetch(orderUrl, {
+          method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            status: 'Cancelled', retailerCancelRefunded: true, retailerRefundAmount: amount,
+            retailerRefundedAt: new Date().toLocaleString(), retailerCancelLock: null,
+            deliveryResult: 'Cancelled by Retailer • ₹' + amount + ' refunded to wallet'
+          })
+        });
+        if (!finishRes.ok) throw new Error('Wallet refund ho gaya, lekin order status update nahi hua. Admin se sampark karein.');
+        activeUser.wallet = newBalance;
+        setSafeLocalData('raghu_active_user', activeUser);
+        var walletEl = document.getElementById('barWalletAmt');
+        if (walletEl) walletEl.textContent = newBalance.toFixed(2);
+        alert('Order cancel ho gaya aur ₹' + amount.toFixed(2) + ' Wallet mein wapas aa gaye.');
+        fetchRetailerMyOrders();
+      } catch (err) {
+        console.error('Retailer order cancel/refund failed:', err);
+        if (lockSet) {
+          try {
+            var latestRes = await fetch(orderUrl);
+            var latest = latestRes.ok ? await latestRes.json() : null;
+            if (latest && latest.retailerCancelLock === lockToken && !latest.retailerCancelRefunded) {
+              await fetch(orderUrl, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'Pending', retailerCancelLock: null, retailerCancelError: String(err.message || err) }) });
+            }
+          } catch (recoveryError) { console.error('Cancel recovery failed:', recoveryError); }
+        }
+        alert('Order cancel/refund nahi ho paya: ' + (err.message || err) + '. Wallet aur Order status check karein.');
+        fetchRetailerMyOrders();
+      } finally {
+        if (button) { button.disabled = false; button.textContent = '🗑️ Delete & Refund'; }
+      }
     }
 
     function openRechargeModule() {
