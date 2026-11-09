@@ -2125,13 +2125,17 @@
     function fetchPendingOrders() {
       var base = FIREBASE_URL + "/service_orders.json";
       var pendingUrl = base + '?orderBy=%22status%22&equalTo=%22Pending%22';
+      var lowercasePendingUrl = base + '?orderBy=%22status%22&equalTo=%22pending%22';
       var legacyUrl = base + '?orderBy=%22status%22&equalTo=null';
       return Promise.all([
         fetch(pendingUrl).then(function(res) { if (!res.ok) throw new Error('Pending orders HTTP ' + res.status); return res.json(); }),
+        fetch(lowercasePendingUrl).then(function(res) { if (!res.ok) throw new Error('Lowercase pending orders HTTP ' + res.status); return res.json(); }),
         fetch(legacyUrl).then(function(res) { if (!res.ok) throw new Error('Legacy pending orders HTTP ' + res.status); return res.json(); })
       ]).then(function(results) {
         var combined = results[0] || {};
-        Object.keys(results[1] || {}).forEach(function(key) { combined[key] = results[1][key]; });
+        [results[1], results[2]].forEach(function(group) {
+          Object.keys(group || {}).forEach(function(key) { combined[key] = group[key]; });
+        });
         return combined;
       });
     }
