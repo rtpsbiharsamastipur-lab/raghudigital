@@ -3329,16 +3329,16 @@
               stLabel = "Refunded (₹" + o.charge + " Wapas)";
             }
 
+            var escapeOrderText = function(value) {
+              return String(value == null ? '' : value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+            };
             var dlHtml = o.deliveryResult ? 
-              (o.deliveryResult.startsWith('data:') || o.deliveryResult.startsWith('http') ? '<a href="' + o.deliveryResult + '" target="_blank" download="Receipt_' + o.orderId + '" style="color: #059669; font-weight: bold; background: #dcfce7; padding: 6px 12px; border-radius: 4px; text-decoration: none; display:inline-block;">📥 Download / Print Slip</a>' : '<span style="display:inline-block;font-family:Trebuchet MS,Arial,sans-serif;font-size:14px;font-weight:900;letter-spacing:.25px;line-height:1.5;color:#1d4ed8;background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:6px 9px;">' + escapeOrderText(o.deliveryResult) + '</span>') 
+              (String(o.deliveryResult).startsWith('data:') || String(o.deliveryResult).startsWith('http') ? '<a href="' + escapeOrderText(o.deliveryResult) + '" target="_blank" rel="noopener noreferrer" download="Receipt_' + escapeOrderText(o.orderId || '') + '" style="color: #059669; font-weight: bold; background: #dcfce7; padding: 6px 12px; border-radius: 4px; text-decoration: none; display:inline-block;">📥 Download / Print Slip</a>' : '<span style="display:inline-block;font-family:Trebuchet MS,Arial,sans-serif;font-size:14px;font-weight:900;letter-spacing:.25px;line-height:1.5;color:#1d4ed8;background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:6px 9px;">' + escapeOrderText(o.deliveryResult) + '</span>') 
               : '<span style="color:#94a3b8;">Kaam chal raha hai...</span>';
 
             var formData = o.formData && typeof o.formData === 'object' ? o.formData : {};
             var customerName = formData.NAME || formData.FULL_NAME || formData.APPLICANT_NAME || formData.CUSTOMER_NAME || formData.NAME_AS_PER_AADHAAR || formData.name || formData.applicantName || formData.customerName || '';
             var customerFather = formData.FATHER_NAME || formData.FATHERNAME || formData.FATHER || formData.fatherName || '';
-            var escapeOrderText = function(value) {
-              return String(value == null ? '' : value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-            };
             var customerHtml = customerName
               ? '<strong style="color:#0f172a;">' + escapeOrderText(customerName) + '</strong>' + (customerFather ? '<br><small style="color:#64748b;">Father: ' + escapeOrderText(customerFather) + '</small>' : '')
               : '<span style="color:#94a3b8;font-size:12px;">Name not entered</span>';
@@ -3353,6 +3353,10 @@
               '<td>' + dlHtml + '</td>';
             tbody.appendChild(tr);
           });
+        })
+        .catch(function(err) {
+          console.error('Retailer orders load failed:', err);
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#dc2626;padding:16px;">Orders load nahi ho sake. Internet / Firebase connection check karke dobara kholein.</td></tr>';
         });
     }
 
