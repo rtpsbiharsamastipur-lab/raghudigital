@@ -2221,7 +2221,7 @@
             }
 
             var resultDeliveryHtml = o.deliveryResult ? 
-              (o.deliveryResult.startsWith('data:') || o.deliveryResult.startsWith('http') ? '<a href="' + o.deliveryResult + '" target="_blank" download="Slip_' + (o.orderId || key) + '" style="color:#059669; font-weight:bold; background:#dcfce7; padding:4px 8px; border-radius:4px; text-decoration:none;">📄 Open Slip</a>' : o.deliveryResult) 
+              (o.deliveryResult.startsWith('data:') || o.deliveryResult.startsWith('http') ? '<a href="' + o.deliveryResult + '" target="_blank" download="Slip_' + (o.orderId || key) + '" style="color:#059669; font-weight:bold; background:#dcfce7; padding:4px 8px; border-radius:4px; text-decoration:none;">📄 Open Slip</a>' : '<span style="display:inline-block;font-family:Trebuchet MS,Arial,sans-serif;font-size:14px;font-weight:900;letter-spacing:.25px;line-height:1.5;color:#1d4ed8;background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:6px 9px;">' + String(o.deliveryResult).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;') + '</span>') 
               : '<span style="color:#94a3b8;">Pending Action</span>';
 
             var tr = document.createElement('tr');
@@ -3330,7 +3330,7 @@
             }
 
             var dlHtml = o.deliveryResult ? 
-              (o.deliveryResult.startsWith('data:') || o.deliveryResult.startsWith('http') ? '<a href="' + o.deliveryResult + '" target="_blank" download="Receipt_' + o.orderId + '" style="color: #059669; font-weight: bold; background: #dcfce7; padding: 6px 12px; border-radius: 4px; text-decoration: none; display:inline-block;">📥 Download / Print Slip</a>' : '<strong style="color:#0f172a;">' + o.deliveryResult + '</strong>') 
+              (o.deliveryResult.startsWith('data:') || o.deliveryResult.startsWith('http') ? '<a href="' + o.deliveryResult + '" target="_blank" download="Receipt_' + o.orderId + '" style="color: #059669; font-weight: bold; background: #dcfce7; padding: 6px 12px; border-radius: 4px; text-decoration: none; display:inline-block;">📥 Download / Print Slip</a>' : '<span style="display:inline-block;font-family:Trebuchet MS,Arial,sans-serif;font-size:14px;font-weight:900;letter-spacing:.25px;line-height:1.5;color:#1d4ed8;background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:6px 9px;">' + escapeOrderText(o.deliveryResult) + '</span>') 
               : '<span style="color:#94a3b8;">Kaam chal raha hai...</span>';
 
             var formData = o.formData && typeof o.formData === 'object' ? o.formData : {};
