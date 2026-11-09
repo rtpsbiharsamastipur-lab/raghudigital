@@ -437,9 +437,9 @@
 <body>
 
   <!-- Audio Element for Order Alert -->
-  <audio id="orderSoundAlert" preload="auto">
-    <source src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" type="audio/mpeg">
-  </audio>
+  <!-- Sound is generated locally so external audio hosting cannot block alerts. -->
+  <audio id="orderSoundAlert" preload="none"></audio>
+  <button id="enablePortalAlertsBtn" type="button" onclick="enablePortalAlerts()" style="display:none;position:fixed;right:18px;bottom:18px;z-index:9999;background:#0f766e;color:#fff;border:0;border-radius:24px;padding:11px 16px;font-weight:800;box-shadow:0 4px 14px #0003;cursor:pointer;">🔊 Enable Admin Alarm</button>
 
   <!-- Flashing Notification Bar for Master Admin -->
   <div id="adminNoticeAlert" onclick="openAdminOrdersPanel()">
@@ -1020,7 +1020,10 @@
     var activeOrderContext = null;
     var lastKnownOrdersCount = -1;
     var lastKnownRechargeCount = -1;
+    var lastKnownOrderIds = null;
+    var lastKnownRechargeIds = null;
     var portalAlertAudioUnlocked = false;
+    var portalAlertAudioContext = null;
 
     var SERVICES_CONFIG = [
       {
@@ -1265,8 +1268,8 @@
         showRegister(false);
       }
 
-      // Reduce Firebase download usage: refresh portal state once per minute instead of every 8 seconds.
-      setInterval(syncPortalState, 300000);
+      // Refresh alerts every 60 seconds; the Admin alarm is enabled with the button after login.
+      setInterval(syncPortalState, 60000);
     });
 
     var loginConfirmationResult = null;
@@ -1664,24 +1667,55 @@
       });
     }
 
-    function unlockPortalAlertAudio() {
-      var audio = document.getElementById('orderSoundAlert');
-      if (!audio || portalAlertAudioUnlocked) return;
+    function enablePortalAlerts() {
       try {
-        audio.muted = true;
-        var attempt = audio.play();
-        if (attempt && typeof attempt.then === 'function') {
-          attempt.then(function() { audio.pause(); audio.currentTime = 0; audio.muted = false; portalAlertAudioUnlocked = true; })
-            .catch(function() { audio.muted = false; });
-        } else { audio.pause(); audio.currentTime = 0; audio.muted = false; portalAlertAudioUnlocked = true; }
-      } catch (e) { audio.muted = false; }
+        var AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) throw new Error('Web Audio is not supported by this browser.');
+        if (!portalAlertAudioContext) portalAlertAudioContext = new AudioCtx();
+        var resumed = portalAlertAudioContext.resume();
+        if (resumed && typeof resumed.then === 'function') {
+          resumed.then(function() {
+            portalAlertAudioUnlocked = true;
+            var btn = document.getElementById('enablePortalAlertsBtn');
+            if (btn) btn.textContent = '🔊 Admin Alarm ON';
+            playPortalAlertSound(true);
+          }).catch(function(err) { console.warn('Could not enable alarm audio:', err); });
+        } else {
+          portalAlertAudioUnlocked = true;
+          var btn = document.getElementById('enablePortalAlertsBtn');
+          if (btn) btn.textContent = '🔊 Admin Alarm ON';
+          playPortalAlertSound(true);
+        }
+      } catch (err) {
+        console.warn('Admin alarm audio is unavailable:', err);
+        alert('Browser mein sound enable nahi ho paya. Chrome/Firefox ki site sound permission Allow karein.');
+      }
     }
 
-    function playPortalAlertSound() {
-      var audio = document.getElementById('orderSoundAlert');
-      if (!audio) return;
-      try { audio.currentTime = 0; audio.muted = false; audio.play().catch(function(err) { console.warn('Alert sound blocked by browser; click once on portal to enable sound.', err); }); }
-      catch (e) { console.warn('Alert sound could not play:', e); }
+    function unlockPortalAlertAudio() {
+      // Browser audio permission must be granted by a real user click.
+      var btn = document.getElementById('enablePortalAlertsBtn');
+      if (btn && activeUser && activeUser.role === 'admin') btn.style.display = 'block';
+    }
+
+    function playPortalAlertSound(testOnly) {
+      if (!portalAlertAudioUnlocked || !portalAlertAudioContext) return;
+      try {
+        var ctx = portalAlertAudioContext;
+        if (ctx.state === 'suspended') { ctx.resume(); }
+        var now = ctx.currentTime;
+        [0, 0.22, 0.44].forEach(function(offset, index) {
+          var osc = ctx.createOscillator();
+          var gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.value = index === 1 ? 1046 : 880;
+          gain.gain.setValueAtTime(0.0001, now + offset);
+          gain.gain.exponentialRampToValueAtTime(0.22, now + offset + 0.025);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + offset + 0.18);
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.start(now + offset); osc.stop(now + offset + 0.19);
+        });
+      } catch (err) { console.warn('Admin alarm playback failed:', err); }
     }
 
     function openDashboardPanel() {
@@ -1766,8 +1800,10 @@
             var list = Object.keys(orders);
             var pendingCount = list.length;
             document.getElementById('countAdminPending').innerText = pendingCount;
-
-            if (lastKnownOrdersCount !== -1 && pendingCount > lastKnownOrdersCount) {
+            var currentOrderIds = {};
+            list.forEach(function(id) { currentOrderIds[id] = true; });
+            var hasNewOrder = lastKnownOrderIds !== null && list.some(function(id) { return !lastKnownOrderIds[id]; });
+            if (hasNewOrder) {
               playPortalAlertSound();
               var alertBar = document.getElementById('adminNoticeAlert');
               if (alertBar) {
@@ -1776,6 +1812,7 @@
                 alertBar.style.display = 'block';
               }
             }
+            lastKnownOrderIds = currentOrderIds;
             lastKnownOrdersCount = pendingCount;
           }).catch(function(err){ console.warn('Pending orders count refresh failed:', err); });
 
@@ -1783,11 +1820,13 @@
           .then(function(res) { return res.json(); })
           .then(function(rech) {
             var count = 0;
+            var currentRechargeIds = {};
             for (var r in rech || {}) {
-              if (rech[r] && rech[r].status === 'Pending') count++;
+              if (rech[r] && rech[r].status === 'Pending') { count++; currentRechargeIds[r] = true; }
             }
             document.getElementById('countAdminRech').innerText = count;
-            if (lastKnownRechargeCount !== -1 && count > lastKnownRechargeCount) {
+            var hasNewRecharge = lastKnownRechargeIds !== null && Object.keys(currentRechargeIds).some(function(id) { return !lastKnownRechargeIds[id]; });
+            if (hasNewRecharge) {
               playPortalAlertSound();
               var alertBar = document.getElementById('adminNoticeAlert');
               if (alertBar) {
@@ -1796,6 +1835,7 @@
                 alertBar.style.display = 'block';
               }
             }
+            lastKnownRechargeIds = currentRechargeIds;
             lastKnownRechargeCount = count;
           }).catch(function(){});
       }
