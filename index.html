@@ -2977,7 +2977,8 @@
         formData: formDataMap,
         status: "Pending",
         deliveryResult: "",
-        date: new Date().toLocaleString()
+        date: new Date().toLocaleString(),
+        createdAt: Date.now()
       };
 
       try {
@@ -3318,7 +3319,26 @@
             return;
           }
 
-          myOrders.reverse().forEach(function(o) {
+          function getOrderSortTime(order) {
+            if (order && order.createdAt != null && Number.isFinite(Number(order.createdAt))) return Number(order.createdAt);
+            var raw = String(order && order.date || '').trim();
+            // Indian portal dates are displayed as DD/MM/YYYY, with optional 12-hour time.
+            var match = raw.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})(?:[, ]+\s*(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(am|pm)?)?/i);
+            if (match) {
+              var day = Number(match[1]), month = Number(match[2]), year = Number(match[3]);
+              var hour = Number(match[4] || 0), minute = Number(match[5] || 0), second = Number(match[6] || 0);
+              var meridiem = String(match[7] || '').toLowerCase();
+              if (meridiem === 'pm' && hour < 12) hour += 12;
+              if (meridiem === 'am' && hour === 12) hour = 0;
+              var parsed = new Date(year, month - 1, day, hour, minute, second).getTime();
+              if (Number.isFinite(parsed)) return parsed;
+            }
+            var fallback = Date.parse(raw);
+            return Number.isFinite(fallback) ? fallback : 0;
+          }
+          // Oldest orders first; today's/newest orders will always appear at the bottom.
+          myOrders.sort(function(a, b) { return getOrderSortTime(a) - getOrderSortTime(b); });
+          myOrders.forEach(function(o) {
             var stClass = "st-pending";
             var stLabel = o.status || 'Pending';
 
