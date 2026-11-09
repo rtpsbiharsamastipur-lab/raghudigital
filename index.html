@@ -1019,6 +1019,8 @@
     var currentService = null;
     var activeOrderContext = null;
     var lastKnownOrdersCount = -1;
+    var lastKnownRechargeCount = -1;
+    var portalAlertAudioUnlocked = false;
 
     var SERVICES_CONFIG = [
       {
@@ -1662,7 +1664,28 @@
       });
     }
 
+    function unlockPortalAlertAudio() {
+      var audio = document.getElementById('orderSoundAlert');
+      if (!audio || portalAlertAudioUnlocked) return;
+      try {
+        audio.muted = true;
+        var attempt = audio.play();
+        if (attempt && typeof attempt.then === 'function') {
+          attempt.then(function() { audio.pause(); audio.currentTime = 0; audio.muted = false; portalAlertAudioUnlocked = true; })
+            .catch(function() { audio.muted = false; });
+        } else { audio.pause(); audio.currentTime = 0; audio.muted = false; portalAlertAudioUnlocked = true; }
+      } catch (e) { audio.muted = false; }
+    }
+
+    function playPortalAlertSound() {
+      var audio = document.getElementById('orderSoundAlert');
+      if (!audio) return;
+      try { audio.currentTime = 0; audio.muted = false; audio.play().catch(function(err) { console.warn('Alert sound blocked by browser; click once on portal to enable sound.', err); }); }
+      catch (e) { console.warn('Alert sound could not play:', e); }
+    }
+
     function openDashboardPanel() {
+      unlockPortalAlertAudio();
       document.getElementById('loginBox').style.display = 'none';
       document.getElementById('regBox').style.display = 'none';
       document.getElementById('userBar').style.display = 'flex';
@@ -1750,8 +1773,7 @@
             document.getElementById('countAdminPending').innerText = pendingCount;
 
             if (lastKnownOrdersCount !== -1 && list.length > lastKnownOrdersCount) {
-              var audio = document.getElementById('orderSoundAlert');
-              if (audio) { audio.play().catch(function(){}); }
+              playPortalAlertSound();
               document.getElementById('adminNoticeAlert').style.display = 'block';
             }
             lastKnownOrdersCount = list.length;
@@ -1762,9 +1784,19 @@
           .then(function(rech) {
             var count = 0;
             for (var r in rech || {}) {
-              if (rech[r].status === 'Pending') count++;
+              if (rech[r] && rech[r].status === 'Pending') count++;
             }
             document.getElementById('countAdminRech').innerText = count;
+            if (lastKnownRechargeCount !== -1 && count > lastKnownRechargeCount) {
+              playPortalAlertSound();
+              var alertBar = document.getElementById('adminNoticeAlert');
+              if (alertBar) {
+                alertBar.textContent = '💳 NAYA RECHARGE REQUEST AAYA HAI! Yahan click karke Recharges kholein.';
+                alertBar.onclick = openAdminRechargePanel;
+                alertBar.style.display = 'block';
+              }
+            }
+            lastKnownRechargeCount = count;
           }).catch(function(){});
       }
     }
