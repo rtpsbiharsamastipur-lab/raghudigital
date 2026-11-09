@@ -2137,6 +2137,20 @@
           Object.keys(group || {}).forEach(function(key) { combined[key] = group[key]; });
         });
         return combined;
+      }).catch(function(queryError) {
+        // If Firebase index/query support is unavailable, fall back safely so Admin can still open Pending Orders.
+        console.warn('Filtered pending query failed; using compatibility fallback:', queryError);
+        return fetch(base).then(function(res) {
+          if (!res.ok) throw new Error('Orders fallback HTTP ' + res.status);
+          return res.json();
+        }).then(function(allOrders) {
+          var pendingOnly = {};
+          Object.keys(allOrders || {}).forEach(function(key) {
+            var status = String((allOrders[key] || {}).status || 'Pending').toLowerCase();
+            if (status === 'pending') pendingOnly[key] = allOrders[key];
+          });
+          return pendingOnly;
+        });
       });
     }
 
@@ -2240,7 +2254,10 @@
               '<td><button class="btn-action-small" onclick="openOrderClearanceAction(\'' + (o.orderId || key) + '\')">Deliver Slip / Action</button></td>';
             tbody.appendChild(tr);
           });
-        }).catch(function(){});
+        }).catch(function(err) {
+          console.error('Admin pending orders load failed:', err);
+          tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#dc2626;padding:18px;">Pending Orders load nahi ho paaye. Firebase Rules / Internet connection check karein aur dobara try karein.</td></tr>';
+        });
     }
 
     function openOrderClearanceAction(orderId) {
