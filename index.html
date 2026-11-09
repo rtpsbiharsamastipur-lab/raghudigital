@@ -1760,24 +1760,24 @@
       }
 
       if (activeUser.role === 'admin') {
-        fetch(FIREBASE_URL + "/service_orders.json")
-          .then(function(res) { return res.json(); })
+        fetchPendingOrders()
           .then(function(orders) {
-            if (!orders) return;
+            orders = orders || {};
             var list = Object.keys(orders);
-            var pendingCount = 0;
-            list.forEach(function(k) {
-              if (orders[k].status === 'Pending') pendingCount++;
-            });
-
+            var pendingCount = list.length;
             document.getElementById('countAdminPending').innerText = pendingCount;
 
-            if (lastKnownOrdersCount !== -1 && list.length > lastKnownOrdersCount) {
+            if (lastKnownOrdersCount !== -1 && pendingCount > lastKnownOrdersCount) {
               playPortalAlertSound();
-              document.getElementById('adminNoticeAlert').style.display = 'block';
+              var alertBar = document.getElementById('adminNoticeAlert');
+              if (alertBar) {
+                alertBar.textContent = '🔔 NAYA ORDER AAYA HAI! Yahan click karke Orders Desk kholein.';
+                alertBar.onclick = openAdminOrdersPanel;
+                alertBar.style.display = 'block';
+              }
             }
-            lastKnownOrdersCount = list.length;
-          }).catch(function(){});
+            lastKnownOrdersCount = pendingCount;
+          }).catch(function(err){ console.warn('Pending orders count refresh failed:', err); });
 
         fetch(FIREBASE_URL + "/recharge_requests.json")
           .then(function(res) { return res.json(); })
@@ -2120,16 +2120,30 @@
         .catch(function() { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#dc2626;">Completed orders load nahi ho sake. Refresh karke dobara try karein.</td></tr>'; });
     }
 
+    // Fetch only pending orders from Firebase instead of downloading every historical order.
+    // Also include legacy records whose status field is missing (the portal previously treated them as Pending).
+    function fetchPendingOrders() {
+      var base = FIREBASE_URL + "/service_orders.json";
+      var pendingUrl = base + '?orderBy=%22status%22&equalTo=%22Pending%22';
+      var legacyUrl = base + '?orderBy=%22status%22&equalTo=null';
+      return Promise.all([
+        fetch(pendingUrl).then(function(res) { if (!res.ok) throw new Error('Pending orders HTTP ' + res.status); return res.json(); }),
+        fetch(legacyUrl).then(function(res) { if (!res.ok) throw new Error('Legacy pending orders HTTP ' + res.status); return res.json(); })
+      ]).then(function(results) {
+        var combined = results[0] || {};
+        Object.keys(results[1] || {}).forEach(function(key) { combined[key] = results[1][key]; });
+        return combined;
+      });
+    }
+
     function fetchAdminOrdersList() {
       var tbody = document.getElementById('adminOrdersTableBody');
       tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #64748b;">Orders fetch ho rahe hain...</td></tr>';
 
-      fetch(FIREBASE_URL + "/service_orders.json")
-        .then(function(res) { return res.json(); })
+      fetchPendingOrders()
         .then(function(data) {
           tbody.innerHTML = '';
-          var allOrderKeys = Object.keys(data || {});
-          var keys = allOrderKeys.filter(function(key) {
+          var keys = Object.keys(data || {}).filter(function(key) {
             var status = String((data[key] || {}).status || 'Pending').toLowerCase();
             return status === 'pending';
           });
