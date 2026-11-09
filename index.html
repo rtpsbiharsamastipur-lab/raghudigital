@@ -3456,6 +3456,7 @@
       var orderUrl = FIREBASE_URL + '/service_orders/' + encodeURIComponent(orderId) + '.json';
       var lockToken = 'retailer-cancel-' + Date.now() + '-' + Math.random().toString(36).slice(2);
       var lockSet = false;
+      var walletCredited = false;
       try {
         var orderRes = await fetch(orderUrl);
         if (!orderRes.ok) throw new Error('Order fetch failed');
@@ -3494,6 +3495,7 @@
           method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newBalance)
         });
         if (!walletRes.ok) throw new Error('Wallet refund save nahi hua.');
+        walletCredited = true;
 
         var finishRes = await fetch(orderUrl, {
           method: 'PATCH', headers: { 'Content-Type': 'application/json' },
@@ -3516,7 +3518,7 @@
           try {
             var latestRes = await fetch(orderUrl);
             var latest = latestRes.ok ? await latestRes.json() : null;
-            if (latest && latest.retailerCancelLock === lockToken && !latest.retailerCancelRefunded) {
+            if (latest && latest.retailerCancelLock === lockToken && !latest.retailerCancelRefunded && !walletCredited) {
               await fetch(orderUrl, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'Pending', retailerCancelLock: null, retailerCancelError: String(err.message || err) }) });
             }
           } catch (recoveryError) { console.error('Cancel recovery failed:', recoveryError); }
