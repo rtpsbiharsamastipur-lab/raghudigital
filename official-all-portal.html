@@ -79,7 +79,9 @@ body.retailer-view .grid a[href="https://yashportal.in/members/login"]{display:n
 <a href="https://serviceonline.bihar.gov.in/officials/" target="_blank" rel="noopener noreferrer">🏛️ RTPS Official Login</a>
 </div></main><script>
 (function(){
- if(new URLSearchParams(window.location.search).get("view")==="retailer")document.body.classList.add("retailer-view");
+ var portalView=new URLSearchParams(window.location.search).get("view");
+ try{var savedPortalUser=JSON.parse(localStorage.getItem("raghu_active_user")||"null");if(savedPortalUser&&savedPortalUser.role==="retailer")portalView="retailer";}catch(e){}
+ if(portalView==="retailer")document.body.classList.add("retailer-view");
  var grid=document.querySelector(".grid"), input=document.getElementById("portalSearch"), clear=document.getElementById("clearSearch");
  if(!grid||!input)return;
  var cards=Array.prototype.slice.call(grid.querySelectorAll("a[href]"));
