@@ -1842,7 +1842,8 @@
     }
 
     function openOfficialAllPortal() {
-      window.open("./official-all-portal.html", "_blank", "noopener,noreferrer");
+      var portalRole = activeUser && activeUser.role === 'admin' ? 'admin' : 'retailer';
+      window.open("./official-all-portal.html?view=" + portalRole, "_blank", "noopener,noreferrer");
     }
 
     function openRetailerHomePanel() {
