@@ -26,6 +26,8 @@ body{margin:0;padding:20px;font-family:Arial,'Noto Sans',sans-serif;background:l
 .portal-desc{display:block;font-size:12px;font-weight:600;line-height:1.35;color:#334155}
 .portal-arrow{display:inline-flex;align-items:center;justify-content:center;flex:0 0 30px;width:30px;height:30px;margin-left:auto;border-radius:50%;background:rgba(255,255,255,.75);font-size:18px;font-weight:900}
 .empty-state{display:none;padding:28px;text-align:center;background:#fff;border:1px dashed #93c5fd;border-radius:14px;color:#475569;font-weight:700}
+body.retailer-view .grid a[href="https://printscards.com/login"],
+body.retailer-view .grid a[href="https://yashportal.in/members/login"]{display:none!important}
 @media(max-width:1250px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:850px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.portal-logo{flex-basis:54px;width:54px;height:54px}.grid a{gap:9px}.portal-title{font-size:14px}}
 @media(max-width:600px){body{padding:7px}.wrap{padding:11px}.topline{align-items:stretch}.search-wrap{max-width:none}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.grid a{padding:9px!important;min-height:100px;gap:8px}.portal-logo{flex-basis:42px;width:42px;height:42px;padding:4px;border-radius:10px}.portal-title{font-size:12px}.portal-desc{font-size:10px}.portal-arrow{display:none}.filter-chip{padding:9px 12px;font-size:12px}}
@@ -77,6 +79,7 @@ body{margin:0;padding:20px;font-family:Arial,'Noto Sans',sans-serif;background:l
 <a href="https://serviceonline.bihar.gov.in/officials/" target="_blank" rel="noopener noreferrer">🏛️ RTPS Official Login</a>
 </div></main><script>
 (function(){
+ if(new URLSearchParams(window.location.search).get("view")==="retailer")document.body.classList.add("retailer-view");
  var grid=document.querySelector(".grid"), input=document.getElementById("portalSearch"), clear=document.getElementById("clearSearch");
  if(!grid||!input)return;
  var cards=Array.prototype.slice.call(grid.querySelectorAll("a[href]"));
