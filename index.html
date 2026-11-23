@@ -461,6 +461,7 @@
       <button class="btn-bar-action btn-admin-orders" id="btnAdminOrders" onclick="openAdminOrdersPanel()">📦 Orders Desk (<span id="countAdminPending">0</span>)</button>
       <button class="btn-bar-action btn-admin-recharge" id="btnAdminRecharge" onclick="openAdminRechargePanel()">💳 Recharges (<span id="countAdminRech">0</span>)</button>
       <button class="btn-bar-action btn-admin-ledger" id="btnAdminLedger" onclick="openAdminLedgerPanel()">📊 Din Bhar Ka Khata</button>
+      <button class="btn-bar-action btn-admin-ledger" id="btnAdminMonthlyReport" onclick="openAdminMonthlyReport()" style="background:#7c3aed;">📅 Monthly Retailer Report</button>
       <button class="btn-bar-action btn-admin-manage" id="btnAdminPanel" onclick="openAdminPanel()">👑 Retailers</button>
       <button class="btn-bar-action btn-my-orders" id="btnMyOrders" onclick="openRetailerOrdersPanel()">📑 Mere Orders</button>
       <div class="wallet-pill" id="barWalletPill" onclick="openRechargeModule()">💰 Wallet: ₹<span id="barWalletAmt">0.00</span> ➕</div>
@@ -831,6 +832,43 @@
             <tbody id="ledgerTransfersTableBody">
               <tr><td colspan="5" style="text-align: center; color: #64748b;">Records load ho rahe hain...</td></tr>
             </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ADMIN EXCLUSIVE: MONTHLY RETAILER REPORT -->
+      <div class="module-card" id="adminMonthlyReportBox" style="border-top-color:#7c3aed;display:none;">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:15px;">
+          <div>
+            <h3 style="color:#6d28d9;font-size:19px;">📅 Monthly Retailer Work &amp; Wallet Report</h3>
+            <p style="font-size:13px;color:#64748b;">Har retailer ke monthly orders, service charges, approved recharge aur Admin wallet transfers ka hisaab.</p>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <input type="month" id="adminMonthlyReportMonth" style="padding:8px;border:1px solid #cbd5e1;border-radius:7px;">
+            <button type="button" class="c-btn btn-open" onclick="renderAdminMonthlyReport()">🔎 Report Dekhein</button>
+            <button type="button" class="btn-exit" style="background:#475569;" onclick="closeAllModules()">Close</button>
+          </div>
+        </div>
+        <div id="adminMonthlyReportSummary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:16px;"></div>
+        <h4 style="margin:14px 0 8px;color:#334155;">Retailer-wise Monthly Summary</h4>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead><tr><th>Retailer</th><th>Total Orders</th><th>Success</th><th>Pending</th><th>Refunded</th><th>Service Charges</th><th>Retailer Recharge</th><th>Admin Wallet Add</th><th>Total Wallet Added</th><th>Current Wallet</th></tr></thead>
+            <tbody id="adminMonthlyRetailerSummary"><tr><td colspan="10" style="text-align:center;">Report load karein.</td></tr></tbody>
+          </table>
+        </div>
+        <h4 style="margin:18px 0 8px;color:#334155;">Monthly Order Details</h4>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead><tr><th>Date &amp; Time</th><th>Order ID</th><th>Retailer</th><th>Service</th><th>Charge</th><th>Status</th></tr></thead>
+            <tbody id="adminMonthlyOrderDetails"><tr><td colspan="6" style="text-align:center;">Report load karein.</td></tr></tbody>
+          </table>
+        </div>
+        <h4 style="margin:18px 0 8px;color:#334155;">Monthly Recharge / Wallet Credit Details</h4>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead><tr><th>Date</th><th>Retailer</th><th>Type</th><th>Amount</th><th>Status / Reference</th></tr></thead>
+            <tbody id="adminMonthlyCreditDetails"><tr><td colspan="5" style="text-align:center;">Report load karein.</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -1491,7 +1529,7 @@
       var actionBox = document.getElementById('orderClearanceActionBox');
       if (actionBox) actionBox.style.display = 'none';
       document.body.classList.remove('orders-only');
-      var ids = ['retailerAccountBox', 'adminHomeBox', 'retailerHomeBox', 'adminOrdersBox', 'adminRechargeBox', 'adminLedgerBox', 'retailerOrdersBox', 'adminRetailerBox', 'formOrderBox', 'formRechargeBox'];
+      var ids = ['retailerAccountBox', 'adminHomeBox', 'retailerHomeBox', 'adminOrdersBox', 'adminRechargeBox', 'adminLedgerBox', 'adminMonthlyReportBox', 'retailerOrdersBox', 'adminRetailerBox', 'formOrderBox', 'formRechargeBox'];
       ids.forEach(function(id) {
         var el = document.getElementById(id);
         if (el) el.style.display = 'none';
@@ -2600,6 +2638,132 @@
         console.error('Admin wallet transfer error:', err);
         alert('❌ Wallet add nahi hua: ' + (err && err.message ? err.message : 'Network/Firebase error'));
       }
+    }
+
+    function openAdminMonthlyReport() {
+      if (!activeUser || activeUser.role !== 'admin') { alert('Ye report sirf Admin ke liye hai.'); return; }
+      closeAllModules();
+      var box = document.getElementById('adminMonthlyReportBox');
+      if (box) { box.style.display = 'block'; box.scrollIntoView({behavior:'smooth'}); }
+      var month = document.getElementById('adminMonthlyReportMonth');
+      if (month && !month.value) month.value = new Date().toISOString().slice(0,7);
+      renderAdminMonthlyReport();
+    }
+
+    function monthlyReportDate(value) {
+      if (value === null || value === undefined || value === '') return null;
+      if (typeof value === 'number' || (typeof value === 'string' && /^\d{10,13}$/.test(value))) {
+        var n = Number(value); if (n < 100000000000) n *= 1000;
+        var numericDate = new Date(n); return isNaN(numericDate.getTime()) ? null : numericDate;
+      }
+      var raw = String(value).trim();
+      var parsed = new Date(raw);
+      if (!isNaN(parsed.getTime())) return parsed;
+      var m = raw.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})/);
+      if (!m) return null;
+      var first = Number(m[1]), second = Number(m[2]), year = Number(m[3]);
+      var day = first > 12 ? first : (second > 12 ? second : first);
+      var month = first > 12 ? second : (second > 12 ? first : second);
+      var d = new Date(year, month - 1, day);
+      return isNaN(d.getTime()) ? null : d;
+    }
+
+    async function renderAdminMonthlyReport() {
+      if (!activeUser || activeUser.role !== 'admin') return;
+      var monthValue = document.getElementById('adminMonthlyReportMonth').value;
+      if (!monthValue) { alert('Mahina select karein.'); return; }
+      var summaryBody = document.getElementById('adminMonthlyRetailerSummary');
+      var orderBody = document.getElementById('adminMonthlyOrderDetails');
+      var creditBody = document.getElementById('adminMonthlyCreditDetails');
+      var summaryCards = document.getElementById('adminMonthlyReportSummary');
+      summaryBody.innerHTML = '<tr><td colspan="10" style="text-align:center;">Monthly data load ho raha hai...</td></tr>';
+      orderBody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Loading...</td></tr>';
+      creditBody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Loading...</td></tr>';
+      try {
+        var responses = await Promise.all([
+          fetch(FIREBASE_URL + '/service_orders.json'),
+          fetch(FIREBASE_URL + '/recharge_requests.json'),
+          fetch(FIREBASE_URL + '/admin_transfers.json'),
+          fetch(FIREBASE_URL + '/retailers.json')
+        ]);
+        for (var i = 0; i < responses.length; i++) if (!responses[i].ok) throw new Error('Firebase report data load failed (HTTP ' + responses[i].status + ').');
+        var data = await Promise.all(responses.map(function(res){ return res.json(); }));
+        var orders = data[0] || {}, recharges = data[1] || {}, transfers = data[2] || {}, retailers = data[3] || {};
+        var rows = {};
+        function getRow(key, name, mobile) {
+          key = String(key || mobile || name || 'unknown');
+          if (!rows[key]) rows[key] = {key:key,name:name || key,mobile:mobile || key,orders:0,success:0,pending:0,refunded:0,serviceCharges:0,recharge:0,adminAdd:0,currentWallet:0};
+          if (name) rows[key].name = name;
+          if (mobile) rows[key].mobile = mobile;
+          return rows[key];
+        }
+        function inSelectedMonth(value) {
+          var d = monthlyReportDate(value);
+          return !!d && d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') === monthValue;
+        }
+        var orderList = [], creditList = [];
+        Object.keys(orders).forEach(function(k) {
+          var o = orders[k] || {};
+          if (!inSelectedMonth(o.createdAt || o.date)) return;
+          var mobile = String(o.retailerPhone || '').trim();
+          var r = getRow(mobile || o.retailerName, o.retailerName, mobile);
+          var charge = Number(o.charge || 0); if (!Number.isFinite(charge)) charge = 0;
+          r.orders++; r.serviceCharges += charge;
+          var status = String(o.status || 'Pending').toLowerCase();
+          if (status === 'completed' || status === 'success') r.success++;
+          else if (status.indexOf('refund') >= 0 || status === 'cancelled' || status === 'rejected_refund') r.refunded++;
+          else if (status === 'pending' || status === 'processing' || !status) r.pending++;
+          orderList.push({date:o.date || '',id:o.orderId || k,name:o.retailerName || mobile,service:o.serviceName || '',charge:charge,status:o.status || 'Pending',time:o.createdAt || 0});
+        });
+        Object.keys(recharges).forEach(function(k) {
+          var x = recharges[k] || {};
+          if (String(x.status || '').toLowerCase() !== 'approved' || !inSelectedMonth(x.creditedAt || x.date)) return;
+          var mobile = String(x.retailerKey || x.mobile || '').trim();
+          var r = getRow(mobile, x.name, mobile);
+          var amount = Number(x.amount || 0); if (!Number.isFinite(amount)) amount = 0;
+          r.recharge += amount;
+          creditList.push({date:x.creditedAt || x.date || '',name:x.name || mobile,type:'Retailer Recharge (Approved)',amount:amount,ref:x.utr || k});
+        });
+        Object.keys(transfers).forEach(function(k) {
+          var x = transfers[k] || {};
+          if (!inSelectedMonth(x.fullTime || x.date)) return;
+          var mobile = String(x.mobile || x.retailerKey || '').trim();
+          var r = getRow(mobile, x.retailer, mobile);
+          var amount = Number(x.amount || 0); if (!Number.isFinite(amount)) amount = 0;
+          r.adminAdd += amount;
+          creditList.push({date:x.fullTime || x.date || '',name:x.retailer || mobile,type:'Admin Wallet Transfer',amount:amount,ref:k});
+        });
+        Object.keys(retailers).forEach(function(k) {
+          var x = retailers[k] || {};
+          var r = getRow(k, x.name, k);
+          r.currentWallet = Number(x.wallet || 0);
+          if (!Number.isFinite(r.currentWallet)) r.currentWallet = 0;
+        });
+        var list = Object.keys(rows).map(function(k){return rows[k];}).sort(function(a,b){return a.name.localeCompare(b.name);});
+        var totals = {orders:0,charges:0,recharge:0,adminAdd:0};
+        list.forEach(function(r){totals.orders+=r.orders;totals.charges+=r.serviceCharges;totals.recharge+=r.recharge;totals.adminAdd+=r.adminAdd;});
+        summaryCards.innerHTML = [
+          ['TOTAL ORDERS',totals.orders,'#2563eb'],['SERVICE CHARGES','₹'+totals.charges.toFixed(2),'#0f766e'],
+          ['RETAILER RECHARGE','₹'+totals.recharge.toFixed(2),'#15803d'],['ADMIN WALLET ADD','₹'+totals.adminAdd.toFixed(2),'#7c3aed'],
+          ['TOTAL WALLET CREDIT','₹'+(totals.recharge+totals.adminAdd).toFixed(2),'#b45309']
+        ].map(function(x){return '<div style="padding:13px;background:#f8fafc;border-left:4px solid '+x[2]+';border-radius:7px;"><small style="font-weight:800;color:#475569;">'+x[0]+'</small><div style="font-size:21px;font-weight:900;color:'+x[2]+';margin-top:5px;">'+x[1]+'</div></div>';}).join('');
+        summaryBody.innerHTML = list.length ? list.map(function(r){
+          return '<tr><td><strong>'+escapeMonthlyReportText(r.name)+'</strong><br><small>'+escapeMonthlyReportText(r.mobile)+'</small></td><td>'+r.orders+'</td><td>'+r.success+'</td><td>'+r.pending+'</td><td>'+r.refunded+'</td><td>₹'+r.serviceCharges.toFixed(2)+'</td><td>₹'+r.recharge.toFixed(2)+'</td><td>₹'+r.adminAdd.toFixed(2)+'</td><td><strong>₹'+(r.recharge+r.adminAdd).toFixed(2)+'</strong></td><td>₹'+r.currentWallet.toFixed(2)+'</td></tr>';
+        }).join('') : '<tr><td colspan="10" style="text-align:center;">Is mahine ka retailer record nahi mila.</td></tr>';
+        orderList.sort(function(a,b){return String(a.date).localeCompare(String(b.date));});
+        orderBody.innerHTML = orderList.length ? orderList.map(function(o){return '<tr><td>'+escapeMonthlyReportText(o.date)+'</td><td>'+escapeMonthlyReportText(o.id)+'</td><td>'+escapeMonthlyReportText(o.name)+'</td><td>'+escapeMonthlyReportText(o.service)+'</td><td>₹'+o.charge.toFixed(2)+'</td><td>'+escapeMonthlyReportText(o.status)+'</td></tr>';}).join('') : '<tr><td colspan="6" style="text-align:center;">Is mahine koi order nahi mila.</td></tr>';
+        creditList.sort(function(a,b){return String(a.date).localeCompare(String(b.date));});
+        creditBody.innerHTML = creditList.length ? creditList.map(function(x){return '<tr><td>'+escapeMonthlyReportText(x.date)+'</td><td>'+escapeMonthlyReportText(x.name)+'</td><td>'+escapeMonthlyReportText(x.type)+'</td><td>₹'+x.amount.toFixed(2)+'</td><td>'+escapeMonthlyReportText(x.ref)+'</td></tr>';}).join('') : '<tr><td colspan="5" style="text-align:center;">Is mahine koi approved recharge / wallet transfer nahi mila.</td></tr>';
+      } catch (err) {
+        console.error('Monthly retailer report error:',err);
+        summaryBody.innerHTML = '<tr><td colspan="10" style="color:#dc2626;">Report load nahi hui: '+escapeMonthlyReportText(err.message || err)+'</td></tr>';
+        orderBody.innerHTML = '<tr><td colspan="6" style="color:#dc2626;">Data load error.</td></tr>';
+        creditBody.innerHTML = '<tr><td colspan="5" style="color:#dc2626;">Data load error.</td></tr>';
+      }
+    }
+
+    function escapeMonthlyReportText(value) {
+      return String(value == null ? '' : value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
     }
 
     function openAdminLedgerPanel() {
