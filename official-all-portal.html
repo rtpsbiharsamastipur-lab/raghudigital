@@ -87,12 +87,11 @@ body.retailer-view .grid a[href="https://yashportal.in/members/login"]{display:n
  try{var savedPortalUser=JSON.parse(localStorage.getItem("raghu_active_user")||"null");if(savedPortalUser&&savedPortalUser.role==="admin")isAdminPortal=true;}catch(e){}
  var grid=document.querySelector(".grid"), input=document.getElementById("portalSearch"), clear=document.getElementById("clearSearch");
  if(!grid||!input)return;
- if(!isAdminPortal){
-   grid.querySelectorAll('a[href="https://printscards.com/login"],a[href="https://yashportal.in/members/login"]').forEach(function(card){card.remove();});
- }
  var cards=Array.prototype.slice.call(grid.querySelectorAll("a[href]"));
  var info=[
  ["NPCI Aadhaar Seeding / DBT","NPCI BASE Portal","Banking","NPCI Aadhaar bank DBT seeding","🏦","NPCI"],
+ ["Printscards Login","Printscards Login Portal","Others","printscards print cards","🖨️","PRINT"],
+ ["Yash Portal Login","Yash Portal Members Login","Others","yash portal","🌐","YASH"],
  ["Electricity Bill Check / Pay","NBPDCL Official Portal","Utility","electricity bijli bill north bihar power","⚡","NBPDCL"],
  ["Aadhaar Download / My Aadhaar","UIDAI Official Portal","Aadhaar","aadhaar aadhar uidai download","🪪","AADHAAR"],
  ["Aadhaar Status Check","UIDAI Status Portal","Aadhaar","aadhaar aadhar uidai status","🪪","AADHAAR"],
@@ -154,6 +153,10 @@ body.retailer-view .grid a[href="https://yashportal.in/members/login"]{display:n
   var arrow=document.createElement("span");arrow.className="portal-arrow";arrow.textContent="→";
   card.replaceChildren(mark,copy,arrow);
  });
+ if(!isAdminPortal){
+   grid.querySelectorAll('a[href="https://printscards.com/login"],a[href="https://yashportal.in/members/login"]').forEach(function(card){card.remove();});
+   cards=Array.prototype.slice.call(grid.querySelectorAll("a[href]"));
+ }
  var chips=Array.prototype.slice.call(document.querySelectorAll(".filter-chip")), active="All";
  var empty=document.getElementById("emptyState");
  if(!empty){empty=document.createElement("div");empty.id="emptyState";empty.className="empty-state";empty.textContent="No matching portals found. Try another keyword.";grid.parentNode.insertBefore(empty,grid.nextSibling);}
